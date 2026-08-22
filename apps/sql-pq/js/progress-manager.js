@@ -37,8 +37,20 @@
 
   let state = load();
 
+  let _saveFailWarned = false; // biar peringatan cuma sekali per sesi
   function persist() {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage full/unavailable — ignore */ }
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+    } catch (e) {
+      // Data safety (bagian 30): sebelumnya kegagalan simpan progress (XP/streak/
+      // riwayat) sepenuhnya senyap — siswa bisa kehilangan progres tanpa tahu.
+      if (!_saveFailWarned) {
+        _saveFailWarned = true;
+        if (global.UI && typeof global.UI.toast === 'function') {
+          global.UI.toast('Penyimpanan progres gagal (penyimpanan browser penuh/mode privat). XP mungkin tidak tersimpan permanen.', 'err');
+        }
+      }
+    }
   }
 
   function todayStr() { return new Date().toISOString().slice(0, 10); }

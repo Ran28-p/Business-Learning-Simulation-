@@ -6,6 +6,7 @@
  * case-exercise engine's state.
  */
 import { saveTaxState, loadTaxState } from '../storage/localStorage.js';
+import { showToast } from '../presentation/modals.js';
 import { TAX_STATUS, TAX_MODE, DEFAULT_VAT_RATE_PERCENT } from './taxConstants.js';
 
 function defaultState() {
@@ -166,8 +167,18 @@ export function ensureDemoData(opts = {}) {
   return changed;
 }
 
+let _taxSaveFailWarned = false; // biar peringatan cuma sekali per sesi, tidak spam toast di tiap aksi
+
 export function persistTaxState() {
-  saveTaxState(state);
+  const ok = saveTaxState(state);
+  // Data safety (bagian 30): dipanggil dari 23+ tempat setiap invoice/transaksi/
+  // partner ditambah — sebelumnya kalau localStorage penuh/mode privat, semua
+  // data pajak/invoice yang baru diinput bisa hilang tanpa peringatan sama sekali.
+  if (!ok && !_taxSaveFailWarned) {
+    _taxSaveFailWarned = true;
+    showToast('⚠️ Penyimpanan otomatis modul Pajak/Invoice gagal (penyimpanan browser penuh atau mode privat). Data terbaru mungkin tidak tersimpan.');
+  }
+  return ok;
 }
 
 /* ─── Getters ─── */

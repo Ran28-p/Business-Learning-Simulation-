@@ -35,6 +35,7 @@
     }
   }
 
+  let _careerSaveFailWarned = false; // biar peringatan cuma sekali per sesi
   function saveProgress(patch) {
     const cur = loadProgress();
     const next = Object.assign({}, cur, patch, { updatedAt: Date.now() });
@@ -42,6 +43,12 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch (e) {
       console.warn("Gagal simpan progress Tax Career:", e);
+      // Data safety (bagian 30): sebelumnya kegagalan ini sepenuhnya senyap —
+      // hasil simulasi karier (skor/kasus selesai) bisa hilang tanpa peringatan.
+      if (!_careerSaveFailWarned) {
+        _careerSaveFailWarned = true;
+        alert('⚠️ Penyimpanan progres Tax Career gagal (penyimpanan browser penuh atau mode privat). Progres mungkin tidak tersimpan.');
+      }
     }
     return next;
   }

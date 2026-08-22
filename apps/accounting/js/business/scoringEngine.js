@@ -16,6 +16,7 @@
 
 import { saveAppState, loadAppState } from '../storage/localStorage.js';
 import { STORAGE_KEYS } from '../utils/constants.js';
+import { showToast } from '../presentation/modals.js';
 
 /* ═══════════════════════════════════════════════════════════
    WEIGHTS & CONSTANTS
@@ -124,12 +125,21 @@ export function loadProgress() {
   return getProgress();
 }
 
+let _scoreSaveFailWarned = false; // biar peringatan cuma sekali per sesi
+
 export function saveProgress() {
   try {
     const toSave = { ...progress };
     // Don't persist session timers as stale
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(toSave));
-  } catch (_) { /* ignore */ }
+  } catch (_) {
+    // Data safety (bagian 30): ini menyimpan XP/skor/akurasi tiap kali siswa
+    // menjawab — sebelumnya kegagalan simpan di sini sepenuhnya senyap.
+    if (!_scoreSaveFailWarned) {
+      _scoreSaveFailWarned = true;
+      showToast('⚠️ Penyimpanan skor gagal (penyimpanan browser penuh atau mode privat). Progres skor mungkin tidak tersimpan.');
+    }
+  }
 }
 
 export function getProgress() {
