@@ -1,0 +1,10 @@
+{
+  "name": "accounting-simulator",
+  "version": "1.0.0",
+  "description": "Simulator siklus akuntansi (jurnal, buku besar, neraca saldo, penyesuaian, worksheet, laporan keuangan, penutupan) berbasis HTML/CSS/JavaScript murni, berjalan sepenuhnya di browser tanpa backend. File ini HANYA dipakai untuk menjalankan pengujian otomatis (tests/) -- aplikasinya sendiri TIDAK butuh npm install atau proses build apa pun, cukup dibuka lewat server statis.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/test-accounting-engine.mjs"
+  }
+}

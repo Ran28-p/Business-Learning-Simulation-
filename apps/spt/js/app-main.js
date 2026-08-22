@@ -1374,6 +1374,89 @@ function logoutUser() {
             });
         }
 
+        /**
+         * downloadFormPDF — generator PDF generik untuk formulir 1770 & 1771
+         * (bagian 17: "Cetak Formulir" / "Download PDF" — sebelumnya kedua
+         * formulir ini TIDAK punya cara export sama sekali, hanya hasil akhir
+         * simulasi yang bisa diunduh).
+         *
+         * Dua masalah teknis yang wajib ditangani supaya PDF tidak kosong/rusak:
+         *  1. Formulir memakai tab (hanya 1 lampiran tampil lewat inline
+         *     style.display) — clone standar cuma akan berisi tab yang aktif
+         *     saat tombol diklik. Semua lampiran dipaksa tampil di clone.
+         *  2. cloneNode() TIDAK menangkap nilai <input>/<select> yang sedang
+         *     diisi user (hanya atribut HTML awal) — tanpa langkah tambahan,
+         *     PDF akan menampilkan formulir kosong walau siswa sudah mengisi
+         *     penuh. Setiap input/select diganti teks statis berisi nilai
+         *     LIVE-nya, dicocokkan berdasarkan urutan posisi (bukan id) supaya
+         *     baris dinamis (harta, bukti potong, dll., yang idnya tidak
+         *     selalu unik) tetap ikut tertangani dengan benar.
+         */
+        function downloadFormPDF(viewId, fieldPrefix, tabCount, formLabel) {
+            const source = document.getElementById(viewId);
+            if (!source) {
+                alert('❌ Area formulir tidak ditemukan.');
+                return;
+            }
+            if (!window.PDFExport) {
+                alert('❌ Mesin PDF tidak tersedia. Coba muat ulang halaman.');
+                return;
+            }
+
+            const titleEl = document.getElementById(fieldPrefix + '-title');
+            const caseName = titleEl ? titleEl.innerText.trim() : 'Kasus';
+            const filename = `Formulir_${formLabel}_${caseName.replace(/[^a-zA-Z0-9]+/g, '_') || 'Kasus'}.pdf`;
+
+            window.PDFExport.exportElementToPDF(source, {
+                filename,
+                widthPx: 780,
+                scale: 2,
+                onClone: (clone) => {
+                    // 1. Tampilkan SEMUA lampiran, bukan cuma tab yang aktif.
+                    for (let n = 1; n <= tabCount; n++) {
+                        const sheet = clone.querySelector('#' + fieldPrefix + '-tab-' + n);
+                        if (sheet) sheet.style.display = 'block';
+                    }
+                    // 2. Buang navigasi tab — tidak relevan begitu semua lampiran tampil.
+                    clone.querySelectorAll('.form1770-tabs').forEach((el) => el.remove());
+
+                    // 3. Ganti tiap input/select dengan teks statis berisi nilai SEKARANG.
+                    const liveFields = source.querySelectorAll('input, select, textarea');
+                    const cloneFields = clone.querySelectorAll('input, select, textarea');
+                    liveFields.forEach((liveEl, i) => {
+                        const cloneEl = cloneFields[i];
+                        if (!cloneEl) return;
+                        let text;
+                        if (liveEl.tagName === 'SELECT') {
+                            const opt = liveEl.options[liveEl.selectedIndex];
+                            text = opt ? opt.textContent.trim() : '';
+                        } else {
+                            text = (liveEl.value || '').trim();
+                        }
+                        const span = document.createElement('span');
+                        span.textContent = text || '—';
+                        span.style.cssText = 'display:inline-block;padding:4px 6px;border-bottom:1px solid #94a3b8;min-width:60px;font-size:9.5pt;';
+                        cloneEl.replaceWith(span);
+                    });
+
+                    // 4. Rapikan tampilan cetak.
+                    clone.style.boxShadow = 'none';
+                    clone.style.padding = '14px';
+                    clone.querySelectorAll('.form1770-sheet').forEach((el) => {
+                        el.style.boxShadow = 'none';
+                        el.style.border = '1px solid #cbd5e1';
+                        el.style.marginBottom = '14px';
+                    });
+                }
+            }).catch((err) => {
+                console.error('[downloadFormPDF:' + fieldPrefix + ']', err);
+                alert('❌ ' + (err.message || 'Gagal membuat PDF formulir.'));
+            });
+        }
+
+        function downloadForm1770PDF() { downloadFormPDF('view-form1770', 'f1770', 5, '1770'); }
+        function downloadForm1771PDF() { downloadFormPDF('view-form1771', 'f1771', 6, '1771'); }
+
         function toggleTheme() {
             const body = document.body;
             if(body.getAttribute('data-theme') === 'dark') {

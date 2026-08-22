@@ -69,6 +69,15 @@ input[type="text"], input[type="month"] { border: 1px solid #999; padding: 5px; 
         -webkit-overflow-scrolling: touch;
     }
 
+    /* .matrix-table dipakai Lampiran II/III/IV (didefinisikan inline per
+       halaman) — sebelumnya tidak ikut aturan scroll ini sama sekali,
+       jadi berisiko overflow horizontal di layar sempit. */
+    .matrix-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .spt-header {
         flex-wrap: wrap;
         gap: 10px;
@@ -90,4 +99,32 @@ input[type="text"], input[type="month"] { border: 1px solid #999; padding: 5px; 
     }
 
     .npwp-inputs { flex-wrap: wrap; row-gap: 6px; }
+}
+/* ══════════════════════════════════════════════════════════════════
+   PRINT STYLESHEET (bagian 17 — audit PDF): modul ini sebelumnya
+   TIDAK punya fitur cetak/PDF sama sekali. Karena halaman ini
+   memang dirancang meniru tampilan formulir resmi, native browser
+   print (Ctrl+P → Simpan sebagai PDF) dipakai — lebih presisi untuk
+   dokumen resmi seperti ini dibanding rendering via canvas.
+   ══════════════════════════════════════════════════════════════════ */
+@media print {
+    body { background: #fff !important; padding: 0 !important; }
+    .spt-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 10mm !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    #mode-panel,
+    .action-buttons,
+    .no-print { display: none !important; }
+
+    input, select, textarea {
+        border: none !important;
+        background: transparent !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    table { page-break-inside: avoid; }
+    .spt-section { page-break-inside: avoid; }
 }
