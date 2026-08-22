@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>SPT 1771 Lampiran III - Kredit Pajak Dalam Negeri</title>
+    <link rel="stylesheet" href="style_formulir.css">
+    <style>
+        .matrix-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .matrix-table th, .matrix-table td { border: 1px solid black; padding: 5px; vertical-align: middle; }
+        .matrix-table th { background-color: #d9d9d9; text-align: center; }
+        .input-matrix { width: 100%; border: none; text-align: left; background: transparent; font-size: 12px; }
+        .input-matrix:focus { outline: 2px solid #004b87; background-color: #fff; }
+        .input-num { width: 100%; border: none; text-align: right; background: transparent; font-family: 'Courier New', monospace; font-size: 13px; }
+        .input-num:focus { outline: 2px solid #004b87; background-color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="spt-container" style="max-width: 1100px;">
+        <div class="spt-header">
+            <div class="header-left">KEMENTERIAN KEUANGAN RI<br>DIREKTORAT JENDERAL PAJAK</div>
+            <div class="header-center">
+                <h2>LAMPIRAN - III</h2>
+                <p><b>KREDIT PAJAK DALAM NEGERI</b></p>
+            </div>
+            <div class="header-right"><div class="form-name">1771 - III</div></div>
+        </div>
+        <hr class="thick-line">
+
+        <div class="spt-section">
+            <table class="form-table" style="border: none;">
+                <tr>
+                    <td width="200">NPWP</td><td width="10">:</td>
+                    <td><input type="text" class="medium-input" id="npwp_lampiran" readonly style="background: #e9ecef;"></td>
+                </tr>
+                <tr>
+                    <td>NAMA WAJIB PAJAK</td><td width="10">:</td>
+                    <td><input type="text" class="long-input" id="nama_wp_lampiran" readonly style="background: #e9ecef;"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="spt-section">
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2" width="30">NO</th>
+                        <th colspan="2">PEMOTONG / PEMUNGUT PAJAK</th>
+                        <th rowspan="2">JENIS PENGHASILAN</th>
+                        <th rowspan="2" width="140">JUMLAH BRUTO (Rupiah)</th>
+                        <th rowspan="2" width="140">PPH DIPOTONG (Rupiah)</th>
+                        <th colspan="2">BUKTI PEMOTONGAN</th>
+                    </tr>
+                    <tr>
+                        <th>NAMA</th>
+                        <th width="130">NPWP</th>
+                        <th width="100">NOMOR</th>
+                        <th width="80">TANGGAL</th>
+                    </tr>
+                    <tr style="background: #f8f9fa; text-align: center; font-size: 11px;">
+                        <td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td><td>(5)</td><td>(6)</td><td>(7)</td><td>(8)</td>
+                    </tr>
+                </thead>
+                <tbody id="tableL3Body">
+                    <!-- Baris interaktif via JS -->
+                </tbody>
+                <tfoot>
+                    <tr style="font-weight: bold; background-color: #f0f2f5;">
+                        <td colspan="5" style="text-align: right;">TOTAL KREDIT PAJAK (Pindahkan ke Induk Angka 15):</td>
+                        <td><input type="text" class="input-num readonly" id="total_pph_dipotong" value="0" readonly style="color: #0c5460;"></td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div style="padding: 10px;">
+                <button type="button" id="addRowBtn" style="padding: 5px 15px; background: #004b87; color: white; border: none; cursor: pointer; border-radius: 4px;">+ Tambah Baris Bukti Potong</button>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button id="btnSalinL3" class="btn-save" style="background-color: #17a2b8;">Simpan & Salin ke Form Induk</button>
+            <button id="btnResetL3" class="btn-back" style="background-color: #6c757d;" type="button">Reset Lampiran Ini</button>
+            <a href="1771_induk.html" class="btn-back" style="background-color: #6c757d;">Kembali ke Form Induk</a>
+        </div>
+    </div>
+    <script src="script_Lampiran_III.js"></script>
+</body>
+</html>

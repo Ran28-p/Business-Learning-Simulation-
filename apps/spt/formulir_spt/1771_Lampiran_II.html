@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>SPT 1771 Lampiran II - Perincian Biaya</title>
+    <link rel="stylesheet" href="style_formulir.css">
+    <style>
+        .matrix-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .matrix-table th, .matrix-table td { border: 1px solid black; padding: 5px; vertical-align: middle; }
+        .matrix-table th { background-color: #d9d9d9; text-align: center; }
+        .col-amount { width: 150px; }
+        .total-row td { font-weight: bold; background-color: #f0f2f5; }
+        .input-matrix { width: 100%; border: none; text-align: right; background: transparent; font-family: 'Courier New', Courier, monospace; font-size: 14px;}
+        .input-matrix:focus { outline: 2px solid #004b87; background-color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="spt-container" style="max-width: 1100px;">
+        <!-- Header -->
+        <div class="spt-header">
+            <div class="header-left">KEMENTERIAN KEUANGAN RI<br>DIREKTORAT JENDERAL PAJAK</div>
+            <div class="header-center">
+                <h2>LAMPIRAN - II</h2>
+                <p><b>PERINCIAN HARGA POKOK PENJUALAN, BIAYA USAHA LAINNYA,<br>DAN BIAYA DARI LUAR USAHA SECARA KOMERSIAL</b></p>
+            </div>
+            <div class="header-right"><div class="form-name">1771 - II</div></div>
+        </div>
+        <hr class="thick-line">
+
+        <!-- Identitas -->
+        <div class="spt-section">
+            <table class="form-table" style="border: none;">
+                <tr>
+                    <td width="200">NPWP</td><td width="10">:</td>
+                    <td><input type="text" class="medium-input" id="npwp_lampiran" readonly style="background: #e9ecef;"></td>
+                </tr>
+                <tr>
+                    <td>NAMA WAJIB PAJAK</td><td>:</td>
+                    <td><input type="text" class="long-input" id="nama_wp_lampiran" readonly style="background: #e9ecef;"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Matriks Biaya -->
+        <div class="spt-section">
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th width="30">NO</th>
+                        <th>PERINCIAN</th>
+                        <th class="col-amount">HARGA POKOK PENJUALAN (Rupiah)</th>
+                        <th class="col-amount">BIAYA USAHA LAINNYA (Rupiah)</th>
+                        <th class="col-amount">BIAYA DARI LUAR USAHA (Rupiah)</th>
+                        <th class="col-amount">JUMLAH (Rupiah)<br><span style="font-size:10px">(3) + (4) + (5)</span></th>
+                    </tr>
+                    <tr style="background-color: #f8f9fa; font-size: 11px; text-align: center;">
+                        <td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td><td>(5)</td><td>(6)</td>
+                    </tr>
+                </thead>
+                <tbody id="matrixBody">
+                    <!-- Baris di-generate via JS agar rapi -->
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="2" style="text-align: right; padding-right: 20px;">14. JUMLAH (1 s.d 13)</td>
+                        <td><input type="text" class="input-matrix readonly" id="total_hpp" value="0" readonly style="color: #0c5460;"></td>
+                        <td><input type="text" class="input-matrix readonly" id="total_biaya_usaha" value="0" readonly style="color: #0c5460;"></td>
+                        <td><input type="text" class="input-matrix readonly" id="total_biaya_luar" value="0" readonly style="color: #0c5460;"></td>
+                        <td><input type="text" class="input-matrix readonly" id="total_semua" value="0" readonly></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Info & Navigasi -->
+        <div style="background-color: #e2f3f5; padding: 10px; margin-bottom: 20px; font-size: 13px; border-left: 4px solid #17a2b8;">
+            <b>Petunjuk:</b> Total pada Kolom (3), (4), dan (5) akan disalin masing-masing ke Lampiran I baris 1b, 1c, dan 1f.
+        </div>
+        <div class="action-buttons">
+            <button id="btnSalinL2" class="btn-save" style="background-color: #17a2b8;">Simpan & Salin ke Lampiran I</button>
+            <button id="btnResetL2" class="btn-back" style="background-color: #6c757d;" type="button">Reset Lampiran Ini</button>
+            <a href="1771_Lampiran_I.html" class="btn-back" style="background-color: #6c757d;">Kembali ke Lampiran I</a>
+        </div>
+    </div>
+    <script src="script_Lampiran_II.js"></script>
+</body>
+</html>

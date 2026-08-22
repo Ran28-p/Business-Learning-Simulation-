@@ -1,0 +1,18 @@
+# Dependencies (reinstall via npm in apps/excel when needed for tests)
+node_modules/
+npm-debug.log*
+package-lock.json.bak
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+# Build / test scratch
+*.log
+coverage/
+dist/
+.tmp/

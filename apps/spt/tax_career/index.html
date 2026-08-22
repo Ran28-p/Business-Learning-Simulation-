@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Tax Career &amp; Practice — SIM-SPT</title>
+  <meta name="description" content="Latihan pekerjaan nyata: Tax Compliance, Accountant, Consultant, Planner, Auditor, dan Manager — terhubung ke simulator SPT." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../../../css/responsive-foundation.css" />
+</head>
+<body>
+  <div class="tc-shell">
+    <header class="tc-top">
+      <div>
+        <a class="tc-back" href="../index.html">← Kembali ke SIM-SPT</a>
+        <h1>Tax Career &amp; Practice</h1>
+        <p class="lead">
+          Belajar pekerjaan nyata di bidang perpajakan lewat pola
+          <strong>Learn → Practice → Review → Result</strong>.
+          Modul ini memperkuat simulator SPT (termasuk 1771), bukan menggantikannya.
+        </p>
+      </div>
+    </header>
+
+    <!-- HUB -->
+    <section class="tc-screen active" data-screen="hub" id="tcScreenHub">
+      <div class="tc-grid" id="tcHubGrid"></div>
+    </section>
+
+    <!-- LEARN -->
+    <section class="tc-screen" data-screen="learn" id="tcScreenLearn">
+      <div class="tc-panel" id="tcLearnPanel"></div>
+    </section>
+
+    <!-- PRACTICE -->
+    <section class="tc-screen" data-screen="practice" id="tcScreenPractice">
+      <div class="tc-panel" id="tcPracticePanel"></div>
+    </section>
+
+    <!-- RESULT -->
+    <section class="tc-screen" data-screen="result" id="tcScreenResult">
+      <div class="tc-panel" id="tcResultPanel"></div>
+    </section>
+
+    <!-- COMMERCIAL & FISCAL -->
+    <section class="tc-screen" data-screen="cf-hub" id="tcScreenCfHub">
+      <div id="tcCfHub"></div>
+    </section>
+    <section class="tc-screen" data-screen="cf-work" id="tcScreenCfWork">
+      <div class="tc-panel" id="tcCfWork"></div>
+    </section>
+
+    <!-- TAX AUDITOR -->
+    <section class="tc-screen" data-screen="aud-hub" id="tcScreenAudHub">
+      <div id="tcAudHub"></div>
+    </section>
+    <section class="tc-screen" data-screen="aud-work" id="tcScreenAudWork">
+      <div class="tc-panel" id="tcAudWork"></div>
+    </section>
+  </div>
+
+  <script src="data/tracks.js"></script>
+  <script src="data/questions.js"></script>
+  <script src="data/commercial-fiscal.js"></script>
+  <script src="data/tax-auditor.js"></script>
+  <script src="js/cross-check-engine.js"></script>
+  <script src="app.js"></script>
+  <script src="../../../js/back-to-portal.js"></script>
+</body>
+</html>

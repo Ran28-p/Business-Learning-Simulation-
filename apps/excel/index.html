@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Excel Formula Practice Generator</title>
+<meta name="description" content="Latihan rumus Microsoft Excel bertahap dengan dataset realistis, spreadsheet interaktif, dan pemeriksaan jawaban otomatis." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css" />
+<link rel="stylesheet" href="./css/responsive.css" />
+<link rel="stylesheet" href="../../css/responsive-foundation.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ======================= HEADER ======================= -->
+  <header class="app-header">
+    <div class="app-header__brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="28" height="28" rx="6" fill="var(--efpg-green-700)"/>
+          <path d="M9 9h14M9 15.5h14M9 22h14M13.5 9v13M18.5 9v13" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <span class="brand-title">Excel Formula Practice Generator</span>
+        <span class="brand-subtitle">Latihan rumus Excel dari dataset nyata</span>
+      </div>
+    </div>
+    <div class="app-header__meta">
+      <a class="badge-pill" href="pivot-dashboard/index.html" style="text-decoration:none;">🧮 Latihan Baru: Pivot &amp; Dashboard</a>
+      <span class="badge-pill" id="datasetStatusPill">Belum ada dataset</span>
+    </div>
+  </header>
+
+  <div class="app-body">
+
+    <!-- ======================= SIDEBAR ======================= -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav" aria-label="Navigasi materi">
+        <p class="sidebar-nav__label">Materi Dataset</p>
+        <ul class="dataset-nav" id="datasetNav">
+          <!-- diisi oleh app.js dari DATASET_GENERATORS -->
+        </ul>
+      </nav>
+
+      <nav class="sidebar-nav" aria-label="Navigasi level">
+        <p class="sidebar-nav__label">Level Latihan</p>
+        <ol class="level-path" id="levelPath">
+          <!-- diisi oleh app.js -->
+        </ol>
+      </nav>
+
+      <div class="sidebar-progress" id="sidebarProgress">
+        <p class="sidebar-nav__label">Progres Kamu</p>
+        <div class="progress-stat">
+          <span class="progress-stat__value" id="statXp">0</span>
+          <span class="progress-stat__label">Total XP</span>
+        </div>
+        <div class="progress-mini-grid">
+          <div><span id="statSoal">0</span><small>Soal dikerjakan</small></div>
+          <div><span id="statBenar">0</span><small>Jawaban benar</small></div>
+          <div><span id="statPersen">0%</span><small>Persentase</small></div>
+        </div>
+        <div class="badge-row" id="badgeRow"></div>
+        <button class="btn btn--ghost btn--small" id="btnDownloadProgressPdf" type="button">Download Laporan PDF</button>
+        <button class="btn btn--ghost btn--small" id="btnResetProgress" type="button">Reset Progres</button>
+      </div>
+    </aside>
+
+    <!-- ======================= MAIN CONTENT ======================= -->
+    <main class="main-content">
+
+      <!-- ---------- Panel Pengaturan Latihan ---------- -->
+      <section class="panel setup-panel" id="setupPanel" aria-labelledby="setupPanelTitle">
+        <h2 id="setupPanelTitle">Atur Latihan</h2>
+        <p class="panel-description">Pilih materi, level, dan jumlah data, lalu buat dataset untuk mulai berlatih.</p>
+
+        <div class="setup-grid">
+          <div class="setup-field">
+            <label for="jumlahDataSelect">Jumlah Data</label>
+            <select id="jumlahDataSelect">
+              <option value="10">10 baris</option>
+              <option value="25" selected>25 baris</option>
+              <option value="50">50 baris</option>
+              <option value="100">100 baris</option>
+              <option value="500">500 baris (bisa terasa berat)</option>
+              <option value="1000">1.000 baris (bisa terasa berat)</option>
+              <option value="custom">Jumlah khusus…</option>
+            </select>
+            <input type="number" id="jumlahDataCustom" min="1" max="5000" placeholder="Masukkan jumlah baris (1-5000)" hidden />
+          </div>
+
+          <div class="setup-field">
+            <label for="seedInput">Seed Dataset (opsional)</label>
+            <div class="seed-row">
+              <input type="text" id="seedInput" placeholder="Kosongkan untuk acak" />
+              <button class="btn btn--ghost btn--small" id="btnRandomSeed" type="button" title="Acak seed baru">🎲</button>
+            </div>
+            <small class="field-hint">Seed yang sama akan menghasilkan dataset yang persis sama.</small>
+          </div>
+        </div>
+
+        <div class="setup-actions">
+          <button class="btn btn--primary" id="btnGenerateDataset" type="button">Buat Dataset</button>
+        </div>
+
+        <p class="setup-note" id="setupSelectionNote">Materi aktif: <strong>Penjualan</strong> · Level aktif: <strong>Level 1 — Pemula</strong></p>
+      </section>
+
+      <!-- ---------- Workspace (muncul setelah dataset dibuat) ---------- -->
+      <section class="panel workspace-panel" id="workspacePanel" hidden aria-labelledby="workspaceTitle">
+
+        <div class="workspace-toolbar">
+          <div class="workspace-toolbar__info">
+            <h2 id="workspaceTitle">Lembar Kerja — <span id="datasetLabelText">Penjualan</span></h2>
+            <p id="datasetMetaText" class="panel-description">—</p>
+          </div>
+          <div class="workspace-toolbar__actions">
+            <button class="btn btn--ghost btn--small" id="btnResetSheet" type="button">Reset Sel</button>
+            <button class="btn btn--ghost btn--small" id="btnRegenerateDataset" type="button">Generate Ulang</button>
+          </div>
+        </div>
+
+        <div class="workspace-grid">
+
+          <!-- Kolom kiri: spreadsheet -->
+          <div class="spreadsheet-column">
+            <div class="formula-bar">
+              <div class="formula-bar__namebox" id="nameBox">A1</div>
+              <div class="formula-bar__fx" aria-hidden="true">fx</div>
+              <input type="text" class="formula-bar__input" id="formulaBarInput" autocomplete="off" spellcheck="false" placeholder="Ketik nilai atau rumus (mis. =SUM(H2:H26)) lalu tekan Enter" />
+            </div>
+            <div class="sheet-tabs" id="sheetTabs"></div>
+            <div class="spreadsheet-scroll" id="spreadsheetScroll">
+              <table class="spreadsheet-table" id="spreadsheetTable"></table>
+            </div>
+          </div>
+
+          <!-- Kolom kanan: soal & evaluasi -->
+          <div class="side-column">
+
+            <div class="panel question-panel" id="questionPanel">
+              <div class="question-panel__header">
+                <span class="chip chip--level" id="questionLevelChip">Level 1</span>
+                <h3 id="questionTitle">—</h3>
+              </div>
+              <p id="questionInstruction">Klik "Unduh File Excel" untuk mengunduh workbook .xlsx berisi Sheet 1 dataset dan Sheet 2 soal serta kunci jawaban.</p>
+              <p class="question-target">
+                Sel jawaban:
+                <button class="cell-link" id="btnJumpToTarget" type="button">—</button>
+              </p>
+
+              <div class="question-actions">
+                <button class="btn btn--primary" id="btnStartPractice" type="button">Export Excel (download .xlsx)</button>
+                <button class="btn btn--warning" id="btnHint" type="button" hidden>Petunjuk</button>
+                <button class="btn btn--success" id="btnCheckAnswer" type="button" hidden>Periksa Jawaban</button>
+                <button class="btn btn--ghost" id="btnExplain" type="button" hidden>Lihat Pembahasan</button>
+                <button class="btn btn--primary" id="btnNextQuestion" type="button" hidden>Soal Berikutnya</button>
+              </div>
+            </div>
+
+            <div class="panel question-queue-panel" id="questionQueuePanel" hidden>
+              <div class="question-queue-panel__header">
+                <h4>Daftar Soal</h4>
+                <span id="questionQueueMeta">0/0 soal</span>
+              </div>
+              <div class="question-queue-list" id="questionQueueList"></div>
+            </div>
+
+            <div class="panel result-panel" id="resultPanel" hidden>
+              <p class="result-status" id="resultStatus"></p>
+              <p class="result-message" id="resultMessage"></p>
+              <div class="result-values" id="resultValues"></div>
+            </div>
+
+            <div class="panel hint-panel" id="hintPanel" hidden>
+              <h4>Petunjuk</h4>
+              <ol id="hintList"></ol>
+            </div>
+
+            <div class="panel explanation-panel" id="explanationPanel" hidden>
+              <h4>Pembahasan</h4>
+              <p id="explanationText"></p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="app-footer">
+    <span>Excel Formula Practice Generator · Tahap 1 (MVP) · Berjalan sepenuhnya di browser, tanpa server</span>
+  </footer>
+</div>
+
+<script src="./vendor/exceljs/exceljs.min.js"></script>
+<script src="./js/export/workbook-theme.js"></script>
+<script src="./js/export/format-engine.js"></script>
+<script src="./js/export/workbook-blueprint.js"></script>
+<script src="./js/export/workbook-renderer.js"></script>
+<script src="../../js/shared/pdf-export.js"></script>
+<script type="module" src="./js/app.js"></script>
+  <script src="../../js/back-to-portal.js"></script>
+
+  <!-- PWA: daftarkan service worker (gratis, agar modul bisa dibuka offline) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').catch(function(err) {
+                console.warn('Service worker gagal didaftarkan (app tetap jalan normal seperti web biasa):', err);
+            });
+        });
+    }
+  </script>
+</body>
+</html>

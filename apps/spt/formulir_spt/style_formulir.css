@@ -1,0 +1,93 @@
+* { box-sizing: border-box; font-family: Arial, sans-serif; }
+body { background-color: #f0f2f5; padding: 20px; }
+.spt-container { max-width: 900px; margin: 0 auto; background-color: white; padding: 30px; border: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.spt-header { display: flex; justify-content: space-between; text-align: center; margin-bottom: 10px; }
+.header-left, .header-right { font-size: 12px; font-weight: bold; width: 20%; }
+.header-center h2, .header-center h3 { margin: 5px 0; font-size: 18px; }
+.form-name { font-size: 24px; font-weight: bold; border: 2px solid black; padding: 5px; }
+.thick-line { border: 0; border-top: 3px solid black; margin: 15px 0; }
+.spt-section { border: 2px solid black; margin-bottom: 20px; }
+.section-title { background-color: #d9d9d9; padding: 5px 10px; font-weight: bold; border-bottom: 2px solid black; }
+.form-table { width: 100%; border-collapse: collapse; }
+.form-table td { padding: 8px 10px; font-size: 14px; vertical-align: middle; }
+input[type="text"], input[type="month"] { border: 1px solid #999; padding: 5px; font-size: 14px; text-transform: uppercase; }
+.box-input { width: 40px; text-align: center; letter-spacing: 2px; }
+.klu-input { width: 80px; }
+.long-input { width: 90%; }
+.medium-input { width: 40%; }
+.npwp-inputs { display: flex; align-items: center; gap: 5px; }
+.action-buttons { margin-top: 20px; display: flex; justify-content: space-between; }
+.btn-save, .btn-back { padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; text-decoration: none; border-radius: 5px;}
+.btn-save { background-color: #004b87; color: white; }
+.btn-back { background-color: #c62828; color: white; }
+/* Gaya untuk input nominal uang */
+.amount-input {
+    width: 100%;
+    text-align: right;
+    padding: 6px;
+    border: 1px solid #999;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.amount-input:focus {
+    outline: 2px solid #004b87;
+    background-color: #e6f7ff;
+}
+
+/* Gaya untuk sel hasil rumus (Readonly) */
+.readonly {
+    background-color: #e9ecef;
+    color: #495057;
+    cursor: not-allowed;
+    border: 1px solid #ccc;
+}
+
+.row-num {
+    text-align: center;
+    font-weight: bold;
+    background-color: #f0f2f5;
+    border: 1px solid #ccc;
+}
+
+/* ==========================================================================
+   RESPONSIVE — form ini meniru layout formulir resmi (kolom label lebar
+   tetap via atribut width="..." pada <td>), jadi struktur tabelnya sengaja
+   TIDAK diubah/direflow (supaya tetap terlihat seperti formulir asli).
+   Sebagai gantinya, tabel formulir jadi scroll-container horizontal sendiri
+   di layar sempit — sesuai prinsip "tabel besar boleh scroll horizontal,
+   selama containernya, bukan seluruh halaman".
+   ========================================================================== */
+@media (max-width: 700px) {
+    body { padding: 12px; }
+    .spt-container { padding: 16px; }
+
+    .form-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .spt-header {
+        flex-wrap: wrap;
+        gap: 10px;
+        text-align: left;
+    }
+    .header-left, .header-right {
+        width: auto;
+        flex: 1 1 140px;
+    }
+    .header-center { flex: 1 1 100%; order: -1; text-align: center; }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .btn-save, .btn-back {
+        width: 100%;
+        text-align: center;
+    }
+
+    .npwp-inputs { flex-wrap: wrap; row-gap: 6px; }
+}

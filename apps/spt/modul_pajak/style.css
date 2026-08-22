@@ -1,0 +1,34 @@
+:root{--primary:#004b87;--muted:#6b7a8a;--card:#fff;--border:#dbe9ff;--accent:#e8f4ff}
+*{box-sizing:border-box;font-family:Segoe UI, Arial, sans-serif}
+body{margin:0;background:linear-gradient(180deg,#f7fbff 0%,#f5f7fa 100%);color:#122}
+header{padding:18px 24px;background:linear-gradient(90deg,var(--accent),#fff);border-bottom:1px solid #e1e7ef}
+header h1{margin:0;font-size:1.3rem}
+.container{display:flex;gap:18px;padding:20px}
+.topics{width:260px}
+.topics ul{list-style:none;padding:0}
+.topics li{background:var(--card);padding:10px;border-radius:8px;margin-bottom:8px;cursor:pointer;border:1px solid #e3eefc;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}
+.topics li:hover{transform:translateY(-1px);border-color:var(--primary)}
+.topics li.active{border-color:var(--primary);box-shadow:0 6px 18px rgba(0,75,135,0.06)}
+.content{flex:1}
+.card{background:#fff;padding:18px;border-radius:12px;border:1px solid #e6eef6;box-shadow:0 8px 24px rgba(0,0,0,.03)}
+.btn{background:var(--primary);color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;transition:opacity .15s ease}
+.btn:hover{opacity:.92}
+.btn-outline{background:transparent;border:1px solid #bcd3ef;color:#122}
+.actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+label{display:block;margin-bottom:6px;font-weight:600}
+input[type="text"],input[type="number"],select{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px}
+input[type="radio"]{margin-right:6px}
+.question{margin-bottom:14px;padding:12px;border:1px solid #eef5ff;border-radius:8px;background:#fcfeff}
+.result{margin-top:12px;padding:12px;border-radius:8px;background:#f1fcf6;border:1px solid #d2f1de}
+footer{padding:12px 24px;color:var(--muted);font-size:0.9rem}
+/* Responsiveness untuk layar kecil (Mobile & Tablet) */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Mengubah susunan menjadi atas-bawah */
+        padding: 15px; /* Mengurangi padding agar tidak terlalu sempit di HP */
+    }
+    
+    .topics {
+        width: 100%; /* Membuat menu kiri mengambil lebar penuh */
+    }
+}

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SQL &amp; Power Query Learning Simulator</title>
+<meta name="description" content="Simulator belajar SQL dan Power Query dari pemula sampai mahir — dataset realistis, SQL editor sungguhan di browser, dan simulasi transformasi Power Query." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css" />
+<link rel="stylesheet" href="../../css/knowledge-base.css" />
+<link rel="stylesheet" href="../../css/responsive-foundation.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ======================= HEADER ======================= -->
+  <header class="app-header">
+    <div class="app-header__brand">
+      <button type="button" class="icon-btn mobile-nav-toggle" id="btnMobileNav" aria-label="Buka navigasi">☰</button>
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="28" height="28" rx="7" fill="#2F55B5"/>
+          <path d="M9 12c0-1.7 2.2-3 5-3s5 1.3 5 3-2.2 3-5 3-5 1.3-5 3 2.2 3 5 3 5-1.3 5-3" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <span class="brand-title">SQL &amp; Power Query Learning Simulator</span>
+        <span class="brand-subtitle">Belajar sambil praktik — dataset nyata, query sungguhan</span>
+      </div>
+    </div>
+    <div class="app-header__actions">
+      <span class="badge-pill" id="engineStatusPill">SQL Engine: memuat…</span>
+      <button type="button" class="icon-btn" id="btnOpenKnowledge" aria-label="Modul Pengetahuan" title="Modul Pengetahuan: SQL & Power Query">📘</button>
+      <button type="button" class="icon-btn" id="btnThemeToggle" aria-label="Ganti tema">🌙</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+    <!-- ======================= SIDEBAR ======================= -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidebar-nav" aria-label="Navigasi utama">
+        <p class="sidebar-nav__label">Menu</p>
+        <ul class="nav-list" id="mainNav">
+          <li><button class="nav-item active" data-tab="dashboard"><span class="ic">🏠</span> Dashboard</button></li>
+          <li><button class="nav-item" data-tab="sql-path"><span class="ic">📘</span> SQL Learning Path</button></li>
+          <li><button class="nav-item" data-tab="pq-path"><span class="ic">📗</span> Power Query Path</button></li>
+          <li><button class="nav-item" data-tab="dataset-gen"><span class="ic">🗄️</span> Dataset Generator</button></li>
+          <li><button class="nav-item" data-tab="sql-sim"><span class="ic">💻</span> SQL Simulator</button></li>
+          <li><button class="nav-item" data-tab="pq-sim"><span class="ic">🔧</span> Power Query Simulator</button></li>
+          <li><button class="nav-item" data-tab="projects"><span class="ic">📁</span> Real-World Project</button></li>
+          <li><button class="nav-item" data-tab="challenge"><span class="ic">🏆</span> Final Challenge</button></li>
+          <li><button class="nav-item" data-tab="cheatsheet"><span class="ic">📎</span> Cheat Sheet</button></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-progress">
+        <div class="progress-stat-row">
+          <div class="progress-stat"><span class="progress-stat__value" id="sbXp">0</span><span class="progress-stat__label">XP</span></div>
+          <div class="progress-stat"><span class="progress-stat__value" id="sbLevel">1</span><span class="progress-stat__label">Level</span></div>
+          <div class="progress-stat"><span class="progress-stat__value" id="sbStreak">0</span><span class="progress-stat__label">Streak</span></div>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="sbLevelBar" style="width:0%"></div></div>
+      </div>
+
+      <div class="sidebar-nav">
+        <p class="sidebar-nav__label">Data</p>
+        <ul class="nav-list">
+          <li><button class="nav-item btn-ghost" id="btnResetProgress" style="border:1px solid var(--sqlpq-line-strong)"><span class="ic">♻️</span> Reset Progress</button></li>
+          <li><button class="nav-item btn-ghost" id="btnExportProgress" style="border:1px solid var(--sqlpq-line-strong)"><span class="ic">⬇️</span> Export Progress</button></li>
+          <li><button class="nav-item btn-ghost" id="btnExportProgressPdf" style="border:1px solid var(--sqlpq-line-strong)"><span class="ic">📄</span> Export Progress (PDF)</button></li>
+          <li><button class="nav-item btn-ghost" id="btnImportProgress" style="border:1px solid var(--sqlpq-line-strong)"><span class="ic">⬆️</span> Import Progress</button></li>
+          <input type="file" id="progressFileInput" accept=".json" style="display:none" />
+        </ul>
+      </div>
+    </aside>
+
+    <!-- ======================= MAIN ======================= -->
+    <main class="main-view">
+
+      <!-- DASHBOARD -->
+      <section class="screen active" id="screen-dashboard">
+        <div class="view-head">
+          <div><h2>Dashboard</h2><p>Ringkasan progres belajar SQL &amp; Power Query kamu.</p></div>
+        </div>
+        <div class="grid grid-4" id="dashStats"></div>
+        <div class="grid grid-2" style="margin-top:16px">
+          <div class="card">
+            <h3>Materi Dikuasai vs Belum</h3>
+            <div id="dashMastery"></div>
+          </div>
+          <div class="card">
+            <h3>Riwayat Latihan Terbaru</h3>
+            <div id="dashHistory"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h3>Mulai Cepat</h3>
+          <div class="btn-row">
+            <button class="btn btn-primary" data-goto="sql-path">📘 Mulai Belajar SQL</button>
+            <button class="btn btn-primary" data-goto="pq-path">📗 Mulai Belajar Power Query</button>
+            <button class="btn btn-secondary" data-goto="sql-sim">💻 Practice Mode</button>
+            <button class="btn btn-secondary" data-goto="challenge">🏆 Challenge Mode</button>
+            <button class="btn btn-secondary" data-goto="dataset-gen">🗄️ Dataset Generator</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SQL LEARNING PATH -->
+      <section class="screen" id="screen-sql-path">
+        <div class="view-head">
+          <div><h2>SQL Learning Path</h2><p>Kurikulum bertahap dari Basic sampai Professional. Klik materi untuk membuka syntax &amp; contoh.</p></div>
+        </div>
+        <div id="sqlPathLevels"></div>
+      </section>
+
+      <!-- POWER QUERY LEARNING PATH -->
+      <section class="screen" id="screen-pq-path">
+        <div class="view-head">
+          <div><h2>Power Query Learning Path</h2><p>Konsep ETL: Extract → Transform → Load, dari import data sampai bahasa M.</p></div>
+        </div>
+        <div id="pqPathGroups"></div>
+      </section>
+
+      <!-- DATASET GENERATOR -->
+      <section class="screen" id="screen-dataset-gen">
+        <div class="view-head">
+          <div><h2>Dataset Generator</h2><p>Buat dataset realistis untuk latihan — bisa bersih atau sengaja "kotor" untuk latihan data cleaning.</p></div>
+        </div>
+        <div class="card">
+          <div class="field-row">
+            <div class="field">
+              <label>Kategori</label>
+              <select id="dgCategory"></select>
+            </div>
+            <div class="field">
+              <label>Jumlah Baris</label>
+              <select id="dgRows"></select>
+            </div>
+            <div class="field">
+              <label>Seed (opsional)</label>
+              <input type="text" id="dgSeed" placeholder="kosongkan = acak" style="min-width:140px" />
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <div class="checkbox-row"><input type="checkbox" id="dgDirty" /> <label for="dgDirty">Sertakan Dirty Data (NULL, duplikat, typo, format tanggal berbeda, nilai ekstrem)</label></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btnGenerateDataset">⚙️ Generate Dataset</button>
+            <button class="btn btn-secondary" id="btnLoadRelational">🔗 Muat Sample Relational DB (untuk JOIN)</button>
+            <button class="btn btn-ghost" id="btnImportCsv">📤 Import CSV</button>
+            <button class="btn btn-ghost" id="btnImportExcel">📊 Import Excel</button>
+            <input type="file" id="csvFileInput" accept=".csv" style="display:none" />
+            <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none" />
+          </div>
+          <small>Isi Seed dengan teks apa saja lalu Generate untuk menghasilkan dataset yang bisa direproduksi persis sama di lain waktu (berguna untuk mengulang soal yang identik).</small>
+        </div>
+        <div class="card" id="dgHistoryCard" style="margin-top:14px;display:none">
+          <h4>Riwayat Dataset</h4>
+          <div id="dgHistoryList"></div>
+        </div>
+        <div class="card" style="margin-top:14px" id="dgPreviewCard" style="display:none">
+          <div class="view-head" style="margin-bottom:8px">
+            <h3 id="dgPreviewTitle">Preview Dataset</h3>
+            <div class="btn-row">
+              <button class="btn btn-sm btn-secondary" id="btnDgUseInSql">Gunakan di SQL Simulator</button>
+              <button class="btn btn-sm btn-secondary" id="btnDgUseInPq">Gunakan di PQ Simulator</button>
+              <button class="btn btn-sm btn-ghost" id="btnDgExportCsv">Export CSV</button>
+              <button class="btn btn-sm btn-ghost" id="btnDgExportExcel">Export Excel</button>
+              <button class="btn btn-sm btn-ghost" id="btnDgExportJson">Export JSON</button>
+              <button class="btn btn-sm btn-ghost" id="btnDgExportSql">Export SQL</button>
+            </div>
+          </div>
+          <div id="dgPreviewTable"></div>
+        </div>
+      </section>
+
+      <!-- SQL SIMULATOR -->
+      <section class="screen" id="screen-sql-sim">
+        <div class="view-head">
+          <div><h2>SQL Simulator</h2><p>Mini database laboratory — tulis &amp; jalankan query SQL sungguhan langsung di browser (SQLite/WASM).</p></div>
+          <div class="field">
+            <label>Level Soal</label>
+            <select id="simLevelSelect">
+              <option value="1">Level 1 — Basic</option>
+              <option value="2">Level 2 — Intermediate</option>
+              <option value="3">Level 3 — JOIN</option>
+              <option value="4">Level 4 — Advanced</option>
+              <option value="5">Level 5 — Professional</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="question-box" id="questionBox" style="display:none">
+          <div class="question-box__level">
+            <span class="diff-badge" id="qLevelBadge">Level 1</span>
+            <span class="tag" id="qConceptTag">-</span>
+          </div>
+          <div class="question-box__prompt" id="qPromptText">-</div>
+        </div>
+        <div class="btn-row" style="margin:10px 0">
+          <button class="btn btn-amber" id="btnNewQuestion">🎲 Soal Baru</button>
+          <button class="btn btn-ghost" id="btnHint">💡 Hint</button>
+          <button class="btn btn-ghost" id="btnExplain">📖 Explain</button>
+        </div>
+        <div id="hintArea"></div>
+
+        <div class="sql-lab">
+          <div class="db-explorer">
+            <h4>Database Explorer</h4>
+            <div id="dbTree"></div>
+            <h4 style="margin-top:10px">Table Info</h4>
+            <div class="schema-mini" id="schemaMini">Pilih tabel untuk melihat struktur.</div>
+          </div>
+          <div class="editor-col" id="editorCol">
+            <div class="btn-row" style="justify-content:flex-end;margin-bottom:-4px">
+              <button class="btn btn-sm btn-ghost" id="btnFullscreenEditor" title="Perbesar area editor (berguna di layar kecil)">⛶ Fullscreen Editor</button>
+            </div>
+            <textarea class="sql-editor" id="sqlEditor" spellcheck="false" placeholder="SELECT * FROM sales LIMIT 10;"></textarea>
+            <small>Tips: <kbd>Ctrl/Cmd+Enter</kbd> = Run Query, <kbd>Ctrl/Cmd+Shift+Enter</kbd> = Submit Answer</small>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="btnRunQuery">▶ Run Query</button>
+              <button class="btn btn-green" id="btnSubmitAnswer">✓ Submit Answer</button>
+              <button class="btn btn-ghost" id="btnFormatSql">Format SQL</button>
+              <button class="btn btn-ghost" id="btnResetEditor">Reset</button>
+              <button class="btn btn-ghost" id="btnClearEditor">Clear</button>
+              <button class="btn btn-ghost" id="btnCopySql">Copy</button>
+              <button class="btn btn-ghost" id="btnDownloadResult">Download Result</button>
+              <label class="checkbox-row" style="margin-left:auto"><input type="checkbox" id="chkExplainPlan" /> Tampilkan Execution Plan</label>
+            </div>
+            <div class="result-panel">
+              <div id="resultStatus"></div>
+              <div id="resultTable"></div>
+              <div id="planBox"></div>
+            </div>
+            <div id="explainArea"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- POWER QUERY SIMULATOR -->
+      <section class="screen" id="screen-pq-sim">
+        <div class="view-head">
+          <div><h2>Power Query Simulator</h2><p>RAW DATA → TRANSFORMATION STEPS → RESULT. Setiap langkah tercatat di Applied Steps beserta kode M-nya.</p></div>
+          <div class="field">
+            <label>Sumber Data</label>
+            <select id="pqSourceSelect"><option value="">— pilih dataset di Dataset Generator dulu —</option></select>
+          </div>
+        </div>
+
+        <div class="pq-layout">
+          <div>
+            <div class="card" id="pqPracticeCard">
+              <div class="view-head" style="margin-bottom:8px">
+                <h3>🎯 Practice Mode — Tugas Data Cleaning Terpandu</h3>
+                <button class="btn btn-sm btn-ghost" id="btnTogglePqPractice">Sembunyikan</button>
+              </div>
+              <div id="pqPracticeTaskList" class="grid grid-2"></div>
+              <div id="pqPracticeActive" style="display:none">
+                <div class="question-box">
+                  <div class="question-box__prompt" id="pqPracticeTitle"></div>
+                  <ol id="pqPracticeInstructions" style="margin:8px 0 0 18px"></ol>
+                </div>
+                <div class="btn-row" style="margin:10px 0">
+                  <button class="btn btn-green" id="btnCheckPqSolution">✓ Cek Solusi</button>
+                  <button class="btn btn-ghost" id="btnExitPqPractice">← Daftar Tugas</button>
+                </div>
+                <div id="pqPracticeResult"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:12px">
+              <div class="pq-toolbar" id="pqToolbar"></div>
+              <div id="pqPreviewTable"></div>
+            </div>
+            <div class="card" style="margin-top:12px">
+              <h4>Kode M (dihasilkan otomatis)</h4>
+              <div class="mcode-box" id="mCodeBox">-- pilih dataset sumber untuk melihat kode M --</div>
+              <div class="btn-row" style="margin-top:8px">
+                <button class="btn btn-sm btn-ghost" id="btnCopyMCode">Copy Kode M</button>
+                <button class="btn btn-sm btn-ghost" id="btnExportPqCsv">Export Hasil (CSV)</button>
+                <button class="btn btn-sm btn-ghost" id="btnExportPqJson">Export Hasil (JSON)</button>
+              </div>
+            </div>
+          </div>
+          <div class="applied-steps">
+            <h4>Applied Steps</h4>
+            <div id="appliedStepsList"><div class="empty-state" style="padding:16px 8px"><div class="ic">🪄</div>Belum ada langkah</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="screen" id="screen-projects">
+        <div class="view-head">
+          <div><h2>Real-World Project</h2><p>10 studi kasus seperti pekerjaan Data Analyst / Accounting / Business Analyst sungguhan. Kerjakan dengan SQL Simulator &amp; PQ Simulator, lalu centang tugas yang sudah selesai.</p></div>
+        </div>
+        <div class="grid grid-2" id="projectsGrid"></div>
+      </section>
+
+      <!-- FINAL CHALLENGE -->
+      <section class="screen" id="screen-challenge">
+        <div class="view-head">
+          <div><h2>SQL &amp; Power Query Professional Challenge</h2><p>Ujian akhir gabungan SQL + Power Query dengan skor terbobot dan rekomendasi materi lemah.</p></div>
+        </div>
+        <div id="challengeArea"></div>
+      </section>
+
+      <!-- CHEAT SHEET -->
+      <section class="screen" id="screen-cheatsheet">
+        <div class="view-head">
+          <div><h2>SQL Cheat Sheet</h2><p>Referensi cepat sintaks inti SQL.</p></div>
+        </div>
+        <div class="cheat-grid" id="cheatGrid"></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="../../js/back-to-portal.js"></script>
+
+<!-- Modul Pengetahuan (e-book) -->
+<script src="../../js/knowledge-base.js"></script>
+<script src="data/knowledge-sqlpq.js"></script>
+<script>
+  (function () {
+    var btn = document.getElementById('btnOpenKnowledge');
+    if (btn) btn.addEventListener('click', function () {
+      window.KnowledgeBase.open(window.KNOWLEDGE_CONTENT_SQLPQ);
+    });
+  })();
+</script>
+<script src="./js/dataset-generator.js"></script>
+<script src="./js/relational-dataset.js"></script>
+<script src="./js/sql-engine.js"></script>
+<script src="./js/grading-engine.js"></script>
+<script src="./js/question-bank.js"></script>
+<script src="./js/curriculum-sql.js"></script>
+<script src="./js/curriculum-pq.js"></script>
+<script src="./js/powerquery-engine.js"></script>
+<script src="./js/cheatsheet-data.js"></script>
+<script src="./js/projects-data.js"></script>
+<script src="./js/pq-practice-data.js"></script>
+<script src="./js/progress-manager.js"></script>
+<script src="../../js/shared/pdf-export.js"></script>
+<script src="./js/ui-helpers.js"></script>
+<script src="./js/app.js"></script>
+
+<!-- PWA: daftarkan service worker (gratis, agar modul bisa dibuka offline) -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').catch(function(err) {
+                console.warn('Service worker gagal didaftarkan (app tetap jalan normal seperti web biasa):', err);
+            });
+        });
+    }
+</script>
+</body>
+</html>

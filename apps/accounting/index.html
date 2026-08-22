@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Accounting Master - Simulation & Learning System</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="../../css/knowledge-base.css">
+    <link rel="stylesheet" href="../../css/responsive-foundation.css">
+
+    <!-- Third-party libraries (CDN, non-critical: onboarding tour & confetti only) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+
+    <!-- PDF engine: loads html2pdf from local vendor first (offline-safe),
+         falls back to CDN only if the local file is missing. See js/shared/pdf-export.js -->
+    <script src="../../js/shared/pdf-export.js"></script>
+</head>
+<body>
+
+    <!-- ==========================================================================
+       SIDEBAR NAVIGATION
+       ========================================================================== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span>📊</span> <span class="sidebar-brand-text">ActMaster Pro</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" data-page="dashboard" class="active" title="Dashboard"><span class="menu-icon">🏠</span><span class="menu-label">Dashboard</span></a></li>
+            <li><a href="#" data-page="kasus" title="Kasus Latihan"><span class="menu-icon">📂</span><span class="menu-label">Kasus Latihan</span></a></li>
+            <li><a href="#" data-page="jurnal" title="Jurnal Umum"><span class="menu-icon">📝</span><span class="menu-label">Jurnal Umum</span></a></li>
+            <li><a href="#" data-page="buku-besar" title="Buku Besar"><span class="menu-icon">📖</span><span class="menu-label">Buku Besar</span></a></li>
+            <li><a href="#" data-page="neraca-saldo" title="Neraca Saldo"><span class="menu-icon">⚖️</span><span class="menu-label">Neraca Saldo</span></a></li>
+            <li><a href="#" data-page="penyesuaian" title="Jurnal Penyesuaian"><span class="menu-icon">🔧</span><span class="menu-label">Jurnal Penyesuaian</span></a></li>
+            <li><a href="#" data-page="worksheet" title="Worksheet (10 Kolom)"><span class="menu-icon">📊</span><span class="menu-label">Worksheet (10 Kolom)</span></a></li>
+            <li><a href="#" data-page="laporan" title="Laporan Keuangan"><span class="menu-icon">📈</span><span class="menu-label">Laporan Keuangan</span></a></li>
+            <li><a href="#" data-page="penutup" title="Jurnal Penutup"><span class="menu-icon">🔒</span><span class="menu-label">Jurnal Penutup</span></a></li>
+            <li><a href="#" data-page="evaluasi" title="Evaluasi & Nilai"><span class="menu-icon">🏆</span><span class="menu-label">Evaluasi & Nilai</span></a></li>
+
+            <li class="sidebar-section-label"><span class="menu-label">TRANSAKSI & PAJAK</span></li>
+            <li><a href="#" data-page="pengaturan-pajak" title="Pengaturan Perusahaan & Pajak"><span class="menu-icon">🏢</span><span class="menu-label">Pengaturan Perusahaan</span></a></li>
+            <li><a href="#" data-page="master-partner" title="Master Pelanggan & Pemasok"><span class="menu-icon">👥</span><span class="menu-label">Pelanggan & Pemasok</span></a></li>
+            <li><a href="#" data-page="master-produk" title="Master Produk & Jasa"><span class="menu-icon">📦</span><span class="menu-label">Produk & Jasa</span></a></li>
+            <li><a href="#" data-page="buat-invoice" title="Buat Invoice Penjualan"><span class="menu-icon">🧾</span><span class="menu-label">Buat Invoice</span></a></li>
+            <li><a href="#" data-page="daftar-invoice" title="Daftar Invoice"><span class="menu-icon">📑</span><span class="menu-label">Daftar Invoice</span></a></li>
+            <li><a href="#" data-page="input-pembelian" title="Input Pembelian & Pajak Masukan"><span class="menu-icon">📥</span><span class="menu-label">Input Pembelian</span></a></li>
+            <li><a href="#" data-page="pajak-keluaran" title="Pajak Keluaran"><span class="menu-icon">📤</span><span class="menu-label">Pajak Keluaran</span></a></li>
+            <li><a href="#" data-page="rekonsiliasi-ppn" title="Rekonsiliasi PPN"><span class="menu-icon">🧮</span><span class="menu-label">Rekonsiliasi PPN</span></a></li>
+            <li><a href="#" data-page="jurnal-transaksi" title="Jurnal & Buku Besar Transaksi"><span class="menu-icon">📚</span><span class="menu-label">Jurnal & Buku Besar</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- Overlay/scrim shown behind the sidebar when it's opened as a mobile drawer (<1024px) -->
+    <div class="bls-drawer-overlay" id="sidebarOverlay"></div>
+
+    <!-- ==========================================================================
+       MAIN CONTENT WRAPPER
+       ========================================================================== -->
+    <main class="main-wrapper">
+        <!-- NAVBAR -->
+        <header class="navbar">
+            <div class="navbar-actions">
+                <button class="bls-hamburger" id="btnSidebarToggle" aria-label="Buka menu navigasi" aria-controls="sidebar" aria-expanded="false">☰</button>
+                <button class="navbar-icon-btn" id="btnOpenKnowledge" title="Buku pengetahuan: konsep, istilah, dan contoh laporan keuangan">📘 Pengetahuan</button>
+                <button class="navbar-icon-btn" id="focusModeBtn" data-action="toggle-focus-mode" title="Perkecil menu di samping supaya area kerja lebih luas">🧭 Mode Kerja</button>
+                <button class="theme-toggle" id="themeBtn">🌙</button>
+                <button class="navbar-icon-btn danger" id="resetHistoryBtn" data-action="reset-history" title="Hapus semua XP, level, badge, riwayat nilai, dan pekerjaan saat ini">🗑️ Reset</button>
+            </div>
+            <div class="user-stats">
+                <div class="stat-badge" id="examTimerBadge" style="display:none; background:#fef2f2; border-color:#ef4444; color:#ef4444;">
+                    ⏱ <span id="examTimer">30:00</span>
+                </div>
+                <div class="stat-badge">⭐ XP: <span id="userXP">0</span></div>
+                <div class="stat-badge">🏷️ Level: <span id="userLevel">1</span></div>
+                <div class="stat-badge">🎯 Modus: <span id="gameMode">Belajar</span></div>
+            </div>
+        </header>
+
+        <!-- CONTENT BODY -->
+        <div class="content-body">
+
+            <!-- 1. DASHBOARD PAGE -->
+            <section id="dashboard" class="page-view active">
+                <div class="card">
+                    <h2>Selamat Datang di Accounting Simulator Pro</h2>
+                    <p style="color: var(--text-secondary); margin-top: 8px;">
+                        Platform simulasi siklus akuntansi lengkap berbasis Standar Akuntansi Keuangan (SAK) Indonesia.
+                    </p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    <div class="card">
+                        <h3>Pilih Level Perusahaan</h3>
+                        <br>
+                        <select id="selectLevel" class="form-control">
+                            <option value="1">Perusahaan Jasa</option>
+                            <option value="2">Perusahaan Dagang</option>
+                            <option value="3">Perusahaan Manufaktur</option>
+                        </select>
+                    </div>
+
+                    <div class="card">
+                        <h3>Mode Pembelajaran</h3>
+                        <br>
+                        <select id="selectMode" class="form-control">
+                            <option value="Belajar">Mode Belajar — koreksi langsung, hint, revisi</option>
+                            <option value="Ujian">Mode Ujian — timer, tanpa hint, nilai di akhir</option>
+                        </select>
+                        <div id="examControls" style="margin-top:12px; display:none;">
+                            <label style="font-size:0.85rem; color:var(--text-secondary);">Durasi ujian (menit)</label>
+                            <input type="number" id="examMinutes" value="30" min="5" max="120" style="width:80px; margin:4px 8px 4px 0;">
+                            <button class="btn btn-warning btn-sm" data-action="start-exam">Mulai Ujian</button>
+                            <button class="btn btn-danger btn-sm" data-action="finish-exam" style="display:none;" id="btnFinishExam">Serahkan Ujian</button>
+                        </div>
+                        <p id="modeDesc" style="font-size:0.8rem; color:var(--text-light); margin-top:8px;">
+                            Mode Belajar: jawaban dikoreksi langsung, hint tersedia, boleh revisi.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Pencapaian & Badge</h3>
+                    <br>
+                    <div class="badge-grid" id="badgeContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Ringkasan Transaksi & Pajak</h3>
+                        <span style="font-size:0.8rem; color:var(--text-light);" id="kpiCompanyStatus"></span>
+                    </div>
+                    <div class="kpi-grid" id="kpiGrid">
+                        <div class="kpi-card"><div class="kpi-label">Total Penjualan</div><div class="kpi-value" id="kpiTotalPenjualan">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Total Pembelian</div><div class="kpi-value" id="kpiTotalPembelian">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Total Piutang</div><div class="kpi-value" id="kpiPiutang">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Total Utang</div><div class="kpi-value" id="kpiUtang">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Pajak Keluaran</div><div class="kpi-value" id="kpiPajakKeluaran">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Pajak Masukan</div><div class="kpi-value" id="kpiPajakMasukan">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">PPN Neto</div><div class="kpi-value" id="kpiPpnNeto">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Jumlah Invoice</div><div class="kpi-value" id="kpiJumlahInvoice">0</div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. KASUS LATIHAN PAGE -->
+            <section id="kasus" class="page-view">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Daftar Transaksi Kasus</h2>
+                        <button class="btn btn-sm" data-action="random-transactions">🔀 Acak Soal Baru</button>
+                    </div>
+                    <div id="transactionList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. JURNAL UMUM PAGE -->
+            <section id="jurnal" class="page-view">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Jurnal Umum</h2>
+                        <div>
+                            <button class="btn btn-secondary btn-sm" data-action="show-hint">💡 Petunjuk</button>
+                            <button class="btn btn-sm" data-action="add-journal-row">➕ Tambah Baris</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="journalTable">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Nama Akun</th>
+                                    <th>Debit (Rp)</th>
+                                    <th>Kredit (Rp)</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+                        <button class="btn btn-success" data-action="check-journal">Check & Submit Jurnal</button>
+                        <button class="btn btn-danger btn-sm" data-action="reset-journal">Reset</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. BUKU BESAR PAGE -->
+            <section id="buku-besar" class="page-view">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Buku Besar (T-Account)</h2>
+                        <button class="btn btn-success btn-sm" data-action="auto-post-ledger">⚡ Auto-Post dari Jurnal</button>
+                    </div>
+                    <div id="ledgerContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <!-- Generated Dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. NERACA SALDO PAGE -->
+            <section id="neraca-saldo" class="page-view">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Neraca Saldo (Trial Balance)</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="trialBalanceTable">
+                            <thead>
+                                <tr>
+                                    <th>Kode / Nama Akun</th>
+                                    <th>Debit (Rp)</th>
+                                    <th>Kredit (Rp)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Generated Dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. JURNAL PENYESUAIAN -->
+            <section id="penyesuaian" class="page-view">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2>Data & Jurnal Penyesuaian</h2>
+                        <div>
+                            <button class="btn btn-sm" style="background-color: var(--accent-color); color: white;" data-action="random-adjustments">🔄 Acak Data</button>
+                            <button class="btn btn-sm" data-action="add-adj-row">➕ Tambah Baris</button>
+                        </div>
+                    </div>
+
+                    <div id="adjDataList" style="margin-bottom: 20px; background: var(--bg-primary); padding: 16px; border-radius: var(--radius-sm);">
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="adjTable">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Nama Akun</th>
+                                    <th>Debit (Rp)</th>
+                                    <th>Kredit (Rp)</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <br>
+                    <button class="btn btn-success" data-action="check-adjustment">Verifikasi Penyesuaian</button>
+                </div>
+            </section>
+
+            <!-- 7. WORKSHEET PAGE -->
+            <section id="worksheet" class="page-view">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Kertas Kerja / Worksheet (10 Kolom)</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="worksheetTable" style="font-size: 0.8rem;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">Nama Akun</th>
+                                    <th colspan="2">Neraca Saldo</th>
+                                    <th colspan="2">Penyesuaian</th>
+                                    <th colspan="2">NS Disesuaikan</th>
+                                    <th colspan="2">Laba Rugi</th>
+                                    <th colspan="2">Posisi Keuangan</th>
+                                </tr>
+                                <tr>
+                                    <th>D</th><th>K</th>
+                                    <th>D</th><th>K</th>
+                                    <th>D</th><th>K</th>
+                                    <th>D</th><th>K</th>
+                                    <th>D</th><th>K</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. LAPORAN KEUANGAN -->
+            <section id="laporan" class="page-view">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>Laporan Keuangan</h2>
+                        <button class="btn btn-success" data-action="export-pdf">📄 Download PDF</button>
+                    </div>
+                    <div id="financialReportContainer"></div>
+                </div>
+            </section>
+
+            <!-- 9. JURNAL PENUTUP -->
+            <section id="penutup" class="page-view">
+                <div class="card">
+                    <h2>Jurnal Penutup (Closing Entries)</h2>
+                    <br>
+                    <p style="margin-bottom:12px;">Tutup akun nominal (Pendapatan, Beban, Ikhtisar L/R, Prive) ke ekuitas.</p>
+                    <div class="table-responsive">
+                        <table id="closingTable">
+                            <thead>
+                                <tr>
+                                    <th>Nama Akun</th>
+                                    <th>Debit</th>
+                                    <th>Kredit</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <br>
+                    <button class="btn btn-sm" data-action="add-closing-row">➕ Tambah Baris</button>
+                    <button class="btn btn-success" data-action="check-closing">Verifikasi Penutupan</button>
+                </div>
+            </section>
+
+            <!-- 10. EVALUASI & NILAI -->
+            <section id="evaluasi" class="page-view">
+                <div class="card">
+                    <h2>Evaluasi & Laporan Performa</h2>
+                    <br>
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                        <div style="font-size: 3rem; font-weight: bold; color: var(--accent-color);" id="finalScore">0</div>
+                        <div>
+                            <h3>Nilai Akhir Anda</h3>
+                            <p id="scoreGrade">Grade: -</p>
+                        </div>
+                    </div>
+                    <br>
+                    <button class="btn btn-success" data-action="export-csv">📥 Export Jurnal ke CSV</button>
+                </div>
+            </section>
+
+            <!-- ==========================================================================
+               TRANSAKSI & PAJAK MODULE — Simulator Accounting & Perpajakan Interaktif
+               ========================================================================== -->
+
+            <!-- 11. PENGATURAN PERUSAHAAN & PAJAK -->
+            <section id="pengaturan-pajak" class="page-view">
+                <div class="card">
+                    <div class="card-header"><h2>Profil Perusahaan & Status Pajak</h2></div>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Nama Perusahaan</label><input type="text" id="cpName" placeholder="Nama Perusahaan"></div>
+                        <div class="form-group"><label>NPWP Perusahaan</label><input type="text" id="cpNpwp" placeholder="00.000.000.0-000.000"></div>
+                        <div class="form-group span-2"><label>Alamat</label><input type="text" id="cpAddress" placeholder="Alamat lengkap perusahaan"></div>
+                        <div class="form-group"><label>NIK</label><input type="text" id="cpNik" placeholder="Nomor Induk Kependudukan"></div>
+                        <div class="form-group"><label>Status Perusahaan</label>
+                            <select id="cpTaxStatus"><option value="PKP">PKP</option><option value="NON_PKP">Non-PKP</option></select>
+                        </div>
+                        <div class="form-group"><label>Tanggal Pengukuhan PKP</label><input type="date" id="cpPkpDate"></div>
+                        <div class="form-group"><label>Nomor Identitas Pajak</label><input type="text" id="cpTaxId" placeholder="NITKU / identitas pajak lain"></div>
+                        <div class="form-group"><label>Tarif PPN Default (%)</label><input type="number" id="cpDefaultVat" min="0" step="0.1" value="12"></div>
+                        <div class="form-group"><label>Metode Perhitungan PPN</label>
+                            <select id="cpVatBasis"><option>Tarif efektif</option><option>Tarif penuh</option><option>Manual</option></select>
+                        </div>
+                    </div>
+                    <div id="companyStatusNote" class="alert-box alert-info" style="margin-top:16px;"></div>
+                    <div style="margin-top:16px;"><button class="btn btn-success" data-action="save-company-profile">💾 Simpan Profil Perusahaan</button></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Tarif PPN (Historis)</h2>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Label / Periode</label><input type="text" id="vrLabel" placeholder="cth. Tarif 2025"></div>
+                        <div class="form-group"><label>Tarif PPN (%)</label><input type="number" id="vrRate" min="0" step="0.1" value="12"></div>
+                        <div class="form-group"><label>Dasar Perhitungan</label>
+                            <select id="vrBasis"><option>Tarif efektif</option><option>Tarif penuh</option><option>Manual</option></select>
+                        </div>
+                        <div class="form-group"><label>Tanggal Berlaku</label><input type="date" id="vrEffectiveDate"></div>
+                        <div class="form-group"><label>Status</label>
+                            <select id="vrStatus"><option value="AKTIF">Aktif</option><option value="TIDAK_AKTIF">Tidak Aktif</option></select>
+                        </div>
+                        <div class="form-group" style="align-self:end;"><button class="btn btn-sm" data-action="add-vat-rate">➕ Tambah Tarif</button></div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="vatRateTable">
+                            <thead><tr><th>Label</th><th>Tarif</th><th>Dasar</th><th>Tanggal Berlaku</th><th>Status</th><th>Aksi</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h2>Backup & Data Aplikasi</h2></div>
+                    <p style="color:var(--text-secondary); margin-bottom:16px;">Seluruh data disimpan secara lokal di perangkat Anda (localStorage) — gratis, tanpa server, tanpa biaya tersembunyi. Gunakan backup untuk memindahkan data ke perangkat lain.</p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn btn-success" data-action="backup-export-data">💾 Export / Backup Data (JSON)</button>
+                        <button class="btn btn-secondary" data-action="trigger-import-data">📤 Import / Restore Data</button>
+                        <input type="file" id="importDataInput" accept="application/json" style="display:none;">
+                        <button class="btn btn-danger" data-action="reset-all-data">🗑️ Reset Semua Data</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 12. MASTER PELANGGAN & PEMASOK -->
+            <section id="master-partner" class="page-view">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Master Data Pelanggan & Pemasok</h2>
+                        <button class="btn btn-sm" data-action="toggle-partner-form">➕ Tambah Data</button>
+                    </div>
+                    <div class="filter-bar">
+                        <input type="text" id="partnerSearch" placeholder="🔍 Cari nama, NPWP, atau kota...">
+                        <select id="partnerFilterType"><option value="ALL">Semua Jenis</option><option value="PELANGGAN">Pelanggan</option><option value="PEMASOK">Pemasok</option></select>
+                        <select id="partnerFilterTax"><option value="ALL">Semua Status</option><option value="PKP">PKP</option><option value="NON_PKP">Non-PKP</option></select>
+                    </div>
+
+                    <div id="partnerFormPanel" class="form-panel" style="display:none;">
+                        <input type="hidden" id="partnerEditId">
+                        <div class="form-grid">
+                            <div class="form-group"><label>Jenis</label>
+                                <select id="pfType"><option value="PELANGGAN">Pelanggan</option><option value="PEMASOK">Pemasok</option><option value="KEDUANYA">Keduanya (Pelanggan & Pemasok)</option></select>
+                            </div>
+                            <div class="form-group"><label>Nama Perusahaan/Individu</label><input type="text" id="pfName" placeholder="Nama"></div>
+                            <div class="form-group"><label>Jenis Wajib Pajak</label>
+                                <select id="pfTaxStatus"><option value="NON_PKP">Non-PKP</option><option value="PKP">PKP</option></select>
+                            </div>
+                            <div class="form-group"><label>NPWP</label><input type="text" id="pfNpwp" placeholder="00.000.000.0-000.000"></div>
+                            <div class="form-group"><label>NIK</label><input type="text" id="pfNik" placeholder="Nomor Induk Kependudukan"></div>
+                            <div class="form-group"><label>Kota</label><input type="text" id="pfCity" placeholder="Kota"></div>
+                            <div class="form-group span-2"><label>Alamat</label><input type="text" id="pfAddress" placeholder="Alamat lengkap"></div>
+                            <div class="form-group"><label>Nomor Telepon</label><input type="text" id="pfPhone" placeholder="08xxxxxxxxxx"></div>
+                            <div class="form-group"><label>Email</label><input type="text" id="pfEmail" placeholder="nama@email.com"></div>
+                            <div class="form-group"><label>Status Aktif</label>
+                                <select id="pfActive"><option value="true">Aktif</option><option value="false">Tidak Aktif</option></select>
+                            </div>
+                            <div class="form-group span-2"><label>Catatan</label><input type="text" id="pfNotes" placeholder="Catatan tambahan (opsional)"></div>
+                        </div>
+                        <div style="margin-top:12px; display:flex; gap:10px;">
+                            <button class="btn btn-success" data-action="save-partner">💾 Simpan</button>
+                            <button class="btn btn-secondary" data-action="cancel-partner-form">Batal</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="partnerTable">
+                            <thead><tr><th>Jenis</th><th>Nama</th><th>Status Pajak</th><th>NPWP</th><th>Kota</th><th>Telepon</th><th>Status</th><th>Aksi</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 13. MASTER PRODUK & JASA -->
+            <section id="master-produk" class="page-view">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Master Data Produk & Jasa</h2>
+                        <button class="btn btn-sm" data-action="toggle-product-form">➕ Tambah Produk/Jasa</button>
+                    </div>
+                    <div class="filter-bar">
+                        <input type="text" id="productSearch" placeholder="🔍 Cari kode atau nama produk...">
+                    </div>
+                    <div id="productFormPanel" class="form-panel" style="display:none;">
+                        <input type="hidden" id="prfEditId">
+                        <div class="form-grid">
+                            <div class="form-group"><label>Nama Barang/Jasa</label><input type="text" id="prfName" placeholder="Nama produk atau jasa"></div>
+                            <div class="form-group"><label>Satuan</label><input type="text" id="prfUnit" placeholder="cth. Unit, Pcs, Jam" value="Unit"></div>
+                            <div class="form-group"><label>Harga Jual Default (Rp)</label><input type="number" id="prfPrice" min="0" value="0"></div>
+                            <div class="form-group"><label>Status Aktif</label>
+                                <select id="prfActive"><option value="true">Aktif</option><option value="false">Tidak Aktif</option></select>
+                            </div>
+                        </div>
+                        <div style="margin-top:12px; display:flex; gap:10px;">
+                            <button class="btn btn-success" data-action="save-product">💾 Simpan</button>
+                            <button class="btn btn-secondary" data-action="cancel-product-form">Batal</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="productTable">
+                            <thead><tr><th>Kode</th><th>Nama</th><th>Satuan</th><th>Harga Jual</th><th>Status</th><th>Aksi</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 14. BUAT INVOICE PENJUALAN -->
+            <section id="buat-invoice" class="page-view">
+                <div class="card">
+                    <div class="card-header"><h2>Mode Kerja</h2></div>
+                    <div class="mode-toggle">
+                        <button class="btn btn-sm mode-btn active" id="btnModeOperasional" data-action="set-tax-mode" data-mode="OPERASIONAL">⚙️ Mode Operasional</button>
+                        <button class="btn btn-sm btn-secondary mode-btn" id="btnModeLatihan" data-action="set-tax-mode" data-mode="LATIHAN">🎓 Mode Latihan</button>
+                    </div>
+                    <div id="latihanPanel" style="display:none; margin-top:16px;">
+                        <div class="form-grid">
+                            <div class="form-group span-2"><label>Pilih Studi Kasus</label>
+                                <select id="latihanCaseSelect"></select>
+                            </div>
+                        </div>
+                        <div id="latihanNarrative" class="alert-box alert-info" style="margin-top:10px;"></div>
+                        <div id="latihanResultArea" style="margin-top:14px;"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h2>Buat Invoice</h2></div>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Nomor Invoice</label><input type="text" id="invNumber" readonly placeholder="Otomatis saat disimpan"></div>
+                        <div class="form-group"><label>Tanggal Invoice</label><input type="date" id="invDate"></div>
+                        <div class="form-group"><label>Tanggal Jatuh Tempo</label><input type="date" id="invDueDate"></div>
+                        <div class="form-group"><label>Pelanggan</label><select id="invCustomer"><option value="">— Pilih Pelanggan —</option></select></div>
+                        <div class="form-group"><label>Status Pelanggan</label><input type="text" id="invCustomerStatus" readonly></div>
+                        <div class="form-group"><label>NPWP Pelanggan</label><input type="text" id="invCustomerNpwp" readonly></div>
+                        <div class="form-group span-2"><label>Alamat Pelanggan</label><input type="text" id="invCustomerAddress" readonly></div>
+                        <div class="form-group"><label>Referensi Pesanan</label><input type="text" id="invRef" placeholder="Nomor PO / referensi (opsional)"></div>
+                        <div class="form-group"><label>Mata Uang</label><input type="text" id="invCurrency" value="IDR" readonly></div>
+                        <div class="form-group"><label>Metode Pembayaran</label>
+                            <select id="invPaymentMethod"><option value="KREDIT">Kredit</option><option value="TUNAI">Tunai</option></select>
+                        </div>
+                        <div class="form-group"><label>Status Pembayaran</label>
+                            <select id="invPaymentStatus"><option value="BELUM_DIBAYAR">Belum Dibayar</option><option value="DIBAYAR_SEBAGIAN">Dibayar Sebagian</option><option value="LUNAS">Lunas</option></select>
+                        </div>
+                        <div class="form-group"><label>Perlakuan PPN</label>
+                            <select id="invVatTreatment">
+                                <option value="PPN_DIKENAKAN">PPN Dikenakan</option>
+                                <option value="PPN_TIDAK_DIKENAKAN">PPN Tidak Dikenakan</option>
+                                <option value="NON_PPN">Transaksi Non-PPN</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="invoiceVatNote" class="alert-box alert-info" style="margin-top:14px;"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Detail Barang/Jasa</h2>
+                        <button class="btn btn-sm" data-action="add-invoice-item">➕ Tambah Baris</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="invoiceItemsTable" class="compact-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:36px;">No.</th>
+                                    <th>Produk</th>
+                                    <th>Nama Barang/Jasa</th>
+                                    <th style="width:80px;">Qty</th>
+                                    <th style="width:80px;">Satuan</th>
+                                    <th style="width:130px;">Harga Satuan</th>
+                                    <th style="width:70px;">Disk %</th>
+                                    <th style="width:110px;">Disk Rp</th>
+                                    <th style="width:120px;">DPP</th>
+                                    <th style="width:110px;">PPN</th>
+                                    <th style="width:130px;">Total</th>
+                                    <th style="width:40px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoiceItemsBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="invoice-totals">
+                        <div><span>Subtotal</span><b id="invSubtotal">Rp 0</b></div>
+                        <div><span>Total Diskon</span><b id="invDiscountTotal">Rp 0</b></div>
+                        <div><span>DPP</span><b id="invDppTotal">Rp 0</b></div>
+                        <div><span>PPN</span><b id="invVatTotalDisplay">Rp 0</b></div>
+                        <div class="grand"><span>TOTAL TAGIHAN</span><b id="invGrandTotal">Rp 0</b></div>
+                    </div>
+                    <div class="form-group" style="margin-top:12px;"><label>Catatan</label><input type="text" id="invNotes" placeholder="Catatan invoice (opsional)"></div>
+                    <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn btn-secondary" data-action="save-invoice-draft">📝 Simpan Draft</button>
+                        <button class="btn btn-success" data-action="publish-invoice">✅ Terbitkan Invoice</button>
+                        <button class="btn btn-danger btn-sm" data-action="reset-invoice-form">🗑️ Reset</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 15. DAFTAR INVOICE -->
+            <section id="daftar-invoice" class="page-view">
+                <div class="card">
+                    <div class="card-header"><h2>Daftar Invoice</h2></div>
+                    <div class="filter-bar">
+                        <input type="text" id="invListSearch" placeholder="🔍 Cari nomor invoice / pelanggan...">
+                        <input type="date" id="invListFrom" title="Dari tanggal">
+                        <input type="date" id="invListTo" title="Sampai tanggal">
+                        <select id="invListStatus">
+                            <option value="ALL">Semua Status</option>
+                            <option value="DRAFT">Draft</option>
+                            <option value="BELUM_DIBAYAR">Belum Dibayar</option>
+                            <option value="DIBAYAR_SEBAGIAN">Dibayar Sebagian</option>
+                            <option value="LUNAS">Lunas</option>
+                            <option value="DIBATALKAN">Dibatalkan</option>
+                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="invoiceListTable">
+                            <thead><tr><th>No. Invoice</th><th>Tanggal</th><th>Pelanggan</th><th>Status Pelanggan</th><th>DPP</th><th>PPN</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 16. INPUT PEMBELIAN & PAJAK MASUKAN -->
+            <section id="input-pembelian" class="page-view">
+                <div class="card">
+                    <div class="card-header"><h2>Input Pembelian & Pajak Masukan</h2></div>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Pemasok</label><select id="pchSupplier"><option value="">— Pilih Pemasok —</option></select></div>
+                        <div class="form-group"><label>Status Pemasok</label><input type="text" id="pchSupplierStatus" readonly></div>
+                        <div class="form-group"><label>NPWP Pemasok</label><input type="text" id="pchSupplierNpwp" readonly></div>
+                        <div class="form-group"><label>Nomor Dokumen Pembelian</label><input type="text" id="pchDocNumber" placeholder="Nomor faktur dari pemasok"></div>
+                        <div class="form-group"><label>Tanggal Dokumen</label><input type="date" id="pchDate"></div>
+                        <div class="form-group"><label>Metode Pembayaran</label>
+                            <select id="pchPaymentMethod"><option value="KREDIT">Kredit</option><option value="TUNAI">Tunai</option></select>
+                        </div>
+                        <div class="form-group span-2"><label>Jenis Barang atau Jasa</label><input type="text" id="pchItemDesc" placeholder="Deskripsi barang/jasa yang dibeli"></div>
+                        <div class="form-group"><label>DPP (Rp)</label><input type="number" id="pchDpp" min="0" value="0"></div>
+                        <div class="form-group"><label>Tarif PPN (%)</label><input type="number" id="pchVatRate" min="0" step="0.1" value="12"></div>
+                        <div class="form-group"><label>Nilai PPN (Rp)</label><input type="number" id="pchVatAmount" min="0" value="0"></div>
+                        <div class="form-group"><label>Nomor Faktur Pajak</label><input type="text" id="pchTaxInvoiceNumber" placeholder="Nomor faktur pajak (jika ada)"></div>
+                        <div class="form-group"><label>Status Kredit Pajak</label>
+                            <select id="pchCreditStatus">
+                                <option value="BELUM_DIVERIFIKASI">Belum Diverifikasi</option>
+                                <option value="DAPAT_DIKREDITKAN">Dapat Dikreditkan</option>
+                                <option value="TIDAK_DAPAT_DIKREDITKAN">Tidak Dapat Dikreditkan</option>
+                            </select>
+                        </div>
+                        <div class="form-group span-2"><label>Keterangan</label><input type="text" id="pchNotes" placeholder="Catatan tambahan (opsional)"></div>
+                    </div>
+                    <div id="purchaseVatNote" class="alert-box alert-info" style="margin-top:14px;"></div>
+                    <div style="margin-top:16px;"><button class="btn btn-success" data-action="save-purchase">💾 Simpan Pembelian</button></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h2>Daftar Pembelian & Pajak Masukan</h2></div>
+                    <div class="table-responsive">
+                        <table id="purchaseTable">
+                            <thead><tr><th>Tanggal</th><th>Pemasok</th><th>PKP/Non-PKP</th><th>No. Dokumen</th><th>DPP</th><th>PPN</th><th>Status Kredit</th><th>Keterangan</th><th>Aksi</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 17. PAJAK KELUARAN -->
+            <section id="pajak-keluaran" class="page-view">
+                <div class="card">
+                    <div class="card-header"><h2>Pajak Keluaran</h2></div>
+                    <div class="kpi-grid" id="pkSummaryGrid">
+                        <div class="kpi-card"><div class="kpi-label">Total DPP</div><div class="kpi-value" id="pkTotalDpp">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Total Pajak Keluaran</div><div class="kpi-value" id="pkTotalPpn">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Jumlah Invoice</div><div class="kpi-value" id="pkJumlahInvoice">0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Invoice Belum Dibayar</div><div class="kpi-value" id="pkBelumBayar">0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Invoice Lunas</div><div class="kpi-value" id="pkLunas">0</div></div>
+                    </div>
+                    <div class="filter-bar" style="margin-top:16px;">
+                        <input type="date" id="pkFrom" title="Dari tanggal">
+                        <input type="date" id="pkTo" title="Sampai tanggal">
+                        <button class="btn btn-sm" data-action="apply-pk-filter">Terapkan Filter</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="pajakKeluaranTable">
+                            <thead><tr><th>Tanggal</th><th>No. Invoice</th><th>Pelanggan</th><th>Status PKP</th><th>DPP</th><th>Tarif PPN</th><th>PPN Keluaran</th><th>Status</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 18. REKONSILIASI PPN -->
+            <section id="rekonsiliasi-ppn" class="page-view">
+                <div class="card">
+                    <div class="card-header"><h2>Rekonsiliasi PPN</h2></div>
+                    <div class="filter-bar">
+                        <input type="date" id="rekFrom" title="Dari tanggal">
+                        <input type="date" id="rekTo" title="Sampai tanggal">
+                        <button class="btn btn-sm" data-action="apply-rekonsiliasi-filter">Terapkan Filter</button>
+                    </div>
+                    <div id="rekStatusBanner" class="rek-banner"></div>
+                    <div class="kpi-grid">
+                        <div class="kpi-card"><div class="kpi-label">Pajak Keluaran</div><div class="kpi-value" id="rekKeluaran">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Pajak Masukan Dapat Dikreditkan</div><div class="kpi-value" id="rekMasukanKredit">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Pajak Masukan Tidak Dapat Dikreditkan</div><div class="kpi-value" id="rekMasukanTidak">Rp 0</div></div>
+                        <div class="kpi-card"><div class="kpi-label">PPN Neto</div><div class="kpi-value" id="rekNeto">Rp 0</div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 19. JURNAL & BUKU BESAR TRANSAKSI -->
+            <section id="jurnal-transaksi" class="page-view">
+                <div class="card">
+                    <div class="card-header"><h2>Jurnal Transaksi (Otomatis)</h2></div>
+                    <p style="color:var(--text-secondary); margin-bottom:10px;">Setiap invoice yang diterbitkan dan pembelian yang disimpan otomatis menghasilkan jurnal berikut. Jurnal dari dokumen yang dibatalkan ditandai <i>Dibatalkan</i> dan tidak lagi dihitung dalam buku besar maupun laporan.</p>
+                    <div class="table-responsive">
+                        <table id="journalTransaksiTable">
+                            <thead><tr><th>Tanggal</th><th>Referensi</th><th>Keterangan</th><th>Akun</th><th>Debit</th><th>Kredit</th><th>Status</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h2>Buku Besar Transaksi</h2></div>
+                    <div id="ledgerTransaksiContainer"></div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- INVOICE VIEWER / PRINT MODAL -->
+    <div class="modal-overlay" id="invoiceViewModal">
+        <div class="modal-content modal-wide">
+            <div class="invoice-toolbar no-print">
+                <button class="btn btn-sm" data-action="print-invoice">🖨️ Cetak</button>
+                <button class="btn btn-sm btn-success" data-action="print-invoice-pdf">📄 Cetak PDF</button>
+                <button class="btn btn-sm btn-secondary" data-action="duplicate-invoice">📑 Duplikasi</button>
+                <button class="btn btn-sm btn-danger" data-action="cancel-invoice">🚫 Batalkan</button>
+                <button class="btn btn-sm" data-action="close-invoice-modal" style="margin-left:auto;">✖ Tutup</button>
+            </div>
+            <div id="invoicePrintArea"></div>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP -->
+    <div class="modal-overlay" id="modalAlert">
+        <div class="modal-content">
+            <h3 id="modalTitle">Info</h3>
+            <br>
+            <div id="modalBody"></div>
+            <br>
+            <button class="btn" data-action="close-modal">Tutup</button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTICES (non-blocking) -->
+    <div id="toastContainer"></div>
+
+    <!-- Application entry point (ES Module) -->
+    <script type="module" src="js/main.js"></script>
+  <script src="../../js/back-to-portal.js"></script>
+
+  <!-- Modul Pengetahuan (e-book) -->
+  <script src="../../js/knowledge-base.js"></script>
+  <script src="data/knowledge-accounting.js"></script>
+  <script>
+    (function () {
+      var btn = document.getElementById('btnOpenKnowledge');
+      if (btn) btn.addEventListener('click', function () {
+        window.KnowledgeBase.open(window.KNOWLEDGE_CONTENT_ACCOUNTING);
+      });
+    })();
+  </script>
+
+  <!-- PWA: daftarkan service worker (gratis, agar modul bisa dibuka offline) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').catch(function(err) {
+                console.warn('Service worker gagal didaftarkan (app tetap jalan normal seperti web biasa):', err);
+            });
+        });
+    }
+  </script>
+</body>
+</html>

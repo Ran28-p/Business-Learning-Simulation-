@@ -1,0 +1,181 @@
+/* ============================================================================
+   responsive.css — breakpoint untuk tablet & mobile
+   ============================================================================ */
+
+/* Safety: cegah horizontal scroll dari konten intrinsik */
+.app-shell,
+.app-body,
+.main-content,
+.panel,
+.workspace-grid,
+.spreadsheet-column {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Tablet (<= 1024px): sidebar tetap ada tapi lebih ramping, workspace jadi 1 kolom */
+@media (max-width: 1024px) {
+  .app-body {
+    grid-template-columns: 220px 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+  .spreadsheet-scroll { max-height: 420px; }
+}
+
+/* Mobile (<= 720px): sidebar pindah ke atas, layout stack */
+@media (max-width: 720px) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 12px;
+    align-items: flex-start;
+  }
+  .app-header__brand {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .brand-subtitle { display: none; }
+  .brand-title {
+    font-size: 0.92rem;
+    line-height: 1.25;
+  }
+  .app-header__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+  .badge-pill {
+    font-size: 0.72rem;
+    padding: 5px 10px;
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.3;
+  }
+
+  .app-body {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 12px 88px; /* ruang tombol ← Portal */
+    gap: 14px;
+  }
+
+  .sidebar {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dataset-nav, .level-path {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    gap: 8px;
+  }
+  .dataset-nav__item, .level-path__item {
+    flex-shrink: 0;
+  }
+
+  .panel {
+    padding: 14px;
+    min-width: 0;
+  }
+
+  .setup-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .workspace-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .workspace-toolbar__actions {
+    flex-wrap: wrap;
+  }
+  .workspace-toolbar__actions .btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .workspace-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  .question-actions {
+    flex-direction: column;
+  }
+  .question-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .formula-bar__namebox {
+    width: 56px;
+    font-size: 0.72rem;
+  }
+  .formula-bar__fx {
+    width: 28px;
+    font-size: 0.75rem;
+  }
+  .formula-bar__input {
+    font-size: 0.8rem;
+    padding: 0 8px;
+    min-width: 0;
+  }
+  .spreadsheet-scroll {
+    max-height: 340px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .progress-mini-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Tombol aksi setup full-width di mobile */
+  .setup-panel .btn,
+  .panel .btn--primary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Sangat sempit (<= 480px) */
+@media (max-width: 480px) {
+  .app-body {
+    padding: 10px 10px 100px;
+  }
+  .brand-title {
+    font-size: 0.88rem;
+  }
+  .btn {
+    padding: 9px 12px;
+    font-size: 0.8rem;
+  }
+  .panel {
+    padding: 12px;
+    border-radius: 12px;
+  }
+  .spreadsheet-table {
+    font-size: 0.74rem;
+  }
+  .spreadsheet-table thead th,
+  .spreadsheet-table .header-label-cell {
+    min-width: 72px;
+    padding: 5px 6px;
+  }
+}
+
+/* Sangat sempit (<= 380px) */
+@media (max-width: 380px) {
+  .brand-title { font-size: 0.85rem; }
+  .formula-bar__namebox { width: 48px; font-size: 0.68rem; }
+  .progress-mini-grid { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+}

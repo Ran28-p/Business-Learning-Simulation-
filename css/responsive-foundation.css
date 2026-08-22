@@ -1,0 +1,126 @@
+/* ==========================================================================
+   BLS RESPONSIVE FOUNDATION
+   Shared reset, safety nets, and cross-app components used by the portal
+   and every app (SPT, Accounting, SQL/PQ, Excel). Load this AFTER each
+   app's own stylesheet has defined its color variables, and BEFORE any
+   per-app override block, so the app's own tokens (--border, --text, etc.)
+   are already available and app-specific rules still win on conflicts.
+
+   Breakpoints used consistently across the project:
+     < 480px      small mobile
+     480–767px    mobile
+     768–1023px   tablet
+     1024–1279px  laptop
+     1280px+      desktop
+   Sidebar-based apps (Accounting, SPT, SQL/PQ) switch their sidebar from
+   a fixed desktop column to an off-canvas drawer at the 1024px boundary.
+   ========================================================================== */
+
+/* ---- Safety net (does NOT replace fixing the real overflow source) ---- */
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
+
+/* ---- Accessible hide ---- */
+.bls-sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* ---- Shared hamburger button (theming via inherited currentColor/vars) ---- */
+.bls-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--border, var(--border-color, #d7e3f0));
+  background: transparent;
+  color: inherit;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+.bls-hamburger:hover { background: rgba(127, 127, 127, 0.12); }
+@media (max-width: 1023px) {
+  .bls-hamburger { display: inline-flex; }
+}
+
+/* ---- Shared off-canvas drawer overlay/scrim ---- */
+.bls-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  z-index: 950;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.bls-drawer-overlay.show { opacity: 1; pointer-events: auto; }
+@media (min-width: 1024px) {
+  .bls-drawer-overlay { display: none !important; }
+}
+
+/* ---- Back-to-Portal floating button (see js/back-to-portal.js) ---- */
+.bls-back-to-portal {
+  position: fixed;
+  right: 16px;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  z-index: 500; /* above normal content & sidebars, below modals/drawers/toasts */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0b5cab;
+  color: #fff;
+  font: 700 13px/1 "Segoe UI", system-ui, sans-serif;
+  padding: 10px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  opacity: 0.92;
+  max-width: calc(100vw - 32px);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.bls-back-to-portal:hover,
+.bls-back-to-portal:focus-visible { opacity: 1; }
+/* While the user is actively scrolling, the button fades out so it never sits
+   on top of a chart/table/CTA underneath it — see js/back-to-portal.js, which
+   toggles this class on scroll and brings the button back on scroll-up/pause
+   or when it's focused (so it's never hidden from keyboard/screen-reader use). */
+.bls-back-to-portal.bls-back-to-portal--hidden {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+.bls-back-to-portal.bls-back-to-portal--hidden:focus-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+@media (max-width: 480px) {
+  .bls-back-to-portal {
+    padding: 10px 12px;
+    font-size: 12px;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    right: 12px;
+  }
+}
+
+/* ---- Utility: viewport height that behaves correctly on mobile browsers ---- */
+.bls-min-vh-100 { min-height: 100vh; min-height: 100dvh; }
+
+/* ---- Utility: force any table into a horizontally-scrollable container ---- */
+.bls-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}

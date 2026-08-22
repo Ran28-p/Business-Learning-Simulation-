@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>SPT 1771 Lampiran IV - PPh Final & Non Objek Pajak</title>
+    <link rel="stylesheet" href="style_formulir.css">
+    <style>
+        .matrix-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .matrix-table th, .matrix-table td { border: 1px solid black; padding: 6px; vertical-align: middle; }
+        .matrix-table th { background-color: #d9d9d9; text-align: center; }
+        .input-num { width: 100%; border: none; text-align: right; background: transparent; font-family: 'Courier New', monospace; font-size: 14px; }
+        .input-num:focus { outline: 2px solid #004b87; background-color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="spt-container" style="max-width: 1000px;">
+        <div class="spt-header">
+            <div class="header-left">KEMENTERIAN KEUANGAN RI<br>DIREKTORAT JENDERAL PAJAK</div>
+            <div class="header-center">
+                <h2>LAMPIRAN - IV</h2>
+                <p><b>PPH FINAL DAN PENGHASILAN YANG TIDAK TERMASUK OBJEK PAJAK</b></p>
+            </div>
+            <div class="header-right"><div class="form-name">1771 - IV</div></div>
+        </div>
+        <hr class="thick-line">
+
+        <div class="spt-section">
+            <table class="form-table" style="border: none;">
+                <tr>
+                    <td width="200">NPWP</td><td width="10">:</td>
+                    <td><input type="text" class="medium-input" id="npwp_lampiran" readonly style="background: #e9ecef;"></td>
+                </tr>
+                <tr>
+                    <td>NAMA WAJIB PAJAK</td><td width="10">:</td>
+                    <td><input type="text" class="long-input" id="nama_wp_lampiran" readonly style="background: #e9ecef;"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Bagian A: PPh Final -->
+        <div class="spt-section">
+            <div class="section-title">PART A. PENGHASILAN YANG DIKENAKAN PPH FINAL</div>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th width="40">NO</th>
+                        <th>JENIS PENGHASILAN FINAL</th>
+                        <th width="200">DASAR PENGENAAN PAJAK / BRUTO (Rp)</th>
+                        <th width="200">PPH TERUTANG / FINAL (Rp)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align:center;">1.</td>
+                        <td>Bunga Deposito / Tabungan / Giro / Sertifikat Bank Indonesia</td>
+                        <td><input type="text" class="input-num l4-bruto" id="f1_bruto" value="0"></td>
+                        <td><input type="text" class="input-num l4-pph" id="f1_pph" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">2.</td>
+                        <td>Transaksi Penjualan Saham di Bursa Efek</td>
+                        <td><input type="text" class="input-num l4-bruto" id="f2_bruto" value="0"></td>
+                        <td><input type="text" class="input-num l4-pph" id="f2_pph" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">3.</td>
+                        <td>Persewaan Tanah dan/atau Bangunan</td>
+                        <td><input type="text" class="input-num l4-bruto" id="f3_bruto" value="0"></td>
+                        <td><input type="text" class="input-num l4-pph" id="f3_pph" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">4.</td>
+                        <td>Usaha Jasa Konstruksi</td>
+                        <td><input type="text" class="input-num l4-bruto" id="f4_bruto" value="0"></td>
+                        <td><input type="text" class="input-num l4-pph" id="f4_pph" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">5.</td>
+                        <td>PPh Final PP 23 / UMKM (Omzet Tertentu)</td>
+                        <td><input type="text" class="input-num l4-bruto" id="f5_bruto" value="0"></td>
+                        <td><input type="text" class="input-num l4-pph" id="f5_pph" value="0"></td>
+                    </tr>
+                    <tr style="font-weight: bold; background: #f0f2f5;">
+                        <td colspan="2" style="text-align:right;">11. JUMLAH BAGIAN A</td>
+                        <td><input type="text" class="input-num readonly" id="total_f_bruto" value="0" readonly></td>
+                        <td><input type="text" class="input-num readonly" id="total_f_pph" value="0" readonly></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bagian B: Bukan Objek Pajak -->
+        <div class="spt-section">
+            <div class="section-title">PART B. PENGHASILAN YANG TIDAK TERMASUK OBJEK PAJAK</div>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th width="40">NO</th>
+                        <th>JENIS PENGHASILAN BUKAN OBJEK PAJAK</th>
+                        <th width="250">NOMINAL (Rupiah)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align:center;">12.</td>
+                        <td>Bantuan / Sumbangan / Hibah yang memenuhi syarat</td>
+                        <td><input type="text" class="input-num l4-non" id="non1" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">13.</td>
+                        <td>Dividen / Bagian Laba dari Perseroan Terbatas dalam negeri (syarat kepemilikan)</td>
+                        <td><input type="text" class="input-num l4-non" id="non2" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">14.</td>
+                        <td>Penghasilan Lainnya yang Tidak Termasuk Objek Pajak</td>
+                        <td><input type="text" class="input-num l4-non" id="non3" value="0"></td>
+                    </tr>
+                    <tr style="font-weight: bold; background: #f0f2f5;">
+                        <td colspan="2" style="text-align:right;">15. JUMLAH BAGIAN B (Pindahkan ke Induk Angka 4):</td>
+                        <td><input type="text" class="input-num readonly" id="total_non_objek" value="0" readonly style="color: #0c5460;"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="action-buttons">
+            <button id="btnSalinL4" class="btn-save" style="background-color: #17a2b8;">Simpan & Salin ke Form Induk (Angka 4)</button>
+            <button id="btnResetL4" class="btn-back" style="background-color: #6c757d;" type="button">Reset Lampiran Ini</button>
+            <a href="1771_induk.html" class="btn-back" style="background-color: #6c757d;">Kembali ke Form Induk</a>
+        </div>
+    </div>
+    <script src="script_Lampiran_IV.js"></script>
+</body>
+</html>

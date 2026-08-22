@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>SPT 1771 Induk - Real Form</title>
+    <link rel="stylesheet" href="style_formulir.css">
+</head>
+<body>
+    <div class="spt-container">
+        <!-- Header Formulir -->
+        <div class="spt-header">
+            <div class="header-left">
+                KEMENTERIAN KEUANGAN RI<br>
+                DIREKTORAT JENDERAL PAJAK
+            </div>
+            <div class="header-center">
+                <h2>SPT TAHUNAN</h2>
+                <h3>PAJAK PENGHASILAN WAJIB PAJAK BADAN</h3>
+            </div>
+            <div class="header-right">
+                <div class="form-name">FORMULIR 1771</div>
+            </div>
+        </div>
+
+        <hr class="thick-line">
+
+        <!-- Mode Latihan: Bebas (form kosong) atau Kasus (dengan narasi + penilaian) -->
+        <div class="spt-section" id="mode-panel" style="background: #f8f9fa;">
+            <div class="section-title">MODE LATIHAN</div>
+            <div style="padding: 12px 15px;">
+                <div class="action-buttons" style="margin-bottom: 0;">
+                    <button type="button" id="btnModeBebas" class="btn-save">📝 Mode Bebas (Form Kosong)</button>
+                    <button type="button" id="btnModeKasus" class="btn-back" style="background-color: #6f42c1;">📋 Mode Kasus (dengan Narasi)</button>
+                    <button type="button" id="btnKasusBaru" class="btn-back" style="background-color: #17a2b8; display:none;">🔀 Ganti Kasus</button>
+                </div>
+                <div id="kasusPanel" style="display:none; margin-top: 14px; padding: 14px; background: white; border: 1px solid #ddd; border-radius: 6px;">
+                    <h4 style="margin: 0 0 8px 0;" id="kasusTitle"></h4>
+                    <p id="kasusNarrative" style="white-space: pre-line; font-size: 13px; line-height: 1.7; color: #333; margin: 0;"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bagian Identitas -->
+        <div class="spt-section">
+            <div class="section-title">IDENTITAS</div>
+            <table class="form-table">
+                <tr>
+                    <td width="200">NPWP</td>
+                    <td width="10">:</td>
+                    <td>
+                        <!-- Kotak-kotak NPWP -->
+                        <div class="npwp-inputs">
+                            <input type="text" maxlength="2" class="box-input" id="npwp_1"> . 
+                            <input type="text" maxlength="3" class="box-input" id="npwp_2"> . 
+                            <input type="text" maxlength="3" class="box-input" id="npwp_3"> . 
+                            <input type="text" maxlength="1" class="box-input" id="npwp_4"> - 
+                            <input type="text" maxlength="3" class="box-input" id="npwp_5"> . 
+                            <input type="text" maxlength="3" class="box-input" id="npwp_6">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>NAMA WAJIB PAJAK</td>
+                    <td>:</td>
+                    <td><input type="text" class="long-input" id="nama_wp" placeholder="NAMA PERUSAHAAN"></td>
+                </tr>
+                <tr>
+                    <td>JENIS USAHA</td>
+                    <td>:</td>
+                    <td>
+                        <input type="text" class="medium-input" id="jenis_usaha">
+                        <span style="margin-left:20px;">KLU : <input type="text" class="box-input klu-input" maxlength="6"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>NO. TELEPON / FAKS</td>
+                    <td>:</td>
+                    <td>
+                        <input type="text" class="medium-input" id="no_telp" placeholder="Telepon"> / 
+                        <input type="text" class="medium-input" id="no_faks" placeholder="Faks">
+                    </td>
+                </tr>
+                <tr>
+                    <td>PERIODE PEMBUKUAN</td>
+                    <td>:</td>
+                    <td>
+                        <input type="month" class="date-input" id="periode_awal"> s.d. 
+                        <input type="month" class="date-input" id="periode_akhir">
+                    </td>
+                </tr>
+            </table>
+        </div>
+       <!-- Bagian A. PENGHASILAN KENA PAJAK -->
+        <div class="spt-section">
+            <div class="section-title">A. PENGHASILAN KENA PAJAK</div>
+            <table class="form-table">
+                <tr>
+                    <td width="30">1.</td>
+                    <td>Penghasilan Neto Komersial Dalam Negeri</td>
+                    <td width="30" class="row-num">1</td>
+                    <td width="250"><input type="text" class="amount-input" id="a1" value="0"></td>
+                </tr>
+                <tr>
+                    <td>2.</td>
+                    <td>Penghasilan Neto Komersial Luar Negeri</td>
+                    <td class="row-num">2</td>
+                    <td><input type="text" class="amount-input" id="a2" value="0"></td>
+                </tr>
+                <tr>
+                    <td>3.</td>
+                    <td>Jumlah Penghasilan Neto Komersial (1 + 2)</td>
+                    <td class="row-num">3</td>
+                    <td><input type="text" class="amount-input readonly" id="a3" value="0" readonly></td>
+                </tr>
+                <tr>
+                    <td>4.</td>
+                    <td>Penghasilan yang Dikenakan PPh Final dan Tidak Termasuk Objek Pajak</td>
+                    <td class="row-num">4</td>
+                    <td><input type="text" class="amount-input" id="a4" value="0"></td>
+                </tr>
+                <tr>
+                    <td>5.</td>
+                    <td>Penyesuaian Fiskal Positif</td>
+                    <td class="row-num">5</td>
+                    <td><input type="text" class="amount-input" id="a5" value="0"></td>
+                </tr>
+                <tr>
+                    <td>6.</td>
+                    <td>Penyesuaian Fiskal Negatif</td>
+                    <td class="row-num">6</td>
+                    <td><input type="text" class="amount-input" id="a6" value="0"></td>
+                </tr>
+                <tr>
+                    <td>7.</td>
+                    <td>Fasilitas Penanaman Modal Berupa Pengurangan Penghasilan Neto</td>
+                    <td class="row-num">7</td>
+                    <td><input type="text" class="amount-input" id="a7" value="0"></td>
+                </tr>
+                <tr>
+                    <td>8.</td>
+                    <td>Penghasilan Neto Fiskal (3 - 4 + 5 - 6 - 7)</td>
+                    <td class="row-num">8</td>
+                    <td><input type="text" class="amount-input readonly" id="a8" value="0" readonly></td>
+                </tr>
+            </table>
+        </div> 
+        <!-- Bagian B. PAJAK PENGHASILAN TERUTANG -->
+        <div class="spt-section">
+            <div class="section-title">B. PAJAK PENGHASILAN TERUTANG</div>
+            <table class="form-table">
+                <tr>
+                    <td width="30">9.</td>
+                    <td>Kompensasi Kerugian Fiskal</td>
+                    <td width="30" class="row-num">9</td>
+                    <td width="250"><input type="text" class="amount-input" id="b9" value="0"></td>
+                </tr>
+                <tr>
+                    <td>10.</td>
+                    <td>Penghasilan Kena Pajak (8 - 9)</td>
+                    <td class="row-num">10</td>
+                    <td><input type="text" class="amount-input readonly" id="b10" value="0" readonly></td>
+                </tr>
+                <tr>
+                    <td>11.</td>
+                    <td>Pajak Penghasilan Terutang<br>
+                        <span style="font-size: 11px; color: #555;">(Isi manual hasil hitung tarif PPh Badan, misal 22% x Baris 10)</span>
+                    </td>
+                    <td class="row-num">11</td>
+                    <td><input type="text" class="amount-input" id="b11" value="0"></td>
+                </tr>
+                <tr>
+                    <td>12.</td>
+                    <td>Pengembalian/Pengurangan PPh Ps. 24 yang Telah Dikreditkan</td>
+                    <td class="row-num">12</td>
+                    <td><input type="text" class="amount-input" id="b12" value="0"></td>
+                </tr>
+                <tr>
+                    <td>13.</td>
+                    <td>Jumlah PPh Terutang (11 + 12)</td>
+                    <td class="row-num">13</td>
+                    <td><input type="text" class="amount-input readonly" id="b13" value="0" readonly></td>
+                </tr>
+            </table>
+        </div>
+        <!-- Bagian C. KREDIT PAJAK -->
+        <div class="spt-section">
+            <div class="section-title">C. KREDIT PAJAK</div>
+            <table class="form-table">
+                <tr>
+                    <td width="30">14.</td>
+                    <td>PPh Ditanggung Pemerintah (Proyek Bantuan Luar Negeri)</td>
+                    <td width="30" class="row-num">14</td>
+                    <td width="250"><input type="text" class="amount-input" id="c14" value="0"></td>
+                </tr>
+                <tr>
+                    <td>15.</td>
+                    <td>Kredit Pajak Dalam Negeri dan Luar Negeri</td>
+                    <td class="row-num">15</td>
+                    <td><input type="text" class="amount-input" id="c15" value="0"></td>
+                </tr>
+                <tr>
+                    <td>16.</td>
+                    <td>Jumlah Kredit Pajak (14 + 15)</td>
+                    <td class="row-num">16</td>
+                    <td><input type="text" class="amount-input readonly" id="c16" value="0" readonly></td>
+                </tr>
+                <tr>
+                    <td>17.</td>
+                    <td>PPh yang Kurang Dibayar (13 - 16) ATAU PPh Lebih Dibayar (16 - 13)</td>
+                    <td class="row-num">17</td>
+                    <td><input type="text" class="amount-input readonly" id="c17" value="0" readonly></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Bagian D. PPh KURANG/LEBIH BAYAR -->
+        <div class="spt-section">
+            <div class="section-title">D. PPh KURANG/LEBIH BAYAR</div>
+            <table class="form-table">
+                <tr>
+                    <td width="30">18.</td>
+                    <td>PPh yang dibayar sendiri (Pasal 25):</td>
+                    <td width="30"></td>
+                    <td width="250"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>a. PPh Pasal 25 bulanan</td>
+                    <td class="row-num">18a</td>
+                    <td><input type="text" class="amount-input" id="d18a" value="0"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>b. STP PPh Pasal 25 (Hanya Pokok Pajak)</td>
+                    <td class="row-num">18b</td>
+                    <td><input type="text" class="amount-input" id="d18b" value="0"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>c. Jumlah PPh Dibayar Sendiri (18a + 18b)</td>
+                    <td class="row-num">18c</td>
+                    <td><input type="text" class="amount-input readonly" id="d18c" value="0" readonly></td>
+                </tr>
+                <tr>
+                    <td>19.</td>
+                    <td>PPh yang Kurang Dibayar (Pasal 29) / Lebih Dibayar (Pasal 28A) <br>
+                        <span style="font-size: 11px; color: #555;">(Jika Lebih Bayar, angka akan berada dalam kurung)</span>
+                    </td>
+                    <td class="row-num">19</td>
+                    <td><input type="text" class="amount-input readonly" id="d19" value="0" readonly></td>
+                </tr>
+            </table>
+        </div>
+        <!-- Bagian E. PERMOHONAN -->
+        <div class="spt-section">
+            <div class="section-title">E. PERMOHONAN</div>
+            <div style="padding: 15px; font-size: 14px;">
+                <p style="margin-top: 0;">Jika jumlah pada Angka 19 menunjukkan <b>Lebih Bayar</b>, mohon untuk:</p>
+                <div style="margin-bottom: 8px;">
+                    <label><input type="radio" name="permohonan" id="e_restitusi" value="restitusi" disabled> a. Direstitusikan (Pasal 17B)</label>
+                </div>
+                <div>
+                    <label><input type="radio" name="permohonan" id="e_kompensasi" value="kompensasi" disabled> b. Dikompensasikan dengan Utang Pajak</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bagian F. ANGSURAN PPh PASAL 25 TAHUN PAJAK BERIKUTNYA -->
+        <div class="spt-section">
+            <div class="section-title">F. ANGSURAN PPh PASAL 25 TAHUN PAJAK BERIKUTNYA</div>
+            <table class="form-table">
+                <tr>
+                    <td width="30">20.</td>
+                    <td>Penghasilan yang menjadi dasar penghitungan angsuran</td>
+                    <td width="30" class="row-num">20</td>
+                    <td width="250"><input type="text" class="amount-input" id="f20" value="0"></td>
+                </tr>
+                <tr>
+                    <td>21.</td>
+                    <td>Angsuran PPh Pasal 25 Tahun Pajak Berikutnya</td>
+                    <td class="row-num">21</td>
+                    <td><input type="text" class="amount-input" id="f21" value="0"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Bagian G & H. LAMPIRAN & PERNYATAAN -->
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div class="spt-section" style="flex: 1; margin-bottom: 0;">
+                <div class="section-title">G. LAMPIRAN</div>
+                <div style="padding: 10px; font-size: 12px; line-height: 1.6;">
+                    <label><input type="checkbox" checked disabled> Lampiran I s.d. VI</label><br>
+                    <label><input type="checkbox" id="g_lk"> Laporan Keuangan</label><br>
+                    <label><input type="checkbox" id="g_ssp"> SSP PPh Pasal 29</label><br>
+                    <label><input type="checkbox" id="g_lainnya"> Dokumen Lainnya</label>
+                </div>
+            </div>
+            <div class="spt-section" style="flex: 1; margin-bottom: 0;">
+                <div class="section-title">H. PERNYATAAN</div>
+                <div style="padding: 10px; font-size: 12px; text-align: center;">
+                    <p>Dengan menyadari sepenuhnya akan segala akibatnya, saya menyatakan bahwa apa yang telah saya beritahukan di atas adalah benar, lengkap, dan jelas.</p>
+                    <br>
+                    <input type="date" class="date-input" style="margin-bottom: 20px;"><br>
+                    <p><b>Pengurus / Kuasa</b></p>
+                    <br><br>
+                    <hr style="width: 60%; border-top: 1px solid black;">
+                    <input type="text" placeholder="Nama Lengkap" style="text-align: center; border: none; background: transparent; width: 100%; text-transform: uppercase;">
+                </div>
+            </div>
+        </div>
+        <!-- Hasil Pengecekan Jawaban (Mode Kasus) -->
+        <div id="hasilPengecekan" style="display:none; margin-bottom: 20px; padding: 16px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px;"></div>
+
+        <!-- Tombol Aksi -->
+        <div class="action-buttons">
+            <button id="btnSimpan" class="btn-save">Simpan Draf</button>
+            <button id="btnResetDraf" class="btn-back" style="background-color: #6c757d;" type="button">Reset Formulir</button>
+            <button id="btnCekJawaban" class="btn-save" style="background-color: #28a745; display:none;" type="button">✅ Cek Jawaban</button>
+            <button onclick="window.close()" class="btn-back">Tutup & Kembali</button>
+        <a href="1771_Lampiran_I.html" id="btnKeLampiran1" class="btn-back" style="background-color: #17a2b8;">Buka Lampiran I (Penghasilan Neto Fiskal)</a>
+        <a href="1771_Lampiran_III.html" class="btn-back" style="background-color: #6f42c1;">Buka Lampiran III (Kredit Pajak)</a>
+        <a href="1771_Lampiran_IV.html" class="btn-back" style="background-color: #e83e8c;">Buka Lampiran IV (PPh Final)</a>
+    </div>
+</div>
+    <script src="script_formulir.js"></script>
+</body>
+</html>

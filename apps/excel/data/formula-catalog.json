@@ -1,0 +1,899 @@
+{
+  "_meta": {
+    "note": "Katalog rumus modular. Tahap 1: fungsi agregasi Level 1. Tahap 2 menambahkan Logika, Agregasi bersyarat (COUNTIF/SUMIF), Teks, dan Tanggal — semuanya sudah didukung penuh oleh formula-validator.js dan spreadsheet-engine.js. Kategori Level 3+ (VLOOKUP, INDEX-MATCH, SUMIFS/COUNTIFS) akan ditambahkan pada tahap berikutnya.",
+    "version": "0.2.0-tahap2"
+  },
+  "formulas": [
+    {
+      "id": "sum",
+      "name": "SUM",
+      "category": "Matematika dan Agregasi",
+      "level": 1,
+      "syntax": "SUM(rentang1, [rentang2], ...)",
+      "description": "Menjumlahkan seluruh nilai numerik pada satu atau beberapa rentang sel.",
+      "parameters": [
+        {
+          "name": "rentang1",
+          "required": true,
+          "description": "Rentang atau sel pertama yang ingin dijumlahkan."
+        },
+        {
+          "name": "rentang2, ...",
+          "required": false,
+          "description": "Rentang tambahan (opsional), bisa lebih dari satu."
+        }
+      ],
+      "example": "=SUM(H2:H26)",
+      "difficulty": 1,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Rentang tidak mencakup seluruh baris data sehingga hasil lebih kecil dari seharusnya.",
+        "Menjumlahkan kolom yang berisi teks (misalnya kolom Nama), sehingga sel teks diabaikan dan hasil tidak sesuai maksud soal."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "average",
+      "name": "AVERAGE",
+      "category": "Matematika dan Agregasi",
+      "level": 1,
+      "syntax": "AVERAGE(rentang1, [rentang2], ...)",
+      "description": "Menghitung rata-rata (mean) dari nilai numerik pada satu atau beberapa rentang sel.",
+      "parameters": [
+        {
+          "name": "rentang1",
+          "required": true,
+          "description": "Rentang atau sel pertama yang ingin dirata-ratakan."
+        },
+        {
+          "name": "rentang2, ...",
+          "required": false,
+          "description": "Rentang tambahan (opsional)."
+        }
+      ],
+      "example": "=AVERAGE(I2:I26)",
+      "difficulty": 1,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Sel kosong pada rentang ikut mempengaruhi jumlah pembagi jika ditangani secara manual, padahal AVERAGE otomatis mengabaikan sel kosong.",
+        "Menghitung rata-rata dari rentang yang salah kolom."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "min",
+      "name": "MIN",
+      "category": "Matematika dan Agregasi",
+      "level": 1,
+      "syntax": "MIN(rentang1, [rentang2], ...)",
+      "description": "Mengambil nilai terkecil dari satu atau beberapa rentang sel numerik.",
+      "parameters": [
+        {
+          "name": "rentang1",
+          "required": true,
+          "description": "Rentang atau sel pertama."
+        }
+      ],
+      "example": "=MIN(M2:M26)",
+      "difficulty": 1,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Tertukar dengan MAX sehingga mengambil nilai terbesar, bukan terkecil."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "max",
+      "name": "MAX",
+      "category": "Matematika dan Agregasi",
+      "level": 1,
+      "syntax": "MAX(rentang1, [rentang2], ...)",
+      "description": "Mengambil nilai terbesar dari satu atau beberapa rentang sel numerik.",
+      "parameters": [
+        {
+          "name": "rentang1",
+          "required": true,
+          "description": "Rentang atau sel pertama."
+        }
+      ],
+      "example": "=MAX(M2:M26)",
+      "difficulty": 1,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Tertukar dengan MIN sehingga mengambil nilai terkecil, bukan terbesar."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "count",
+      "name": "COUNT",
+      "category": "Matematika dan Agregasi",
+      "level": 1,
+      "syntax": "COUNT(rentang1, [rentang2], ...)",
+      "description": "Menghitung jumlah sel yang berisi nilai numerik pada satu atau beberapa rentang. Sel berisi teks atau kosong tidak dihitung.",
+      "parameters": [
+        {
+          "name": "rentang1",
+          "required": true,
+          "description": "Rentang atau sel pertama."
+        }
+      ],
+      "example": "=COUNT(H2:H26)",
+      "difficulty": 1,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Menggunakan COUNT pada kolom teks (misalnya Nama Pelanggan) dan bingung karena hasilnya 0 — COUNT hanya menghitung sel angka, bukan COUNTA."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "if",
+      "name": "IF",
+      "category": "Logika",
+      "level": 2,
+      "syntax": "IF(kondisi, nilai_jika_benar, [nilai_jika_salah])",
+      "description": "Mengembalikan salah satu dari dua nilai tergantung apakah kondisi bernilai benar atau salah.",
+      "parameters": [
+        {
+          "name": "kondisi",
+          "required": true,
+          "description": "Ekspresi perbandingan, mis. H2>5 atau F2=\"Jawa Barat\"."
+        },
+        {
+          "name": "nilai_jika_benar",
+          "required": true,
+          "description": "Nilai/teks yang dikembalikan jika kondisi benar."
+        },
+        {
+          "name": "nilai_jika_salah",
+          "required": false,
+          "description": "Nilai/teks yang dikembalikan jika kondisi salah."
+        }
+      ],
+      "example": "=IF(M2>=1000000,\"Penjualan Besar\",\"Penjualan Kecil\")",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Lupa tanda kutip pada nilai teks, sehingga dianggap sebagai referensi sel.",
+        "Kondisi memakai tanda \"=\" tunggal seperti pada bahasa pemrograman lain — di Excel itu sudah benar untuk kesetaraan."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "and",
+      "name": "AND",
+      "category": "Logika",
+      "level": 2,
+      "syntax": "AND(kondisi1, [kondisi2], ...)",
+      "description": "Menghasilkan BENAR hanya jika SEMUA kondisi yang diberikan bernilai benar.",
+      "parameters": [
+        {
+          "name": "kondisi1",
+          "required": true,
+          "description": "Kondisi pertama."
+        },
+        {
+          "name": "kondisi2, ...",
+          "required": false,
+          "description": "Kondisi tambahan (opsional)."
+        }
+      ],
+      "example": "=IF(AND(H2>5,I2>100000),\"Ya\",\"Tidak\")",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Mengira AND bisa berdiri sendiri sebagai jawaban akhir tanpa dibungkus IF untuk menampilkan teks."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "or",
+      "name": "OR",
+      "category": "Logika",
+      "level": 2,
+      "syntax": "OR(kondisi1, [kondisi2], ...)",
+      "description": "Menghasilkan BENAR jika SALAH SATU dari kondisi yang diberikan bernilai benar.",
+      "parameters": [
+        {
+          "name": "kondisi1",
+          "required": true,
+          "description": "Kondisi pertama."
+        },
+        {
+          "name": "kondisi2, ...",
+          "required": false,
+          "description": "Kondisi tambahan (opsional)."
+        }
+      ],
+      "example": "=IF(OR(G2=\"Bali\",G2=\"DKI Jakarta\"),\"Prioritas\",\"Biasa\")",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Tertukar logika dengan AND — OR hanya butuh salah satu kondisi benar, bukan semuanya."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "not",
+      "name": "NOT",
+      "category": "Logika",
+      "level": 2,
+      "syntax": "NOT(kondisi)",
+      "description": "Membalik hasil sebuah kondisi: BENAR menjadi SALAH, dan sebaliknya.",
+      "parameters": [
+        {
+          "name": "kondisi",
+          "required": true,
+          "description": "Kondisi yang ingin dibalik."
+        }
+      ],
+      "example": "=IF(NOT(H2>5),\"Sedikit\",\"Banyak\")",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "iferror",
+      "name": "IFERROR",
+      "category": "Logika",
+      "level": 2,
+      "syntax": "IFERROR(nilai, nilai_jika_error)",
+      "description": "Mengembalikan nilai_jika_error apabila rumus pada argumen pertama menghasilkan error; jika tidak, mengembalikan hasil aslinya.",
+      "parameters": [
+        {
+          "name": "nilai",
+          "required": true,
+          "description": "Rumus/ekspresi yang ingin diperiksa."
+        },
+        {
+          "name": "nilai_jika_error",
+          "required": true,
+          "description": "Nilai pengganti jika terjadi error."
+        }
+      ],
+      "example": "=IFERROR(FIND(\"X\",D2),\"Tidak ditemukan\")",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "countif",
+      "name": "COUNTIF",
+      "category": "Matematika dan Agregasi",
+      "level": 2,
+      "syntax": "COUNTIF(rentang, kriteria)",
+      "description": "Menghitung jumlah sel pada suatu rentang yang memenuhi SATU kriteria tertentu.",
+      "parameters": [
+        {
+          "name": "rentang",
+          "required": true,
+          "description": "Rentang sel yang diperiksa."
+        },
+        {
+          "name": "kriteria",
+          "required": true,
+          "description": "Kriteria, mis. \"Jawa Barat\", \">5\", atau \"<>0\"."
+        }
+      ],
+      "example": "=COUNTIF(G2:G26,\"Jawa Barat\")",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Lupa tanda kutip pada kriteria teks atau kriteria berawalan operator seperti \">5\"."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "sumif",
+      "name": "SUMIF",
+      "category": "Matematika dan Agregasi",
+      "level": 2,
+      "syntax": "SUMIF(rentang, kriteria, [rentang_jumlah])",
+      "description": "Menjumlahkan nilai pada rentang_jumlah untuk baris-baris yang kolom rentang-nya memenuhi kriteria tertentu.",
+      "parameters": [
+        {
+          "name": "rentang",
+          "required": true,
+          "description": "Rentang yang diperiksa terhadap kriteria."
+        },
+        {
+          "name": "kriteria",
+          "required": true,
+          "description": "Kriteria pencocokan."
+        },
+        {
+          "name": "rentang_jumlah",
+          "required": false,
+          "description": "Rentang yang dijumlahkan; jika kosong, memakai rentang itu sendiri."
+        }
+      ],
+      "example": "=SUMIF(F2:F26,\"Elektronik\",M2:M26)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Rentang kriteria dan rentang jumlah berukuran berbeda (jumlah baris tidak sama)."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "left",
+      "name": "LEFT",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "LEFT(teks, [jumlah_karakter])",
+      "description": "Mengambil sejumlah karakter dari sisi KIRI sebuah teks.",
+      "parameters": [
+        {
+          "name": "teks",
+          "required": true,
+          "description": "Teks atau referensi sel sumber."
+        },
+        {
+          "name": "jumlah_karakter",
+          "required": false,
+          "description": "Jumlah karakter yang diambil (default 1)."
+        }
+      ],
+      "example": "=LEFT(D2,3)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "right",
+      "name": "RIGHT",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "RIGHT(teks, [jumlah_karakter])",
+      "description": "Mengambil sejumlah karakter dari sisi KANAN sebuah teks.",
+      "parameters": [
+        {
+          "name": "teks",
+          "required": true,
+          "description": "Teks atau referensi sel sumber."
+        },
+        {
+          "name": "jumlah_karakter",
+          "required": false,
+          "description": "Jumlah karakter yang diambil (default 1)."
+        }
+      ],
+      "example": "=RIGHT(D2,3)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "mid",
+      "name": "MID",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "MID(teks, mulai, jumlah_karakter)",
+      "description": "Mengambil sejumlah karakter dari TENGAH sebuah teks, mulai dari posisi tertentu.",
+      "parameters": [
+        {
+          "name": "teks",
+          "required": true,
+          "description": "Teks atau referensi sel sumber."
+        },
+        {
+          "name": "mulai",
+          "required": true,
+          "description": "Posisi karakter awal (dimulai dari 1)."
+        },
+        {
+          "name": "jumlah_karakter",
+          "required": true,
+          "description": "Jumlah karakter yang diambil."
+        }
+      ],
+      "example": "=MID(D2,5,3)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "len",
+      "name": "LEN",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "LEN(teks)",
+      "description": "Menghitung jumlah karakter (termasuk spasi) pada sebuah teks.",
+      "parameters": [
+        {
+          "name": "teks",
+          "required": true,
+          "description": "Teks atau referensi sel sumber."
+        }
+      ],
+      "example": "=LEN(C2)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "trim",
+      "name": "TRIM",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "TRIM(teks)",
+      "description": "Menghapus spasi berlebih di awal, akhir, dan di antara kata pada sebuah teks.",
+      "parameters": [
+        {
+          "name": "teks",
+          "required": true,
+          "description": "Teks atau referensi sel sumber."
+        }
+      ],
+      "example": "=TRIM(\"  Halo   Dunia  \")",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "lower",
+      "name": "LOWER",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "LOWER(teks)",
+      "description": "Mengubah seluruh huruf pada teks menjadi huruf kecil.",
+      "parameters": [
+        {
+          "name": "teks",
+          "required": true,
+          "description": "Teks atau referensi sel sumber."
+        }
+      ],
+      "example": "=LOWER(G2)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "upper",
+      "name": "UPPER",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "UPPER(teks)",
+      "description": "Mengubah seluruh huruf pada teks menjadi huruf kapital.",
+      "parameters": [
+        {
+          "name": "teks",
+          "required": true,
+          "description": "Teks atau referensi sel sumber."
+        }
+      ],
+      "example": "=UPPER(G2)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "proper",
+      "name": "PROPER",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "PROPER(teks)",
+      "description": "Mengubah huruf pertama tiap kata pada teks menjadi kapital (Title Case).",
+      "parameters": [
+        {
+          "name": "teks",
+          "required": true,
+          "description": "Teks atau referensi sel sumber."
+        }
+      ],
+      "example": "=PROPER(C2)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "concat",
+      "name": "CONCAT",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "CONCAT(teks1, [teks2], ...)",
+      "description": "Menggabungkan dua atau lebih teks/nilai menjadi satu teks.",
+      "parameters": [
+        {
+          "name": "teks1",
+          "required": true,
+          "description": "Teks/nilai pertama."
+        },
+        {
+          "name": "teks2, ...",
+          "required": false,
+          "description": "Teks/nilai tambahan (opsional)."
+        }
+      ],
+      "example": "=CONCAT(D2,\"-\",G2)",
+      "difficulty": 2,
+      "excelVersion": "Excel 2016 dan versi lebih baru (pengganti CONCATENATE)",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "find",
+      "name": "FIND",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "FIND(teks_dicari, dalam_teks, [mulai])",
+      "description": "Mencari posisi sebuah teks di dalam teks lain — PEKA huruf besar/kecil (case-sensitive).",
+      "parameters": [
+        {
+          "name": "teks_dicari",
+          "required": true,
+          "description": "Teks yang dicari."
+        },
+        {
+          "name": "dalam_teks",
+          "required": true,
+          "description": "Teks sumber tempat pencarian dilakukan."
+        },
+        {
+          "name": "mulai",
+          "required": false,
+          "description": "Posisi awal pencarian (default 1)."
+        }
+      ],
+      "example": "=FIND(\"Sap\",C2)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Lupa bahwa FIND itu case-sensitive, berbeda dengan SEARCH."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "search",
+      "name": "SEARCH",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "SEARCH(teks_dicari, dalam_teks, [mulai])",
+      "description": "Mencari posisi sebuah teks di dalam teks lain — TIDAK peka huruf besar/kecil (case-insensitive).",
+      "parameters": [
+        {
+          "name": "teks_dicari",
+          "required": true,
+          "description": "Teks yang dicari."
+        },
+        {
+          "name": "dalam_teks",
+          "required": true,
+          "description": "Teks sumber tempat pencarian dilakukan."
+        },
+        {
+          "name": "mulai",
+          "required": false,
+          "description": "Posisi awal pencarian (default 1)."
+        }
+      ],
+      "example": "=SEARCH(\"sap\",C2)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "substitute",
+      "name": "SUBSTITUTE",
+      "category": "Teks",
+      "level": 2,
+      "syntax": "SUBSTITUTE(teks, teks_lama, teks_baru, [kemunculan_ke])",
+      "description": "Mengganti kemunculan teks_lama dengan teks_baru pada sebuah teks.",
+      "parameters": [
+        {
+          "name": "teks",
+          "required": true,
+          "description": "Teks sumber."
+        },
+        {
+          "name": "teks_lama",
+          "required": true,
+          "description": "Teks yang ingin diganti."
+        },
+        {
+          "name": "teks_baru",
+          "required": true,
+          "description": "Teks pengganti."
+        },
+        {
+          "name": "kemunculan_ke",
+          "required": false,
+          "description": "Jika diisi, hanya kemunculan ke-N yang diganti; jika kosong, ganti semua."
+        }
+      ],
+      "example": "=SUBSTITUTE(C2,\"e\",\"3\")",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "today",
+      "name": "TODAY",
+      "category": "Tanggal",
+      "level": 2,
+      "syntax": "TODAY()",
+      "description": "Mengembalikan tanggal hari ini (sesuai jam perangkat), tanpa argumen.",
+      "parameters": [],
+      "example": "=TODAY()",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "Mengira TODAY() perlu argumen di dalam tanda kurung."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "date",
+      "name": "DATE",
+      "category": "Tanggal",
+      "level": 2,
+      "syntax": "DATE(tahun, bulan, tanggal)",
+      "description": "Membentuk sebuah tanggal dari komponen tahun, bulan, dan tanggal terpisah.",
+      "parameters": [
+        {
+          "name": "tahun",
+          "required": true,
+          "description": "Tahun, mis. 2026."
+        },
+        {
+          "name": "bulan",
+          "required": true,
+          "description": "Bulan (1-12)."
+        },
+        {
+          "name": "tanggal",
+          "required": true,
+          "description": "Tanggal (1-31)."
+        }
+      ],
+      "example": "=DATE(2026,5,17)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "year",
+      "name": "YEAR",
+      "category": "Tanggal",
+      "level": 2,
+      "syntax": "YEAR(tanggal)",
+      "description": "Mengambil bagian TAHUN dari sebuah tanggal.",
+      "parameters": [
+        {
+          "name": "tanggal",
+          "required": true,
+          "description": "Tanggal atau referensi sel bertipe tanggal."
+        }
+      ],
+      "example": "=YEAR(B2)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "month",
+      "name": "MONTH",
+      "category": "Tanggal",
+      "level": 2,
+      "syntax": "MONTH(tanggal)",
+      "description": "Mengambil bagian BULAN (1-12) dari sebuah tanggal.",
+      "parameters": [
+        {
+          "name": "tanggal",
+          "required": true,
+          "description": "Tanggal atau referensi sel bertipe tanggal."
+        }
+      ],
+      "example": "=MONTH(B2)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "day",
+      "name": "DAY",
+      "category": "Tanggal",
+      "level": 2,
+      "syntax": "DAY(tanggal)",
+      "description": "Mengambil bagian TANGGAL/hari-dalam-bulan (1-31) dari sebuah tanggal.",
+      "parameters": [
+        {
+          "name": "tanggal",
+          "required": true,
+          "description": "Tanggal atau referensi sel bertipe tanggal."
+        }
+      ],
+      "example": "=DAY(B2)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "datedif",
+      "name": "DATEDIF",
+      "category": "Tanggal",
+      "level": 2,
+      "syntax": "DATEDIF(tanggal_mulai, tanggal_akhir, satuan)",
+      "description": "Menghitung selisih antara dua tanggal dalam satuan \"Y\" (tahun penuh), \"M\" (bulan penuh), atau \"D\" (hari).",
+      "parameters": [
+        {
+          "name": "tanggal_mulai",
+          "required": true,
+          "description": "Tanggal lebih awal."
+        },
+        {
+          "name": "tanggal_akhir",
+          "required": true,
+          "description": "Tanggal lebih akhir (tidak boleh sebelum tanggal_mulai)."
+        },
+        {
+          "name": "satuan",
+          "required": true,
+          "description": "\"Y\", \"M\", atau \"D\"."
+        }
+      ],
+      "example": "=DATEDIF(B2,B10,\"D\")",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel, namun tidak didokumentasikan resmi oleh Microsoft",
+      "commonErrors": [
+        "Menukar urutan tanggal_mulai dan tanggal_akhir, sehingga menghasilkan error."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "weekday",
+      "name": "WEEKDAY",
+      "category": "Tanggal",
+      "level": 2,
+      "syntax": "WEEKDAY(tanggal)",
+      "description": "Mengembalikan angka hari dalam seminggu (1=Minggu ... 7=Sabtu, tipe default Excel).",
+      "parameters": [
+        {
+          "name": "tanggal",
+          "required": true,
+          "description": "Tanggal atau referensi sel bertipe tanggal."
+        }
+      ],
+      "example": "=WEEKDAY(B2)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel; hanya tipe default (1=Minggu) yang didukung pada tahap ini",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "eomonth",
+      "name": "EOMONTH",
+      "category": "Tanggal",
+      "level": 2,
+      "syntax": "EOMONTH(tanggal_mulai, jumlah_bulan)",
+      "description": "Mengembalikan tanggal terakhir pada bulan yang berjarak sejumlah bulan dari tanggal_mulai.",
+      "parameters": [
+        {
+          "name": "tanggal_mulai",
+          "required": true,
+          "description": "Tanggal acuan."
+        },
+        {
+          "name": "jumlah_bulan",
+          "required": true,
+          "description": "Jumlah bulan maju (positif) atau mundur (negatif); 0 = akhir bulan yang sama."
+        }
+      ],
+      "example": "=EOMONTH(B2,0)",
+      "difficulty": 2,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "vlookup",
+      "name": "VLOOKUP",
+      "category": "Lookup",
+      "level": 3,
+      "syntax": "VLOOKUP(lookup_value, table_array, col_index, [range_lookup])",
+      "description": "Mencari nilai pada kolom pertama sebuah tabel dan mengembalikan nilai dari kolom yang ditentukan di baris yang sama.",
+      "parameters": [
+        { "name": "lookup_value", "required": true, "description": "Nilai yang dicari di kolom pertama tabel." },
+        { "name": "table_array", "required": true, "description": "Rentang tabel tempat pencarian dilakukan." },
+        { "name": "col_index", "required": true, "description": "Nomor kolom (1-based) dalam tabel yang nilainya ingin dikembalikan." },
+        { "name": "range_lookup", "required": false, "description": "TRUE untuk pencocokan approximate, FALSE untuk pencocokan exact." }
+      ],
+      "example": "=VLOOKUP(A2,A10:D20,3,FALSE)",
+      "difficulty": 3,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": [
+        "col_index lebih besar dari jumlah kolom tabel.",
+        "Mengabaikan parameter range_lookup sehingga hasil tidak sesuai (approximate vs exact)."
+      ],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "match",
+      "name": "MATCH",
+      "category": "Lookup",
+      "level": 3,
+      "syntax": "MATCH(lookup_value, lookup_array, [match_type])",
+      "description": "Mengembalikan posisi relatif (1-based) dari lookup_value di dalam lookup_array. match_type dapat 1,0,-1 untuk perilaku approx/exact.",
+      "parameters": [
+        { "name": "lookup_value", "required": true, "description": "Nilai yang dicari." },
+        { "name": "lookup_array", "required": true, "description": "Rentang satu dimensi tempat pencarian." },
+        { "name": "match_type", "required": false, "description": "0=exact, 1=less_equal, -1=greater_equal" }
+      ],
+      "example": "=MATCH(\"Apple\",A2:A10,0)",
+      "difficulty": 3,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": ["Lupa mengatur match_type untuk pencocokan exact."],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "index",
+      "name": "INDEX",
+      "category": "Lookup",
+      "level": 3,
+      "syntax": "INDEX(array, row_num, [col_num])",
+      "description": "Mengembalikan nilai dari sebuah array berdasarkan nomor baris dan kolom yang diberikan.",
+      "parameters": [
+        { "name": "array", "required": true, "description": "Rentang array/sel." },
+        { "name": "row_num", "required": true, "description": "Nomor baris relative (1-based) dalam array." },
+        { "name": "col_num", "required": false, "description": "Nomor kolom relative (1-based) dalam array, jika array 2D." }
+      ],
+      "example": "=INDEX(B2:D10,3,2)",
+      "difficulty": 3,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": ["row_num atau col_num berada di luar jangkauan array."],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "sumifs",
+      "name": "SUMIFS",
+      "category": "Matematika dan Agregasi",
+      "level": 3,
+      "syntax": "SUMIFS(sum_range, criteria_range1, criteria1, [criteria_range2, criteria2, ...])",
+      "description": "Menjumlahkan nilai pada sum_range untuk baris yang memenuhi semua kriteria yang diberikan (multi-kriteria).",
+      "parameters": [
+        { "name": "sum_range", "required": true, "description": "Rentang nilai yang akan dijumlahkan." },
+        { "name": "criteria_range1", "required": true, "description": "Rentang untuk kriteria pertama." },
+        { "name": "criteria1", "required": true, "description": "Kriteria pertama (mis. \">1000\" atau \"Elektronik\")." }
+      ],
+      "example": "=SUMIFS(M2:M100,F2:F100,\"Elektronik\",G2:G100,\">=2026-01-01\")",
+      "difficulty": 3,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": ["Rentang kriteria dan rentang jumlah harus memiliki ukuran yang sama."],
+      "practiceDataset": "sales"
+    },
+    {
+      "id": "countifs",
+      "name": "COUNTIFS",
+      "category": "Matematika dan Agregasi",
+      "level": 3,
+      "syntax": "COUNTIFS(criteria_range1, criteria1, [criteria_range2, criteria2, ...])",
+      "description": "Menghitung jumlah baris yang memenuhi semua kriteria (multi-kriteria).",
+      "parameters": [
+        { "name": "criteria_range1", "required": true, "description": "Rentang untuk kriteria pertama." },
+        { "name": "criteria1", "required": true, "description": "Kriteria pertama." }
+      ],
+      "example": "=COUNTIFS(F2:F100,\"Elektronik\",G2:G100,\">=2026-01-01\")",
+      "difficulty": 3,
+      "excelVersion": "Tersedia di semua versi Microsoft Excel",
+      "commonErrors": ["Pasangan rentang/kriteria harus seimbang dan berukuran sama."],
+      "practiceDataset": "sales"
+    }
+  ]
+}

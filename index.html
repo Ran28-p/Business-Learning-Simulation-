@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Portal Belajar — SPT Pajak · Akuntansi · Excel · SQL &amp; Power Query</title>
+  <meta name="description" content="Satu portal untuk latihan SPT Pajak, Akuntansi, Rumus Excel, dan SQL &amp; Power Query. Login tanpa password via email link." />
+  <link rel="stylesheet" href="./css/portal.css" />
+  <link rel="stylesheet" href="./css/responsive-foundation.css" />
+  <link rel="icon" href="./apps/spt/icons/favicon-32.png" />
+</head>
+<body>
+  <!-- Boot -->
+  <section id="screen-boot" class="screen active">
+    <div class="boot">
+      <div class="spinner" aria-hidden="true"></div>
+      <div>Memuat portal…</div>
+    </div>
+  </section>
+
+  <!-- Auth -->
+  <section id="screen-auth" class="screen">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="brand">
+          <div class="brand-mark">PB</div>
+          <div>
+            <h1>Portal Belajar</h1>
+            <p>SPT Pajak · Akuntansi · Excel · SQL &amp; Power Query</p>
+          </div>
+        </div>
+
+        <h2>Masuk tanpa password</h2>
+        <p class="lead">
+          Masukkan email Anda. Kami kirim <strong>link login</strong> — tidak perlu password.
+          Progres bisa disinkron antar perangkat dengan email yang sama.
+        </p>
+
+        <div id="auth-feedback" class="feedback" role="status"></div>
+
+        <form id="auth-form" class="auth-form" autocomplete="on">
+          <div class="field">
+            <label for="auth-email">Email</label>
+            <input id="auth-email" type="email" placeholder="nama@gmail.com" required />
+          </div>
+          <div class="field">
+            <label for="auth-name">Nama tampilan (opsional)</label>
+            <input id="auth-name" type="text" placeholder="Nama Anda" maxlength="60" />
+          </div>
+          <button type="submit" class="btn btn-primary" id="auth-submit">Kirim Link Login</button>
+        </form>
+
+        <div class="guest-row">
+          <button type="button" id="btn-guest">Lanjutkan sebagai Tamu</button>
+        </div>
+
+        <p class="auth-note">
+          Dengan login, Anda bisa menyimpan progres latihan di cloud dan mengaksesnya dari perangkat lain.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  
+  <!-- Hub -->
+  <section id="screen-hub" class="screen">
+    <header class="hub-header">
+      <div class="brand" style="margin:0">
+        <div class="brand-mark" style="width:40px;height:40px;font-size:15px;border-radius:12px">PB</div>
+        <div>
+          <h1 style="font-size:1.05rem">Portal Belajar</h1>
+          <p style="margin:0;font-size:0.78rem;color:var(--muted)">Pilih modul latihan</p>
+        </div>
+      </div>
+      <div class="hub-user">
+        <div class="avatar" id="hub-user-avatar">?</div>
+        <div class="meta">
+          <div class="name" id="hub-user-name">—</div>
+          <div class="email" id="hub-user-email">—</div>
+        </div>
+        <button type="button" class="btn btn-ghost" id="btn-logout" style="padding:8px 12px;margin-left:8px">Keluar</button>
+      </div>
+    </header>
+
+    <main class="hub-main">
+      <div class="hub-hero">
+        <h2>Selamat datang 👋</h2>
+        <p>
+          Beberapa simulator latihan dalam satu sistem. Pilih modul di bawah — masing-masing
+          berjalan mandiri, data progres tersimpan di browser (dan di cloud jika Anda login).
+        </p>
+      </div>
+
+      <div class="resume-banner" id="resumeBanner">
+        <div class="resume-banner__text">Lanjutkan sesi terakhir: <strong id="resumeBannerLabel">—</strong></div>
+        <button type="button" class="btn btn-primary" id="resumeBannerBtn" style="padding:8px 16px">Lanjutkan →</button>
+      </div>
+
+      <div class="module-grid">
+        <button type="button" class="module-card mod-spt" data-module="./apps/spt/index.html" tabindex="0">
+          <div class="icon">🧾</div>
+          <h3>Simulator SPT Pajak</h3>
+          <p>
+            Latihan isi SPT Tahunan Badan (Formulir 1771 + lampiran), modul ringkasan pajak,
+            kuis, dan kasus berbasis aturan perpajakan Indonesia.
+          </p>
+          <div class="tags">
+            <span class="tag">PPh Badan</span>
+            <span class="tag">Formulir 1771</span>
+            <span class="tag">Kuis Pajak</span>
+          </div>
+          <div class="cta">Buka Simulator SPT →</div>
+        </button>
+
+        <button type="button" class="module-card mod-accounting" data-module="./apps/accounting/index.html" tabindex="0">
+          <div class="icon">📊</div>
+          <h3>Accounting Simulator</h3>
+          <p>
+            Siklus akuntansi lengkap: jurnal, buku besar, neraca saldo, penyesuaian, worksheet,
+            laporan keuangan, penutupan, plus modul invoice &amp; rekonsiliasi PPN.
+          </p>
+          <div class="tags">
+            <span class="tag">Jurnal</span>
+            <span class="tag">Laporan Keuangan</span>
+            <span class="tag">PPN &amp; Invoice</span>
+          </div>
+          <div class="cta">Buka Accounting →</div>
+        </button>
+
+        <button type="button" class="module-card mod-excel" data-module="./apps/excel/index.html" tabindex="0">
+          <div class="icon">📈</div>
+          <h3>Excel Formula Practice</h3>
+          <p>
+            Latihan rumus Excel di atas dataset penjualan realistis: SUM, IF, COUNTIF, SUMIF,
+            fungsi teks &amp; tanggal — dengan validasi hasil, XP, dan badge.
+          </p>
+          <div class="tags">
+            <span class="tag">Level 1–2</span>
+            <span class="tag">Dataset Penjualan</span>
+            <span class="tag">XP &amp; Badge</span>
+          </div>
+          <div class="cta">Buka Excel Practice →</div>
+        </button>
+
+
+        <button type="button" class="module-card mod-sqlpq" data-module="./apps/sql-pq/index.html" tabindex="0">
+          <div class="icon">🗄️</div>
+          <h3>SQL &amp; Power Query Simulator</h3>
+          <p>
+            Belajar SQL &amp; Power Query dari dasar sampai mahir: dataset realistis, SQL editor
+            sungguhan di browser (SQLite/WASM), penilaian otomatis, dan simulasi transformasi Power Query.
+          </p>
+          <div class="tags">
+            <span class="tag">SQL Editor Nyata</span>
+            <span class="tag">Dataset Generator</span>
+            <span class="tag">Power Query M-Code</span>
+          </div>
+          <div class="cta">Buka SQL &amp; Power Query →</div>
+        </button>
+      </div>
+
+      <p class="hub-footer">
+        Portal Belajar · Berjalan di browser · Login email-link Firebase · Data modul lokal per aplikasi
+      </p>
+    </main>
+  </section>
+
+  <!-- Firebase SDK (compat, sama seperti Simulator SPT) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/portal.js"></script>
+
+  <!-- PWA: daftarkan service worker (gratis, agar hub bisa dibuka offline) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').catch(function(err) {
+                console.warn('Service worker gagal didaftarkan (portal tetap jalan normal seperti web biasa):', err);
+            });
+        });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>SPT 1771 Lampiran I - Penghasilan Neto Fiskal</title>
+    <link rel="stylesheet" href="style_formulir.css">
+</head>
+<body>
+    <div class="spt-container">
+        <!-- Header Formulir -->
+        <div class="spt-header">
+            <div class="header-left">
+                KEMENTERIAN KEUANGAN RI<br>
+                DIREKTORAT JENDERAL PAJAK
+            </div>
+            <div class="header-center">
+                <h2>LAMPIRAN - I</h2>
+                <h3>SPT TAHUNAN PAJAK PENGHASILAN WAJIB PAJAK BADAN</h3>
+                <p><b>PENGHITUNGAN PENGHASILAN NETO FISKAL</b></p>
+            </div>
+            <div class="header-right">
+                <div class="form-name">1771 - I</div>
+            </div>
+        </div>
+
+        <hr class="thick-line">
+
+        <!-- Bagian Identitas Singkat -->
+        <div class="spt-section">
+            <table class="form-table">
+                <tr>
+                    <td width="200">NPWP</td>
+                    <td width="10">:</td>
+                    <td><input type="text" class="medium-input" id="npwp_lampiran" placeholder="Otomatis dari Induk (Simulasi)"></td>
+                </tr>
+                <tr>
+                    <td>NAMA WAJIB PAJAK</td>
+                    <td>:</td>
+                    <td><input type="text" class="long-input" id="nama_wp_lampiran" placeholder="NAMA PERUSAHAAN"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Tabel Perhitungan -->
+        <div class="spt-section">
+            <div class="section-title">1. PENGHASILAN NETO KOMERSIAL DALAM NEGERI</div>
+            <table class="form-table">
+                <tr>
+                    <td width="30">1a.</td>
+                    <td>Peredaran Usaha (Omzet)</td>
+                    <td width="40" class="row-num">1a</td>
+                    <td width="250"><input type="text" class="amount-input" id="L1a" value="0"></td>
+                </tr>
+                <tr>
+                    <td>1b.</td>
+                    <td>Harga Pokok Penjualan (HPP)</td>
+                    <td class="row-num">1b</td>
+                    <td><input type="text" class="amount-input" id="L1b" value="0"></td>
+                </tr>
+                <tr>
+                    <td>1c.</td>
+                    <td>Biaya Usaha Lainnya</td>
+                    <td class="row-num">1c</td>
+                    <td><input type="text" class="amount-input" id="L1c" value="0"></td>
+                </tr>
+                <tr>
+                    <td>1d.</td>
+                    <td>Penghasilan Neto dari Usaha (1a - 1b - 1c)</td>
+                    <td class="row-num">1d</td>
+                    <td><input type="text" class="amount-input readonly" id="L1d" value="0" readonly></td>
+                </tr>
+                <tr><td colspan="4"><hr style="border-top: 1px dashed #ccc;"></td></tr>
+                <tr>
+                    <td>1e.</td>
+                    <td>Penghasilan dari Luar Usaha</td>
+                    <td class="row-num">1e</td>
+                    <td><input type="text" class="amount-input" id="L1e" value="0"></td>
+                </tr>
+                <tr>
+                    <td>1f.</td>
+                    <td>Biaya dari Luar Usaha</td>
+                    <td class="row-num">1f</td>
+                    <td><input type="text" class="amount-input" id="L1f" value="0"></td>
+                </tr>
+                <tr>
+                    <td>1g.</td>
+                    <td>Penghasilan Neto dari Luar Usaha (1e - 1f)</td>
+                    <td class="row-num">1g</td>
+                    <td><input type="text" class="amount-input readonly" id="L1g" value="0" readonly></td>
+                </tr>
+                <tr><td colspan="4"><hr style="border-top: 2px solid black;"></td></tr>
+                <tr>
+                    <td>1h.</td>
+                    <td><b>JUMLAH (1d + 1g)</b></td>
+                    <td class="row-num">1h</td>
+                    <td><input type="text" class="amount-input readonly" id="L1h" value="0" readonly style="font-weight: 900;"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="spt-section">
+            <table class="form-table">
+                <tr>
+                    <td width="30">2.</td>
+                    <td>PENGHASILAN NETO KOMERSIAL LUAR NEGERI</td>
+                    <td width="40" class="row-num">2</td>
+                    <td width="250"><input type="text" class="amount-input" id="L2" value="0"></td>
+                </tr>
+                <tr>
+                    <td>3.</td>
+                    <td><b>JUMLAH PENGHASILAN NETO KOMERSIAL (1h + 2)</b><br>
+                        <span style="font-size: 11px; color: #555;">*Pindahkan angka ini ke Formulir 1771 Induk Bagian A Angka 1</span>
+                    </td>
+                    <td class="row-num">3</td>
+                    <td><input type="text" class="amount-input readonly" id="L3" value="0" readonly style="background-color: #d1ecf1; color: #0c5460;"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="action-buttons">
+            <button id="btnSalin" class="btn-save" style="background-color: #17a2b8;">Simpan & Salin Angka</button>
+            <button id="btnResetL1" class="btn-back" style="background-color: #6c757d;" type="button">Reset Lampiran Ini</button>
+            <a href="1771_induk.html" class="btn-back" style="background-color: #6c757d;">Ke Form Induk 1771</a>
+            <a href="1771_Lampiran_II.html" class="btn-back" style="background-color: #f57f17;">Buka Lampiran II (Rincian Biaya)</a>
+        </div>
+    </div>
+
+    <script src="script_Lampiran_I.js"></script>
+</body>
+</html>

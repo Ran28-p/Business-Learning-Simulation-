@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pivot Table &amp; Dashboard — Latihan Baru (HyperFormula)</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../../../css/knowledge-base.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="../../../css/responsive-foundation.css">
+</head>
+<body>
+<div class="pd-shell">
+  <header class="pd-header">
+    <div>
+      <a class="pd-back" href="../index.html">← Kembali ke Excel Formula Practice Generator</a>
+      <h1>🧮 Latihan Baru: Pivot Table &amp; Dashboard</h1>
+      <p class="pd-sub">Modul latihan interaktif — dihitung langsung oleh engine formula <strong>HyperFormula</strong> (GPL-v3), terpisah dari latihan rumus utama.</p>
+    </div>
+    <div class="pd-header-actions">
+      <button type="button" class="btn btn--ghost" id="btnOpenKnowledgeExcel">📘 Baca Modul Pengetahuan</button>
+      <span class="pd-engine-status" id="pdEngineStatus">⏳ Memuat engine…</span>
+    </div>
+  </header>
+
+  <nav class="pd-tabs" role="tablist">
+    <button class="pd-tab pd-tab--active" data-pd-tab="data" type="button">1. Data Sumber</button>
+    <button class="pd-tab" data-pd-tab="pivot" type="button">2. Pivot Table</button>
+    <button class="pd-tab" data-pd-tab="dashboard" type="button">3. Dashboard</button>
+  </nav>
+
+  <!-- TAB 1: DATA -->
+  <section class="pd-panel pd-panel--active" data-pd-panel="data">
+    <div class="pd-card">
+      <h2>Dataset Penjualan Fiktif</h2>
+      <p>Dataset ini dibuat otomatis (180+ baris transaksi, Januari–Juni 2025) supaya kamu bisa langsung praktik tanpa perlu data sungguhan. Struktur kolomnya sengaja dibuat seperti data mentah khas sebelum diringkas dengan Pivot Table.</p>
+      <div class="pd-table-scroll">
+        <table class="pd-data-table" id="pdRawTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: PIVOT TABLE -->
+  <section class="pd-panel" data-pd-panel="pivot">
+    <div class="pd-grid">
+      <div class="pd-card pd-card--controls">
+        <h2>Susun Pivot Table-mu</h2>
+        <p class="pd-hint">Pilih field untuk Baris, Kolom, dan Nilai — persis seperti panel "PivotTable Fields" di Excel asli.</p>
+        <label class="pd-field-label">📋 Baris
+          <select id="pdRowField"></select>
+        </label>
+        <label class="pd-field-label">🧱 Kolom
+          <select id="pdColField"></select>
+        </label>
+        <label class="pd-field-label">🔢 Nilai
+          <select id="pdValueField"></select>
+        </label>
+        <label class="pd-field-label">Σ Agregasi
+          <select id="pdAggFn">
+            <option value="SUM">Sum (Jumlah)</option>
+            <option value="AVERAGE">Average (Rata-rata)</option>
+            <option value="COUNT">Count (Cacah)</option>
+          </select>
+        </label>
+        <button type="button" class="btn btn--primary" id="btnBuildPivot">⚙️ Buat / Perbarui Pivot</button>
+        <div class="pd-formula-preview" id="pdFormulaPreview"></div>
+      </div>
+      <div class="pd-card pd-card--result">
+        <h2>Hasil Pivot Table</h2>
+        <div class="pd-table-scroll">
+          <table class="pd-pivot-table" id="pdPivotTable"></table>
+        </div>
+      </div>
+    </div>
+    <div class="pd-card pd-exercise">
+      <h3>🎯 Coba Sendiri</h3>
+      <ul id="pdExerciseList"></ul>
+    </div>
+  </section>
+
+  <!-- TAB 3: DASHBOARD -->
+  <section class="pd-panel" data-pd-panel="dashboard">
+    <div class="pd-card">
+      <div class="pd-dash-toolbar">
+        <h2>Dashboard Penjualan</h2>
+        <label class="pd-field-label pd-slicer">
+          🔎 Slicer — Wilayah
+          <select id="pdSlicerWilayah"><option value="">Semua Wilayah</option></select>
+        </label>
+      </div>
+      <div class="pd-kpi-row" id="pdKpiRow"></div>
+      <div class="pd-charts-row">
+        <div class="pd-chart-card">
+          <h3>Total Penjualan per Wilayah</h3>
+          <div class="pd-bar-chart" id="pdChartWilayah"></div>
+        </div>
+        <div class="pd-chart-card">
+          <h3>Total Penjualan per Bulan</h3>
+          <div class="pd-bar-chart" id="pdChartBulan"></div>
+        </div>
+      </div>
+    </div>
+    <div class="pd-card pd-exercise">
+      <h3>🎯 Coba Sendiri</h3>
+      <ul id="pdDashExerciseList"></ul>
+    </div>
+  </section>
+</div>
+
+<script src="../../../vendor/hyperformula/hyperformula.full.js"></script>
+<script src="../../../js/knowledge-base.js"></script>
+<script src="../data/knowledge-excel-pivot-dashboard.js"></script>
+<script src="js/dataset.js"></script>
+<script src="js/app.js"></script>
+<script src="../../../js/back-to-portal.js"></script>
+</body>
+</html>

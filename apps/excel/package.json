@@ -1,0 +1,19 @@
+{
+  "name": "excel-formula-practice-generator",
+  "version": "1.0.0",
+  "description": "Aplikasi latihan rumus Microsoft Excel berbasis dataset realistis, berjalan sepenuhnya di browser (HTML/CSS/JavaScript murni), tanpa backend, tanpa API key, dan gratis. File ini HANYA dipakai untuk menjalankan pengujian otomatis (tests/) -- aplikasinya sendiri TIDAK butuh npm install atau proses build apa pun, cukup dibuka lewat server statis (lihat README).",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/test-question-engine.mjs && node tests/test-engine-additions.mjs && node tests/test-formula-interactivity.mjs && node tests/test-formula-interactivity.dom.mjs && node tests/test-workbook-export.mjs",
+    "test:questions": "node tests/test-question-engine.mjs",
+    "test:engine": "node tests/test-engine-additions.mjs",
+    "test:logic": "node tests/test-formula-interactivity.mjs",
+    "test:dom": "node tests/test-formula-interactivity.dom.mjs",
+    "test:export": "node tests/test-workbook-export.mjs"
+  },
+  "devDependencies": {
+    "exceljs": "^4.4.0",
+    "jsdom": "^24.1.3"
+  }
+}

@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Modul Pajak Lengkap — Ringkasan & Kuis</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../../css/responsive-foundation.css">
+</head>
+<body>
+  <header>
+    <h1>Modul Pajak Lengkap</h1>
+    <p>Ringkasan singkat tiap jenis pajak dan kuis latihan yang lebih menantang serta relevan.</p>
+    <nav><a href="../index.html">← Kembali ke SIM-SPT</a></nav>
+  </header>
+<div class="card-modul">
+    <h3>Praktik Formulir Real</h3>
+    <p>Simulasi pengisian langsung form SPT 1771 Induk layaknya file Excel.</p>
+    <a href="../formulir_spt/1771_induk.html" class="btn-primary">Mulai Pengisian 1771</a>
+</div>
+  <div class="container">
+    <aside class="topics">
+      <h3>Topik</h3>
+      <ul id="topic-list"></ul>
+    </aside>
+
+    <main class="content">
+      <section id="summary" class="card">
+        <h2>Pilih topik untuk melihat ringkasan</h2>
+        <div id="summary-body"></div>
+        <div id="start-area"></div>
+      </section>
+
+      <section id="quiz" class="card" style="display:none;">
+        <h2 id="quiz-title">Kuis</h2>
+        <form id="quiz-form"></form>
+        <div class="actions">
+          <button id="submit-quiz" class="btn">Kirim Jawaban</button>
+          <button id="back-to-summary" class="btn btn-outline">Kembali</button>
+        </div>
+        <div id="quiz-result"></div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <small>Topik: PPh, PPN, PPnBM, PBB-P3, Bea Materai, Bea Cukai, BPHTB, PBB-P2, Pajak Restoran, Pajak Reklame, Pajak Hiburan, Pajak Karbon.</small>
+  </footer>
+
+  <script src="script.js"></script>
+  <script id="questions-data" type="application/json">
+  {
+  "topics": [
+    {
+      "key": "pph",
+      "title": "PPh (Pajak Penghasilan)",
+      "summary": "Pajak atas penghasilan orang pribadi dan badan; meliputi PPh Pasal 21, 23, 25, 29, serta tarif progresif untuk wajib pajak orang pribadi. Tarif yang berlaku saat ini: PPh Orang Pribadi memakai tarif progresif 5 lapis sesuai UU HPP — 5% (sampai Rp60 juta), 15% (di atas Rp60 juta s.d. Rp250 juta), 25% (di atas Rp250 juta s.d. Rp500 juta), 30% (di atas Rp500 juta s.d. Rp5 miliar), dan 35% (di atas Rp5 miliar); PPh Badan tarif umum 22%; PPh final UMKM 0,5% dari peredaran bruto (PP 55/2022).",
+      "questions": [
+        {
+          "q": "Manakah pernyataan yang paling tepat tentang PPh Pasal 21?",
+          "type": "mcq",
+          "options": [
+            "Dipotong atas penghasilan dari pemberi kerja kepada pegawai",
+            "Hanya berlaku untuk perusahaan besar",
+            "Hanya dikenakan pada penjualan barang mewah",
+            "Tidak berkaitan dengan pembayaran gaji"
+          ],
+          "answer": "Dipotong atas penghasilan dari pemberi kerja kepada pegawai",
+          "explanation": "PPh Pasal 21 merupakan pemotongan pajak atas penghasilan pegawai, penerima honorarium, dan sejenisnya dari pemberi kerja.",
+          "ref": "PPh Pasal 21"
+        },
+        {
+          "q": "Jika penghasilan kena pajak seseorang Rp 80.000.000 dan tarifnya 5%, berapa PPh terutang? (Rp)",
+          "type": "number",
+          "answer": 4000000,
+          "explanation": "PPh terutang dihitung dari dasar pengenaan dikalikan tarif yang berlaku. Pada contoh ini, 5% x Rp 80.000.000 = Rp 4.000.000.",
+          "ref": "Tarif progresif PPh"
+        },
+        {
+          "q": "Apa tujuan utama PPh final UMKM menurut PP 55/2022?",
+          "type": "text",
+          "answer": "simpel dan pasti",
+          "explanation": "PP 55/2022 menerapkan skema PPh final yang lebih sederhana untuk UMKM, sehingga perhitungan dan pelaporan menjadi lebih praktis.",
+          "ref": "PP 55/2022"
+        },
+        {
+          "q": "Tarif PPh final UMKM badan menurut PP 55/2022 adalah ... %",
+          "type": "number",
+          "answer": 0.5,
+          "explanation": "Tarif final untuk UMKM badan yang ditetapkan dalam PP 55/2022 adalah 0,5% dari peredaran bruto.",
+          "ref": "PP 55/2022"
+        }
+      ]
+    },
+    {
+      "key": "pajak_progresif",
+      "title": "Pajak Progresif",
+      "summary": "Pajak progresif adalah sistem pungutan di mana persentase tarif pajaknya semakin meningkat seiring dengan bertambahnya nilai dasar pengenaan pajak (seperti jumlah penghasilan atau jumlah aset). Contoh utamanya adalah PPh Orang Pribadi dan Pajak Kendaraan Bermotor (PKB). Tarif yang berlaku saat ini: untuk PPh Orang Pribadi berlaku 5 lapis tarif 5%-35% sesuai UU HPP; untuk PKB, UU HKPD membatasi tarif kendaraan pertama maksimal 1,2% dan kendaraan kedua dan seterusnya progresif hingga maksimal 6% (contoh penerapan di DKI Jakarta: 2%, 3%, 4%, 5%, lalu 6% untuk kendaraan kelima dan seterusnya).",
+      "questions": [
+        {
+          "q": "Sistem pemungutan pajak yang persentase tarifnya meningkat seiring bertambahnya dasar pengenaan pajak disebut...",
+          "type": "mcq",
+          "options": [
+            "Pajak Proporsional",
+            "Pajak Degresif",
+            "Pajak Progresif",
+            "Pajak Regresif"
+          ],
+          "answer": "Pajak Progresif",
+          "explanation": "Pajak progresif menggunakan persentase yang semakin naik. Semakin besar dasar pengenaannya, semakin besar persentase pajaknya.",
+          "ref": "Konsep Dasar Pajak"
+        },
+        {
+          "q": "Sesuai ketentuan UU HPP, tarif PPh progresif lapis pertama (penghasilan sampai dengan Rp60 juta) dikenakan sebesar ... %",
+          "type": "number",
+          "answer": 5,
+          "explanation": "Pada UU HPP, lapisan tarif terendah (penghasilan 0 - Rp60 juta) dikenakan tarif 5%.",
+          "ref": "UU HPP PPh Pasal 21"
+        },
+        {
+          "q": "Di tingkat daerah, pajak progresif biasanya diterapkan pada kepemilikan aset apa? (Jawab dengan huruf kecil, 2 kata)",
+          "type": "text",
+          "answer": "kendaraan bermotor",
+          "explanation": "Pajak Kendaraan Bermotor (PKB) dikenakan secara progresif untuk kepemilikan kendaraan kedua, ketiga, dan seterusnya dalam satu alamat keluarga.",
+          "ref": "Pajak Daerah"
+        }
+      ]
+    },
+    {
+      "key": "ppn",
+      "title": "PPN (Pajak Pertambahan Nilai)",
+      "summary": "Pajak atas konsumsi barang dan jasa; mekanisme kredit pajak membuat PPN menjadi pajak yang sangat penting bagi bisnis. Tarif yang berlaku saat ini: PPN 11% (tarif efektif) untuk penyerahan barang/jasa nonmewah, berdasarkan PMK 131/2024 yang menerapkan DPP Nilai Lain sebesar 11/12 dari harga jual/nilai impor terhadap tarif hukum 12%; barang/jasa tergolong mewah (kena PPnBM) dikenakan tarif penuh 12%; ekspor BKP/JKP dikenakan tarif 0%.",
+      "questions": [
+        {
+          "q": "PPN yang dipungut oleh PKP saat menjual barang kena pajak disebut apa?",
+          "type": "mcq",
+          "options": [
+            "PPN keluaran",
+            "PPN masukan",
+            "PPN final",
+            "PPN tambahan"
+          ],
+          "answer": "PPN keluaran",
+          "explanation": "PPN keluaran adalah pajak yang dipungut ketika PKP menjual barang atau jasa kena pajak.",
+          "ref": "UU PPN"
+        },
+        {
+          "q": "Jika PPN Keluaran Rp 55.000.000 dan PPN Masukan Rp 33.000.000, berapa PPN yang harus disetor? (Rp)",
+          "type": "number",
+          "answer": 22000000,
+          "explanation": "PPN terutang dihitung dari selisih PPN keluaran dan PPN masukan. Jadi Rp 55.000.000 - Rp 33.000.000 = Rp 22.000.000.",
+          "ref": "UU PPN"
+        },
+        {
+          "q": "Apa bukti yang digunakan untuk mengkreditkan PPN masukan?",
+          "type": "text",
+          "answer": "faktur pajak",
+          "explanation": "PPN masukan dikreditkan dengan menggunakan faktur pajak sebagai bukti transaksi pembelian barang atau jasa kena pajak.",
+          "ref": "UU PPN"
+        },
+        {
+          "q": "Tarif PPN umum saat ini adalah ... %",
+          "type": "number",
+          "answer": 11,
+          "explanation": "Tarif PPN umum saat ini adalah 11% sesuai ketentuan yang berlaku.",
+          "ref": "UU PPN"
+        }
+      ]
+    },
+    {
+      "key": "ppnbm",
+      "title": "PPnBM (Pajak Penjualan atas Barang Mewah)",
+      "summary": "Pajak tambahan yang dikenakan atas penjualan barang mewah tertentu, biasanya dengan tarif yang lebih tinggi. Tarif yang berlaku saat ini: berkisar 10% sampai 200% tergantung kelompok barang mewah (Pasal 8 UU PPN & PPnBM) — misalnya hunian mewah di atas Rp30 miliar 20%, kapal pesiar mewah 75%, kendaraan bermotor mewah 15%-95% tergantung kapasitas mesin/emisi; ekspor barang mewah dikenakan tarif 0%.",
+      "questions": [
+        {
+          "q": "PPnBM umumnya dikenakan pada barang apa?",
+          "type": "mcq",
+          "options": [
+            "Barang mewah",
+            "Bahan pokok",
+            "Jasa kesehatan",
+            "Kertas kantor"
+          ],
+          "answer": "Barang mewah",
+          "explanation": "PPnBM dikenakan pada barang mewah tertentu yang masuk kategori barang yang dipilih untuk dibebani pajak tambahan.",
+          "ref": "PPnBM"
+        },
+        {
+          "q": "Sebutkan satu contoh barang yang sering dikenai PPnBM.",
+          "type": "text",
+          "answer": "mobil mewah",
+          "explanation": "Contoh barang mewah yang umum dikenai PPnBM adalah kendaraan mewah dan barang elektronik premium.",
+          "ref": "PPnBM"
+        },
+        {
+          "q": "Apakah PPnBM merupakan pajak final atas penghasilan?",
+          "type": "text",
+          "answer": "tidak",
+          "explanation": "PPnBM adalah pajak atas penjualan barang mewah, bukan pajak penghasilan yang bersifat final dalam arti yang sama.",
+          "ref": "PPnBM"
+        },
+        {
+          "q": "Tujuan utama pemberlakuan PPnBM adalah ...",
+          "type": "text",
+          "answer": "mengendalikan konsumsi barang mewah",
+          "explanation": "PPnBM bertujuan untuk mengendalikan konsumsi barang mewah dan menambah penerimaan negara dari golongan yang mampu.",
+          "ref": "PPnBM"
+        }
+      ]
+    },
+    {
+      "key": "pbb_p3",
+      "title": "PBB P3 (Pajak Bumi dan Bangunan Perdesaan dan Perkotaan)",
+      "summary": "PBB adalah pajak atas tanah dan/atau bangunan yang dipungut oleh pemerintah daerah berdasarkan NJOP. Tarif yang berlaku saat ini: paling tinggi 0,5% dari NJOP setelah dikurangi NJOPTKP, sesuai UU HKPD; besaran final ditetapkan oleh Perda masing-masing kabupaten/kota.",
+      "questions": [
+        {
+          "q": "Dasar pengenaan PBB adalah apa?",
+          "type": "mcq",
+          "options": [
+            "NJOP",
+            "Harga pasar global",
+            "Biaya produksi",
+            "Pendapatan bersih"
+          ],
+          "answer": "NJOP",
+          "explanation": "PBB dikenakan berdasarkan Nilai Jual Objek Pajak atau NJOP yang ditetapkan oleh pemerintah daerah.",
+          "ref": "PBB"
+        },
+        {
+          "q": "PBB dibayar ke tingkat pemerintahan mana?",
+          "type": "text",
+          "answer": "daerah",
+          "explanation": "PBB adalah pajak daerah sehingga pemungutannya dilakukan oleh pemerintah daerah.",
+          "ref": "PBB"
+        },
+        {
+          "q": "Objek PBB adalah ...",
+          "type": "text",
+          "answer": "tanah dan bangunan",
+          "explanation": "PBB dikenakan atas tanah dan/atau bangunan yang menjadi objek pajak.",
+          "ref": "PBB"
+        },
+        {
+          "q": "PBB termasuk jenis pajak apa?",
+          "type": "text",
+          "answer": "pajak daerah",
+          "explanation": "PBB merupakan pajak daerah karena pemungutannya dilakukan oleh pemerintah daerah sesuai aturan setempat.",
+          "ref": "PBB"
+        }
+      ]
+    },
+    {
+      "key": "bea_materai",
+      "title": "Bea Materai",
+      "summary": "Pajak atas dokumen tertentu yang berfungsi sebagai bukti legalitas dan keabsahan dokumen. Tarif yang berlaku saat ini: tarif tunggal Rp10.000 untuk semua dokumen yang terutang Bea Meterai, sesuai UU No. 10 Tahun 2020.",
+      "questions": [
+        {
+          "q": "Bea materai dikenakan pada apa?",
+          "type": "mcq",
+          "options": [
+            "Dokumen tertentu",
+            "Barang konsumsi",
+            "Layanan transportasi",
+            "Pajak penghasilan"
+          ],
+          "answer": "Dokumen tertentu",
+          "explanation": "Bea materai dikenakan pada dokumen tertentu yang ditentukan peraturan, seperti surat perjanjian atau kuitansi.",
+          "ref": "Bea Materai"
+        },
+        {
+          "q": "Sebutkan satu contoh dokumen yang sering memerlukan materai.",
+          "type": "text",
+          "answer": "surat perjanjian",
+          "explanation": "Surat perjanjian adalah contoh dokumen yang sering dikenakan bea materai.",
+          "ref": "Bea Materai"
+        },
+        {
+          "q": "Apa fungsi utama bea materai?",
+          "type": "text",
+          "answer": "menjamin keabsahan dokumen",
+          "explanation": "Bea materai memberikan tanda atau bukti bahwa dokumen memiliki status resmi dan sah secara hukum.",
+          "ref": "Bea Materai"
+        },
+        {
+          "q": "Bea materai termasuk jenis pajak atas apa?",
+          "type": "text",
+          "answer": "dokumen",
+          "explanation": "Bea materai adalah pajak yang dikenakan atas dokumen tertentu, bukan atas barang atau jasa.",
+          "ref": "Bea Materai"
+        }
+      ]
+    },
+    {
+      "key": "bea_cukai",
+      "title": "Bea Cukai",
+      "summary": "Cukai dikenakan pada barang tertentu untuk mengendalikan konsumsi, sedangkan bea masuk dikenakan pada barang impor. Tarif yang berlaku saat ini: bervariasi per jenis barang. Cukai hasil tembakau memakai tarif spesifik per batang yang berbeda menurut golongan pabrik dan jenis produk (SKM/SKT/SPM/rokok elektrik) dan tidak dinaikkan pada 2025-2026 (PMK 96 & 97/2024); bea masuk atas barang impor memakai tarif MFN yang berbeda-beda per pos tarif (HS code) dalam Buku Tarif Kepabeanan Indonesia.",
+      "questions": [
+        {
+          "q": "Barang yang biasanya dikenai cukai adalah ...",
+          "type": "mcq",
+          "options": [
+            "Rokok dan minuman beralkohol",
+            "Buku pelajaran",
+            "Pakaian kerja",
+            "Alat tulis"
+          ],
+          "answer": "Rokok dan minuman beralkohol",
+          "explanation": "Cukai umumnya dikenakan pada barang-barang tertentu seperti rokok, minuman beralkohol, dan produk lain yang dikendalikan.",
+          "ref": "Bea Cukai"
+        },
+        {
+          "q": "Apa yang dimaksud dengan bea masuk?",
+          "type": "text",
+          "answer": "pajak atas barang impor",
+          "explanation": "Bea masuk adalah pungutan atas barang yang masuk ke wilayah pabean Indonesia.",
+          "ref": "Bea Cukai"
+        },
+        {
+          "q": "Tujuan utama penerapan cukai adalah ...",
+          "type": "text",
+          "answer": "mengendalikan konsumsi dan melindungi kesehatan",
+          "explanation": "Cukai diterapkan untuk mengendalikan konsumsi barang tertentu dan menjaga dampak sosial serta kesehatan masyarakat.",
+          "ref": "Bea Cukai"
+        },
+        {
+          "q": "Bea cukai dikelola oleh lembaga apa?",
+          "type": "text",
+          "answer": "dirjen bea cukai",
+          "explanation": "Bea cukai dikelola oleh Direktorat Jenderal Bea dan Cukai sebagai bagian dari otoritas kepabeanan.",
+          "ref": "Bea Cukai"
+        }
+      ]
+    },
+    {
+      "key": "bphtb",
+      "title": "BPHTB (Bea Perolehan Hak atas Tanah dan Bangunan)",
+      "summary": "Pajak yang timbul saat terjadi perolehan hak atas tanah dan/atau bangunan, misalnya dalam transaksi jual beli. Tarif yang berlaku saat ini: 5% dari Nilai Perolehan Objek Pajak (NPOP) dikurangi NPOPTKP (minimal Rp80 juta), sesuai UU HKPD.",
+      "questions": [
+        {
+          "q": "BPHTB dikenakan saat apa?",
+          "type": "mcq",
+          "options": [
+            "Saat terjadi perolehan hak atas tanah dan bangunan",
+            "Saat menerima gaji bulanan",
+            "Saat memproduksi barang",
+            "Saat membayar PPN"
+          ],
+          "answer": "Saat terjadi perolehan hak atas tanah dan bangunan",
+          "explanation": "BPHTB timbul ketika terjadi perolehan hak atas tanah dan/atau bangunan melalui transaksi tertentu.",
+          "ref": "BPHTB"
+        },
+        {
+          "q": "Sebutkan satu contoh transaksi yang memicu BPHTB.",
+          "type": "text",
+          "answer": "jual beli tanah",
+          "explanation": "Transaksi jual beli tanah atau bangunan merupakan contoh perolehan hak yang menimbulkan BPHTB.",
+          "ref": "BPHTB"
+        },
+        {
+          "q": "Objek BPHTB adalah ...",
+          "type": "text",
+          "answer": "hak atas tanah dan bangunan",
+          "explanation": "Objek BPHTB adalah perolehan hak atas tanah dan/atau bangunan yang ditetapkan oleh aturan.",
+          "ref": "BPHTB"
+        },
+        {
+          "q": "BPHTB biasanya dipungut oleh ...",
+          "type": "text",
+          "answer": "pemda",
+          "explanation": "BPHTB merupakan pajak daerah yang dipungut berdasarkan ketentuan pemerintah daerah.",
+          "ref": "BPHTB"
+        }
+      ]
+    },
+    {
+      "key": "pbb_p2",
+      "title": "PBB-P2 (Pajak Bumi dan Bangunan Perdesaan & Perkotaan untuk Perusahaan)",
+      "summary": "PBB-P2 adalah bentuk PBB yang terkait dengan objek pajak yang dipakai untuk kegiatan usaha atau badan. Tarif yang berlaku saat ini: sama seperti PBB Perdesaan dan Perkotaan pada umumnya, paling tinggi 0,5% dari NJOP setelah dikurangi NJOPTKP, sesuai UU HKPD; besaran final ditetapkan oleh Perda masing-masing daerah.",
+      "questions": [
+        {
+          "q": "PBB-P2 biasanya terkait dengan siapa?",
+          "type": "mcq",
+          "options": [
+            "Badan atau perusahaan",
+            "Pekerja harian",
+            "Pengusaha kecil tanpa bangunan",
+            "Pelanggan rumah tangga"
+          ],
+          "answer": "Badan atau perusahaan",
+          "explanation": "PBB-P2 dikenal sebagai PBB yang terkait dengan subjek pajak badan atau perusahaan dalam kegiatan usaha.",
+          "ref": "PBB-P2"
+        },
+        {
+          "q": "Dasar pengenaan PBB-P2 adalah apa?",
+          "type": "text",
+          "answer": "njop",
+          "explanation": "Seperti PBB pada umumnya, dasar pengenaan PBB-P2 adalah NJOP objek pajak.",
+          "ref": "PBB-P2"
+        },
+        {
+          "q": "PBB-P2 merupakan bagian dari pajak apa?",
+          "type": "text",
+          "answer": "pajak daerah",
+          "explanation": "PBB-P2 merupakan bagian dari pajak daerah yang dipungut berdasarkan ketentuan daerah.",
+          "ref": "PBB-P2"
+        },
+        {
+          "q": "Objek PBB-P2 biasanya berupa ...",
+          "type": "text",
+          "answer": "tanah dan bangunan usaha",
+          "explanation": "Objek pajak dalam PBB-P2 biasanya terkait dengan tanah dan bangunan yang dipakai untuk kegiatan usaha.",
+          "ref": "PBB-P2"
+        }
+      ]
+    },
+    {
+      "key": "pajak_restoran",
+      "title": "Pajak Restoran",
+      "summary": "Pajak daerah atas pelayanan makanan dan minuman, yang sering diterapkan pada restoran, kafe, dan rumah makan. Tarif yang berlaku saat ini: paling tinggi 10% dari nilai transaksi, sebagai bagian dari Pajak Barang dan Jasa Tertentu (PBJT) atas makanan dan minuman, sesuai UU HKPD.",
+      "questions": [
+        {
+          "q": "Objek pajak restoran adalah ...",
+          "type": "mcq",
+          "options": [
+            "Pelayanan makanan dan minuman",
+            "Penjualan kendaraan",
+            "Pengiriman barang ekspor",
+            "Sewa gedung kantor"
+          ],
+          "answer": "Pelayanan makanan dan minuman",
+          "explanation": "Pajak restoran dikenakan pada pelayanan penyediaan makanan dan minuman di restoran atau sejenisnya.",
+          "ref": "Pajak Restoran"
+        },
+        {
+          "q": "Pajak restoran dipungut oleh siapa?",
+          "type": "text",
+          "answer": "pemda",
+          "explanation": "Pajak restoran adalah pajak daerah yang dipungut oleh pemerintah daerah.",
+          "ref": "Pajak Restoran"
+        },
+        {
+          "q": "Sebutkan satu contoh tempat yang biasanya dikenai pajak restoran.",
+          "type": "text",
+          "answer": "restoran",
+          "explanation": "Restoran, rumah makan, dan kafe termasuk objek pajak restoran.",
+          "ref": "Pajak Restoran"
+        },
+        {
+          "q": "Pajak restoran termasuk jenis pajak apa?",
+          "type": "text",
+          "answer": "pajak daerah",
+          "explanation": "Pajak restoran merupakan salah satu jenis pajak daerah yang pendapatannya masuk ke kas daerah.",
+          "ref": "Pajak Restoran"
+        }
+      ]
+    },
+    {
+      "key": "pajak_reklame",
+      "title": "Pajak Reklame",
+      "summary": "Pajak daerah atas pemasangan reklame seperti baliho, billboard, dan spanduk yang dipasang di ruang publik. Tarif yang berlaku saat ini: paling tinggi 25% dari Nilai Sewa Reklame, sesuai UU HKPD.",
+      "questions": [
+        {
+          "q": "Faktor yang biasanya memengaruhi besarnya pajak reklame adalah ...",
+          "type": "mcq",
+          "options": [
+            "Luas, lokasi, dan lama pemasangan",
+            "Warna logo perusahaan",
+            "Jumlah karyawan",
+            "Jenis printer yang dipakai"
+          ],
+          "answer": "Luas, lokasi, dan lama pemasangan",
+          "explanation": "Besaran pajak reklame biasanya dipengaruhi oleh ukuran reklame, zona lokasi, dan masa pemasangannya.",
+          "ref": "Pajak Reklame"
+        },
+        {
+          "q": "Sebutkan satu contoh objek reklame.",
+          "type": "text",
+          "answer": "baliho",
+          "explanation": "Baliho, billboard, dan spanduk adalah contoh reklame yang sering dikenai pajak reklame.",
+          "ref": "Pajak Reklame"
+        },
+        {
+          "q": "Pajak reklame termasuk jenis pajak apa?",
+          "type": "text",
+          "answer": "pajak daerah",
+          "explanation": "Pajak reklame adalah pajak daerah yang dipungut oleh pemerintah daerah.",
+          "ref": "Pajak Reklame"
+        },
+        {
+          "q": "Apakah pajak reklame dipungut oleh pemerintah pusat?",
+          "type": "text",
+          "answer": "tidak",
+          "explanation": "Pajak reklame bukan pajak pusat, melainkan pajak daerah yang dikelola pemerintah daerah.",
+          "ref": "Pajak Reklame"
+        }
+      ]
+    },
+    {
+      "key": "pajak_hiburan",
+      "title": "Pajak Hiburan",
+      "summary": "Pajak daerah atas penyelenggaraan kegiatan hiburan, seperti konser, bioskop, dan pertunjukan lainnya. Tarif yang berlaku saat ini: umumnya paling tinggi 10% sebagai bagian dari PBJT atas jasa kesenian dan hiburan, sesuai UU HKPD; khusus hiburan malam tertentu (diskotek, karaoke, kelab malam, bar, dan spa) tarifnya diatur lebih tinggi, dalam rentang 40%-75%.",
+      "questions": [
+        {
+          "q": "Pajak hiburan dikenakan pada kegiatan apa?",
+          "type": "mcq",
+          "options": [
+            "Penyelenggaraan hiburan",
+            "Penjualan alat tulis",
+            "Pembelian rumah",
+            "Pendidikan formal"
+          ],
+          "answer": "Penyelenggaraan hiburan",
+          "explanation": "Pajak hiburan dikenakan pada berbagai kegiatan yang bersifat hiburan seperti konser, bioskop, dan pertunjukan.",
+          "ref": "Pajak Hiburan"
+        },
+        {
+          "q": "Sebutkan satu contoh objek pajak hiburan.",
+          "type": "text",
+          "answer": "bioskop",
+          "explanation": "Bioskop adalah contoh objek pajak hiburan yang umum diketahui.",
+          "ref": "Pajak Hiburan"
+        },
+        {
+          "q": "Dasar pengenaan pajak hiburan bisa berupa apa?",
+          "type": "text",
+          "answer": "harga tiket",
+          "explanation": "Pajak hiburan sering kali dihitung berdasarkan harga tiket atau penerimaan dari penyelenggaraan kegiatan hiburan.",
+          "ref": "Pajak Hiburan"
+        },
+        {
+          "q": "Pajak hiburan termasuk jenis pajak apa?",
+          "type": "text",
+          "answer": "pajak daerah",
+          "explanation": "Pajak hiburan adalah pajak daerah yang diatur oleh wilayah setempat.",
+          "ref": "Pajak Hiburan"
+        }
+      ]
+    },
+    {
+      "key": "pajak_karbon",
+      "title": "Pajak Karbon",
+      "summary": "Pajak yang dikenakan pada emisi karbon untuk mendorong pengurangan dampak lingkungan dan perubahan iklim. Tarif yang berlaku saat ini: paling rendah Rp30 per kilogram CO2e (setara Rp30.000 per ton CO2e), sesuai UU HPP; penerapannya baru dimulai bertahap pada sektor PLTU batu bara dengan skema cap and tax.",
+      "questions": [
+        {
+          "q": "Tujuan utama pajak karbon adalah ...",
+          "type": "mcq",
+          "options": [
+            "Mengurangi emisi karbon",
+            "Meningkatkan konsumsi listrik",
+            "Menghapus pajak daerah",
+            "Mempermudah ekspor tanpa aturan"
+          ],
+          "answer": "Mengurangi emisi karbon",
+          "explanation": "Pajak karbon bertujuan untuk menekan emisi gas rumah kaca dan mendorong pengurangan dampak lingkungan.",
+          "ref": "Pajak Karbon"
+        },
+        {
+          "q": "Pajak karbon biasanya dikenakan pada apa?",
+          "type": "text",
+          "answer": "emisi",
+          "explanation": "Pajak karbon berfokus pada emisi karbon yang dihasilkan oleh aktivitas ekonomi dan industri.",
+          "ref": "Pajak Karbon"
+        },
+        {
+          "q": "Pajak karbon memiliki sisi apa?",
+          "type": "text",
+          "answer": "fiskal dan lingkungan",
+          "explanation": "Pajak karbon tidak hanya berkaitan dengan penerimaan negara, tetapi juga dengan tujuan lingkungan dan pengurangan emisi.",
+          "ref": "Pajak Karbon"
+        },
+        {
+          "q": "Sebutkan satu sektor yang dapat dikenai pajak karbon.",
+          "type": "text",
+          "answer": "energi",
+          "explanation": "Sektor energi, industri, dan transportasi adalah contoh bidang yang sering dikaitkan dengan emisi karbon.",
+          "ref": "Pajak Karbon"
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</body>
+</html>

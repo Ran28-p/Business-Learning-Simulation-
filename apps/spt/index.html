@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Simulator Latihan SPT Pajak Indonesia</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#004b87">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Simulator SPT">
+
+    <!-- Shared + module styles -->
+    <link rel="stylesheet" href="../../css/knowledge-base.css">
+    <link rel="stylesheet" href="../../css/responsive-foundation.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-top">
+                <div class="brand">
+                    <div class="brand-mark">D</div>
+                    <div class="brand-name">SIM-SPT DJP</div>
+                </div>
+                <button class="collapse-btn" id="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+                    <span>≡</span>
+                </button>
+            </div>
+            <div class="user-card">
+                <strong id="ui-level">Level 1: Wajib Pajak Baru</strong>
+                <span id="ui-xp-text">XP: 0 / 1000</span>
+                <div class="profile-badge">Progress belajar</div>
+            </div>
+            <nav class="sidebar-nav" aria-label="Main navigation">
+                <button class="nav-item active" data-view="dashboard" onclick="navigate('dashboard')">
+                    <span class="icon">📊</span>
+                    <span class="nav-label">Dashboard</span>
+                </button>
+                <button class="nav-item" data-view="history" onclick="navigate('history')">
+                    <span class="icon">📜</span>
+                    <span class="nav-label">Riwayat Latihan</span>
+                </button>
+                <button class="nav-item" data-view="tabloid" onclick="navigate('tabloid')">
+                    <span class="icon">📚</span>
+                    <span class="nav-label">Tabloid Pajak</span>
+                </button>
+                <button class="nav-item" id="btnOpenKnowledge" type="button">
+                    <span class="icon">📘</span>
+                    <span class="nav-label">Pengetahuan</span>
+                </button>
+                <button class="nav-item" data-view="calculator" onclick="navigate('calculator')">
+                    <span class="icon">🧮</span>
+                    <span class="nav-label">Kalkulator Pajak</span>
+                </button>
+                <button class="nav-item" data-view="coretax" onclick="navigate('coretax')">
+                    <span class="icon">🧾</span>
+                    <span class="nav-label">Panduan Coretax</span>
+                </button>
+                <button class="nav-item" onclick="exportData()" data-view="backup">
+                    <span class="icon">💾</span>
+                    <span class="nav-label">Backup Data</span>
+                </button>
+                <button class="nav-item" onclick="document.getElementById('import-file').click()" data-view="load">
+                    <span class="icon">📂</span>
+                    <span class="nav-label">Load Data</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <span>Bukan Aplikasi Resmi DJP untuk Edukasi</span>
+            </div>
+            <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(event)">
+        </aside>
+
+        <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Buka menu navigasi">☰</button>
+                    <div class="page-meta">
+                        <span class="page-label">Dashboard</span>
+                        <h1 id="page-title">Dashboard Pembelajaran</h1>
+                        <p id="page-subtitle">Pilih jenis SPT untuk memulai simulasi pengisian.</p>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">🌗</button>
+                    <!-- Login hanya di Portal. SPT mewarisi sesi Firebase dari portal. -->
+                    <button type="button" class="btn btn-outline" id="auth-portal-hint" onclick="window.location.href='../../index.html'" style="padding: 10px 16px; display:none;" title="Login dilakukan di Portal Belajar">Login di Portal</button>
+                    <div class="profile-chip">
+                        <div class="profile-avatar">A</div>
+                        <div>
+                            <div class="profile-name" id="profile-name">Tamu</div>
+                            <div class="profile-role" id="profile-role">Pelajar Pajak</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+        <!-- VIEW: DASHBOARD -->
+        <div id="view-dashboard" class="view active">
+            <div class="dashboard-top">
+                <div class="hero-card">
+                    <div style="position: relative; z-index: 1;">
+                        <div class="hero-badges">
+                            <span class="hero-badge">📘 Simulasi SPT Interaktif</span>
+                            <span class="hero-badge">🧠 Belajar Lebih Terarah</span>
+                            <span class="hero-badge">📈 Pantau Progres</span>
+                        </div>
+                        <h2>Platform pembelajaran pajak yang lebih profesional dan terstruktur.</h2>
+                        <p>Latih kemampuan pengisian SPT Anda dengan pengalaman yang lebih modern, ikuti perkembangan pembelajaran, dan akses panduan Coretax dengan lebih nyaman.</p>
+                        <div class="hero-actions">
+                            <button class="btn" onclick="navigate('coretax')">Lihat Panduan Coretax</button>
+                            <button class="btn btn-outline" onclick="navigate('tabloid')">Baca Update Pajak</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="chart-card">
+                        <div class="section-heading">
+                            <h3>Ringkasan Pengguna</h3>
+                            <span>Performa belajar Anda</span>
+                        </div>
+                        <div class="dashboard-stats">
+                            <div class="stat">
+                                <div class="stat-icon">📚</div>
+                                <div class="label">Total Modul</div>
+                                <div class="value" id="stat-modules" data-target="0">0</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-icon">⚡</div>
+                                <div class="label">XP Anda</div>
+                                <div class="value" id="stat-xp" data-target="0">0</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-icon">🏅</div>
+                                <div class="label">Level</div>
+                                <div class="value" id="stat-level" data-target="1">1</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="section-heading">
+                            <h3>Perkembangan Progres</h3>
+                            <span>5 minggu terakhir</span>
+                        </div>
+                        <div class="chart-bars">
+                            <div class="chart-bar"><div class="chart-rect" style="height: 56%"></div><div class="chart-label">Mgg 1</div></div>
+                            <div class="chart-bar"><div class="chart-rect" style="height: 72%"></div><div class="chart-label">Mgg 2</div></div>
+                            <div class="chart-bar"><div class="chart-rect" style="height: 88%"></div><div class="chart-label">Mgg 3</div></div>
+                            <div class="chart-bar"><div class="chart-rect" style="height: 63%"></div><div class="chart-label">Mgg 4</div></div>
+                            <div class="chart-bar"><div class="chart-rect" style="height: 95%"></div><div class="chart-label">Mgg 5</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card" style="margin-bottom: 20px;">
+                <div class="section-heading">
+                    <h3>Peraturan Pajak Terbaru</h3>
+                    <span>Update singkat dan relevan</span>
+                </div>
+                <ul style="margin: 0; padding-left: 18px; color: var(--text-main); line-height: 1.7;">
+                    <li>UU HPP dan PMK terkait tetap menjadi dasar perhitungan PTKP dan tarif progresif PPh Orang Pribadi.</li>
+                    <li>PP 55/2022 mengatur PPh Final UMKM 0,5% untuk WP Badan serta kategori perpajakan UMKM.</li>
+                    <li>PP 58/2023 menetapkan mekanisme Tarif Efektif Rata-Rata (TER) untuk pemotongan PPh 21 bulanan.</li>
+                    <li>Tarif PPN 11% masih berlaku; perhatikan kompensasi dan restitusi jika PPN Masukan melebihi PPN Keluaran.</li>
+                    <li>Fasilitas Pasal 31E PPh Badan berlaku untuk peredaran bruto sampai Rp 50 miliar dengan pembagian tarif khusus.</li>
+                </ul>
+            </div>
+
+            <div class="card" style="margin-bottom: 20px; border-left: 4px solid var(--info); background: linear-gradient(135deg, rgba(2,119,189,0.08), rgba(255,255,255,0.95));">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <div>
+                        <h3 style="margin-bottom: 8px; color: var(--primary);">Panduan Coretax untuk Pemula</h3>
+                        <p style="margin:0; color: var(--text-main); line-height:1.6;">Pelajari alur penggunaan Coretax, langkah persiapan akun, dan hal yang perlu dipahami sebelum mengisi SPT secara digital.</p>
+                    </div>
+                    <button class="btn" onclick="navigate('coretax')">Buka Panduan Coretax</button>
+                </div>
+            </div>
+
+            <div class="module-grid">
+                <div class="card" style="border-left: 4px solid var(--secondary);" onclick="openModeSelect('SPT_LENGKAP')">
+                    <button class="card-info" onclick="toggleCardInfo(event, 'SPT_LENGKAP')">i</button>
+                    <h3>⭐ Pelatihan SPT 1770 Lengkap</h3>
+                    <p>Latihan mengisi SELURUH alur Induk SPT: Identitas, Ikhtisar Penghasilan, PTKP, PPh Terutang, Kredit Pajak, Kurang/Lebih Bayar, Harta/Utang, hingga Angsuran PPh 25 tahun berikutnya — mengikuti struktur formulir resmi PER-11/PJ/2025.</p>
+                    <span class="tag">Komprehensif</span>
+                    <div class="card-extra"></div>
+                </div>
+                <div class="card" onclick="openForm1770()">
+                    <button class="card-info" onclick="toggleCardInfo(event, '1770')">i</button>
+                    <h3>SPT 1770</h3>
+                    <p>Orang Pribadi. Pekerjaan Bebas / Pengusaha / UMKM. <strong>Mode Isi Formulir Lengkap.</strong></p>
+                    <span class="tag">Sulit</span>
+                    <div class="card-extra"></div>
+                </div>
+                <div class="card" onclick="openModeSelect('1770SS')">
+                    <button class="card-info" onclick="toggleCardInfo(event, '1770SS')">i</button>
+                    <h3>SPT 1770 SS</h3>
+                    <p>Orang Pribadi. Karyawan dengan penghasilan bruto <= Rp 60 Juta setahun.</p>
+                    <span class="tag">Mudah</span>
+                    <div class="card-extra"></div>
+                </div>
+                <div class="card" onclick="openModeSelect('1770S')">
+                    <button class="card-info" onclick="toggleCardInfo(event, '1770S')">i</button>
+                    <h3>SPT 1770 S</h3>
+                    <p>Orang Pribadi. Karyawan dengan penghasilan bruto > Rp 60 Juta setahun.</p>
+                    <span class="tag">Sedang</span>
+                    <div class="card-extra"></div>
+                </div>
+                <div class="card" onclick="openModeSelect('PajakProgresif')">
+                    <button class="card-info" onclick="toggleCardInfo(event, 'pajak progresif')">i</button>
+                    <h3>Pajak Progresif</h3>
+                    <p>Pelajari konsep dan perhitungan Pajak Progresif sesuai UU HPP terbaru. Dilengkapi dengan ringkasan dan kuis latihan.</p>
+                    <span class="tag">Tambahan</span>
+                    <div class="card-extra"></div>
+                </div>
+                <div class="card" onclick="openModeSelect('PPh21')">
+                    <button class="card-info" onclick="toggleCardInfo(event, 'PPh21')">i</button>
+                    <h3>SPT Masa PPh 21</h3>
+                    <p>Pemotongan Pajak atas Gaji, Upah, Honorarium (Karyawan & Non-Karyawan).</p>
+                    <span class="tag">Sedang</span>
+                    <div class="card-extra"></div>
+                </div>
+                <div class="card" onclick="openModeSelect('PPhFinal')">
+                    <button class="card-info" onclick="toggleCardInfo(event, 'PPhFinal')">i</button>
+                    <h3>SPT Masa PPh 4(2)</h3>
+                    <p>Pajak Final: UMKM, Sewa Bangunan, Jasa Konstruksi, Dividen.</p>
+                    <span class="tag">Mudah</span>
+                    <div class="card-extra"></div>
+                </div>
+                <div class="card" onclick="openForm1771()">
+                    <button class="card-info" onclick="toggleCardInfo(event, '1771')">i</button>
+                    <h3>SPT Badan 1771</h3>
+                    <p>Laporan Laba Rugi, Rekonsiliasi Fiskal, Koreksi Positif/Negatif, Fasilitas Pasal 31E (penuh/sebagian/tanpa fasilitas), Kompensasi Kerugian, Kredit Pajak Dalam &amp; Luar Negeri, hingga Angsuran PPh 25. <strong>Mode Isi Formulir Lengkap.</strong></p>
+                    <span class="tag">Sangat Sulit</span>
+                    <div class="card-extra"></div>
+                </div>
+                <!-- Tambahkan kode ini di bagian menu/navigasi modul Anda -->
+<!-- KARTU BARU: FORMULIR SPT 1771 (REAL FORM) -->
+            <div class="card" style="border-left: 4px solid #4CAF50;" onclick="window.open('formulir_spt/1771_induk.html','_blank')">
+                <button class="card-info" onclick="event.stopPropagation(); window.open('formulir_spt/1771_induk.html','_blank')">i</button>
+                <h3>Praktik Formulir 1771</h3>
+                <p>Simulasi pengisian langsung form SPT 1771 Induk dengan tampilan fisik (Real Form) layaknya Excel.</p>
+                <span class="tag" style="background: rgba(76, 175, 80, 0.1); color: #4CAF50;">Interaktif</span>
+            <div class="card-extra"></div>
+</div>
+                <div class="card" onclick="openModeSelect('PPN')">
+                    <button class="card-info" onclick="toggleCardInfo(event, 'PPN')">i</button>
+                    <h3>SPT Masa PPN</h3>
+                    <p>Faktur Pajak, PPN Masukan, PPN Keluaran, Retur.</p>
+                    <span class="tag">Sulit</span>
+                    <div class="card-extra"></div>
+                </div>
+                <div class="card" style="border-left: 4px solid #17a2b8;" onclick="window.open('modul_pajak/index.html','_blank')">
+                    <button class="card-info" onclick="event.stopPropagation(); window.open('modul_pajak/index.html','_blank')">i</button>
+                    <h3>Modul Pajak Lengkap (Ringkasan & Kuis)</h3>
+                    <p>Modul interaktif berisi ringkasan setiap jenis pajak yang umum dan soal latihan singkat per topik.</p>
+                    <span class="tag">Tambahan</span>
+                    <div class="card-extra"></div>
+                </div>
+                <div class="card" style="border-left: 4px solid #6a1b9a;" onclick="window.open('tax_career/index.html','_blank')">
+                    <button class="card-info" onclick="event.stopPropagation(); window.open('tax_career/index.html','_blank')">i</button>
+                    <h3>Tax Career &amp; Practice</h3>
+                    <p>Latihan pekerjaan nyata: Compliance, Accountant, Consultant, Planner, Auditor, Manager — Learn → Practice → Result, terhubung ke SPT 1771.</p>
+                    <span class="tag">Karier Pajak</span>
+                    <div class="card-extra"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: MODE SELECT -->
+        <div id="view-modeselect" class="view">
+            <button class="btn btn-outline mb-3" onclick="navigate('dashboard')">← Kembali</button>
+            <h2 class="mb-3">Pilih Mode Latihan</h2>
+            <div id="generator-toggle-box" style="display:none; margin-bottom: 16px; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; display:flex; align-items:center; gap:10px;">
+                <input type="checkbox" id="chk-use-generator" onchange="appState.useGenerator = this.checked;" style="width:auto;">
+                <label for="chk-use-generator" style="margin:0; cursor:pointer;">🎲 Pakai Kasus Acak (Generator) — angka & profil dibuat otomatis dan dihitung oleh TaxEngine, bukan dari bank soal tetap.</label>
+            </div>
+            <div class="grid">
+                <div class="card" onclick="startSimulation('latihan')">
+                    <h3 style="color: var(--info);">Mode Latihan (Learning)</h3>
+                    <p>✅ AI memberikan petunjuk/hint<br>✅ Validasi langsung per input<br>✅ Penjelasan Dasar Hukum (UU HPP/KUP)<br>Cocok untuk pemula.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--danger);" onclick="startSimulation('ujian')">
+                    <h3 style="color: var(--danger);">Mode Ujian (Assessment)</h3>
+                    <p>❌ Tanpa bantuan AI<br>❌ Tanpa validasi langsung<br>✅ Skor, Waktu, & Penilaian di akhir<br>Uji kemampuan riil Anda.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: SIMULATION FORM -->
+        <div id="view-simulation" class="view">
+            <div class="d-flex" style="justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button class="btn btn-outline" onclick="navigate('dashboard')">Batal</button>
+                <div id="sim-badge-mode" class="tag" style="background: var(--info); color: white;">MODE LATIHAN</div>
+            </div>
+
+            <div class="card mb-3" style="background: rgba(0, 75, 135, 0.05); border: 1px solid var(--primary);">
+                <h3>Detail Kasus: <span id="case-title"></span></h3>
+                <p id="case-scenario" style="font-size: 1rem; color: var(--text-main); margin-top: 10px;"></p>
+            </div>
+
+            <div class="card">
+                <form id="simulation-form" onsubmit="event.preventDefault(); submitSimulation();">
+                    <div id="dynamic-form-container"></div>
+                    
+                    <div class="mt-3 text-right">
+                        <button type="button" id="btn-cek-jawaban" class="btn btn-outline" onclick="checkAnswers()" style="display: none;">Cek Jawaban Sementara</button>
+                        <button type="submit" class="btn">Selesai & Kumpulkan Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- VIEW: FORM 1770 (mode isi formulir sungguhan, bukan Q&A) -->
+        <div id="view-form1770" class="view">
+            <div class="d-flex" style="justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button class="btn btn-outline" onclick="navigate('dashboard')">Batal</button>
+                <div class="tag" style="background: var(--primary); color: white;">MODE ISI FORMULIR — SPT 1770</div>
+            </div>
+
+            <div class="card mb-3" style="background: rgba(0, 75, 135, 0.05); border: 1px solid var(--primary);">
+                <h3>Kasus: <span id="f1770-title"></span></h3>
+                <p id="f1770-narrative" style="font-size: 0.95rem; color: var(--text-main); margin-top: 10px; white-space: pre-line; line-height: 1.7;"></p>
+            </div>
+
+            <div class="form1770-tabs">
+                <button type="button" class="form1770-tab-btn active" id="f1770-tabbtn-1" onclick="switchForm1770Tab(1)">① Lampiran I — Usaha</button>
+                <button type="button" class="form1770-tab-btn" id="f1770-tabbtn-2" onclick="switchForm1770Tab(2)">② Lampiran II — Bukti Potong</button>
+                <button type="button" class="form1770-tab-btn" id="f1770-tabbtn-3" onclick="switchForm1770Tab(3)">③ Lampiran III — Final &amp; Bukan Objek</button>
+                <button type="button" class="form1770-tab-btn" id="f1770-tabbtn-4" onclick="switchForm1770Tab(4)">④ Lampiran IV — Harta, Utang &amp; Keluarga</button>
+                <button type="button" class="form1770-tab-btn" id="f1770-tabbtn-5" onclick="switchForm1770Tab(5)">⑤ Induk SPT 1770</button>
+            </div>
+
+            <!-- TAB 1: LAMPIRAN I -->
+            <div class="card form1770-sheet" id="f1770-tab-1">
+                <h4 class="form1770-sheet-title">LAMPIRAN I — Penghitungan Penghasilan Neto Dalam Negeri dari Usaha/Pekerjaan Bebas</h4>
+
+                <div class="form1770-row">
+                    <div class="form1770-row-label">1. Peredaran Bruto Usaha (Rp)</div>
+                    <input type="text" inputmode="numeric" class="form1770-input" id="f1770-peredaranBruto" oninput="recalcForm1770()" placeholder="0">
+                </div>
+                <div class="form1770-row">
+                    <div class="form1770-row-label">2. Harga Pokok Penjualan / HPP (Rp)</div>
+                    <input type="text" inputmode="numeric" class="form1770-input" id="f1770-hpp" oninput="recalcForm1770()" placeholder="0">
+                </div>
+                <div class="form1770-row">
+                    <div class="form1770-row-label">3. Biaya Usaha Lainnya (gaji, sewa, listrik, dll) (Rp)</div>
+                    <input type="text" inputmode="numeric" class="form1770-input" id="f1770-biayaUsaha" oninput="recalcForm1770()" placeholder="0">
+                </div>
+                <div class="form1770-row form1770-row-computed">
+                    <div class="form1770-row-label"><strong>4. Penghasilan Neto Usaha (1 − 2 − 3)</strong></div>
+                    <div class="form1770-computed-value" id="f1770-netoUsaha">Rp 0</div>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Nilai baris 4 otomatis mengalir ke Induk SPT (tab ⑤).</p>
+            </div>
+
+            <!-- TAB 2: LAMPIRAN II -->
+            <div class="card form1770-sheet" id="f1770-tab-2" style="display:none;">
+                <h4 class="form1770-sheet-title">LAMPIRAN II — Daftar Pemotongan/Pemungutan PPh oleh Pihak Lain</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Tambahkan satu baris untuk tiap bukti potong yang disebutkan pada kasus.</p>
+
+                <div id="f1770-buktipotong-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addBuktiPotongRow()">+ Tambah Bukti Potong</button>
+
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Total Kredit Pajak (Σ Bukti Potong)</strong></div>
+                    <div class="form1770-computed-value" id="f1770-totalKreditPajak">Rp 0</div>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Total ini otomatis mengalir ke baris Kredit Pajak di Induk SPT (tab ⑤) — tidak diisi manual lagi di sana.</p>
+            </div>
+
+            <!-- TAB 3: LAMPIRAN III -->
+            <div class="card form1770-sheet" id="f1770-tab-3" style="display:none;">
+                <h4 class="form1770-sheet-title">LAMPIRAN III — Penghasilan yang Dikenakan PPh Final dan Penghasilan Bukan Objek Pajak</h4>
+
+                <h5 style="margin-top: 10px;">A. Penghasilan yang Dikenakan PPh Final/Bersifat Final</h5>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Contoh: sewa tanah/bangunan (final 10%), bunga deposito/tabungan (final 20%), hadiah undian, dll. <strong>Tidak digabung ke Penghasilan Neto di Induk</strong> — sudah selesai pajaknya di sini (final).</p>
+                <div id="f1770-final-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addPenghasilanFinalRow()">+ Tambah Penghasilan Final</button>
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Total PPh Final Terutang</strong></div>
+                    <div class="form1770-computed-value" id="f1770-totalPphFinal">Rp 0</div>
+                </div>
+
+                <h5 style="margin-top: 30px;">B. Penghasilan yang Tidak Termasuk Objek Pajak</h5>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Contoh: warisan, bantuan/sumbangan/hibah, klaim asuransi, beasiswa. <strong>Tidak dikenakan pajak sama sekali</strong> dan tidak masuk perhitungan mana pun.</p>
+                <div id="f1770-bukanobjek-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addBukanObjekRow()">+ Tambah Penghasilan Bukan Objek</button>
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Total Penghasilan Bukan Objek Pajak</strong></div>
+                    <div class="form1770-computed-value" id="f1770-totalBukanObjek">Rp 0</div>
+                </div>
+            </div>
+
+            <!-- TAB 4: LAMPIRAN IV -->
+            <div class="card form1770-sheet" id="f1770-tab-4" style="display:none;">
+                <h4 class="form1770-sheet-title">LAMPIRAN IV — Daftar Harta, Kewajiban/Utang, dan Susunan Anggota Keluarga</h4>
+
+                <h5 style="margin-top: 10px;">Daftar Harta pada Akhir Tahun</h5>
+                <div id="f1770-harta-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addHartaRow()">+ Tambah Harta</button>
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Total Harta</strong></div>
+                    <div class="form1770-computed-value" id="f1770-totalHarta">Rp 0</div>
+                </div>
+
+                <h5 style="margin-top: 30px;">Daftar Kewajiban / Utang pada Akhir Tahun</h5>
+                <div id="f1770-utang-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addUtangRow()">+ Tambah Utang</button>
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Total Utang</strong></div>
+                    <div class="form1770-computed-value" id="f1770-totalUtang">Rp 0</div>
+                </div>
+
+                <h5 style="margin-top: 30px;">Daftar Susunan Anggota Keluarga</h5>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Isi sesuai keluarga yang ditanggung — jumlahnya harus konsisten dengan Status PTKP yang dipilih di Induk (tab ⑤).</p>
+                <div id="f1770-keluarga-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addKeluargaRow()">+ Tambah Anggota Keluarga</button>
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Jumlah Anggota Keluarga Terdaftar</strong></div>
+                    <div class="form1770-computed-value" id="f1770-jumlahKeluarga">0</div>
+                </div>
+            </div>
+
+            <!-- TAB 5: INDUK -->
+            <div class="card form1770-sheet" id="f1770-tab-5" style="display:none;">
+                <h4 class="form1770-sheet-title">INDUK SPT 1770</h4>
+
+                <div class="form1770-row form1770-row-computed">
+                    <div class="form1770-row-label">1. Penghasilan Neto dari Usaha/Pekerjaan Bebas (dari Lampiran I)</div>
+                    <div class="form1770-computed-value" id="f1770-netoUsaha-2">Rp 0</div>
+                </div>
+                <div class="form1770-row">
+                    <div class="form1770-row-label">2. Penghasilan Neto Dalam Negeri Lainnya (di luar usaha &amp; di luar final — Rp)</div>
+                    <input type="text" inputmode="numeric" class="form1770-input" id="f1770-netoDNLainnya" oninput="recalcForm1770()" placeholder="0">
+                </div>
+                <div class="form1770-row">
+                    <div class="form1770-row-label">3. Zakat / Sumbangan Wajib Keagamaan (pengurang) (Rp)</div>
+                    <input type="text" inputmode="numeric" class="form1770-input" id="f1770-zakat" oninput="recalcForm1770()" placeholder="0">
+                </div>
+                <div class="form1770-row form1770-row-computed">
+                    <div class="form1770-row-label"><strong>4. Jumlah Penghasilan Neto (1 + 2 − 3)</strong></div>
+                    <div class="form1770-computed-value" id="f1770-jumlahNeto">Rp 0</div>
+                </div>
+                <div class="form1770-row">
+                    <div class="form1770-row-label">5. Kompensasi Kerugian Tahun Sebelumnya (Rp)</div>
+                    <input type="text" inputmode="numeric" class="form1770-input" id="f1770-kompensasiKerugian" oninput="recalcForm1770()" placeholder="0">
+                </div>
+                <div class="form1770-row form1770-row-computed">
+                    <div class="form1770-row-label"><strong>6. Penghasilan Neto Setelah Kompensasi (4 − 5)</strong></div>
+                    <div class="form1770-computed-value" id="f1770-netoSetelahKompensasi">Rp 0</div>
+                </div>
+                <div class="form1770-row">
+                    <div class="form1770-row-label">7. Status PTKP</div>
+                    <select class="form1770-input" id="f1770-ptkpStatus" onchange="recalcForm1770()">
+                        <option value="">— Pilih —</option>
+                        <option value="TK/0">TK/0</option>
+                        <option value="TK/1">TK/1</option>
+                        <option value="TK/2">TK/2</option>
+                        <option value="TK/3">TK/3</option>
+                        <option value="K/0">K/0</option>
+                        <option value="K/1">K/1</option>
+                        <option value="K/2">K/2</option>
+                        <option value="K/3">K/3</option>
+                    </select>
+                </div>
+                <div class="form1770-row form1770-row-computed">
+                    <div class="form1770-row-label">7a. Nilai PTKP</div>
+                    <div class="form1770-computed-value" id="f1770-ptkpValue">Rp 0</div>
+                </div>
+                <div class="form1770-row form1770-row-computed">
+                    <div class="form1770-row-label"><strong>8. Penghasilan Kena Pajak / PKP (6 − 7a)</strong></div>
+                    <div class="form1770-computed-value" id="f1770-pkp">Rp 0</div>
+                </div>
+                <div class="form1770-row form1770-row-computed">
+                    <div class="form1770-row-label"><strong>9. PPh Terutang (Tarif Pasal 17)</strong></div>
+                    <div class="form1770-computed-value" id="f1770-pphTerutang">Rp 0</div>
+                </div>
+                <div class="form1770-row form1770-row-computed">
+                    <div class="form1770-row-label">10. Kredit Pajak (otomatis dari total Lampiran II)</div>
+                    <div class="form1770-computed-value" id="f1770-kreditPajak">Rp 0</div>
+                </div>
+                <div class="form1770-row form1770-row-computed form1770-row-final">
+                    <div class="form1770-row-label"><strong>11. PPh Kurang / Lebih Bayar (9 − 10)</strong></div>
+                    <div class="form1770-computed-value" id="f1770-kblb">Rp 0</div>
+                </div>
+
+                <div class="form1770-row form1770-row-computed" style="margin-top: 20px; background: rgba(252,163,17,0.08);">
+                    <div class="form1770-row-label">ℹ️ Info dari Lampiran III (tidak memengaruhi angka di atas)</div>
+                    <div class="form1770-computed-value" id="f1770-infoFinal" style="font-size: 0.85rem;"></div>
+                </div>
+            </div>
+
+            <div class="mt-3 text-right">
+                <button type="button" class="btn" onclick="checkForm1770Answers()">Selesai &amp; Cek Jawaban</button>
+            </div>
+        </div>
+
+        <!-- VIEW: FORM 1771 (Badan) — mode isi formulir sungguhan -->
+        <div id="view-form1771" class="view">
+            <div class="d-flex" style="justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button class="btn btn-outline" onclick="navigate('dashboard')">Batal</button>
+                <div class="tag" id="f1771-scheme-badge" style="background: var(--primary); color: white;">MODE ISI FORMULIR — SPT 1771 (BADAN)</div>
+            </div>
+
+            <div class="card mb-3" style="background: rgba(0, 75, 135, 0.05); border: 1px solid var(--primary);">
+                <h3>Kasus: <span id="f1771-title"></span></h3>
+                <p id="f1771-narrative" style="font-size: 0.95rem; color: var(--text-main); margin-top: 10px; white-space: pre-line; line-height: 1.7;"></p>
+            </div>
+
+            <div class="form1770-tabs">
+                <button type="button" class="form1770-tab-btn active" id="f1771-tabbtn-1" onclick="switchForm1771Tab(1)">① Lampiran I — Rekonsiliasi Fiskal</button>
+                <button type="button" class="form1770-tab-btn" id="f1771-tabbtn-2" onclick="switchForm1771Tab(2)">② Lampiran II — Rincian HPP &amp; Biaya</button>
+                <button type="button" class="form1770-tab-btn" id="f1771-tabbtn-3" onclick="switchForm1771Tab(3)">③ Lampiran III — Kredit Pajak</button>
+                <button type="button" class="form1770-tab-btn" id="f1771-tabbtn-4" onclick="switchForm1771Tab(4)">④ Lampiran IV — Final &amp; Bukan Objek</button>
+                <button type="button" class="form1770-tab-btn" id="f1771-tabbtn-5" onclick="switchForm1771Tab(5)">⑤ Lampiran V &amp; VI — Pemegang Saham, Pengurus &amp; Cabang</button>
+                <button type="button" class="form1770-tab-btn" id="f1771-tabbtn-6" onclick="switchForm1771Tab(6)">⑥ Induk SPT 1771</button>
+            </div>
+
+            <!-- TAB 1: LAMPIRAN I — REKONSILIASI FISKAL -->
+            <div class="card form1770-sheet" id="f1771-tab-1">
+                <h4 class="form1770-sheet-title">LAMPIRAN I — Penghitungan Penghasilan Neto Fiskal (Rekonsiliasi Fiskal)</h4>
+
+                <!-- Skema NORMAL (pembukuan) -->
+                <div id="f1771-lampiran1-normal">
+                    <div class="form1770-row">
+                        <div class="form1770-row-label">1. Peredaran Usaha (Rp)</div>
+                        <input type="text" inputmode="numeric" class="form1770-input" id="f1771-peredaranUsaha" oninput="recalcForm1771()" placeholder="0">
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label">2. Harga Pokok Penjualan / HPP (otomatis dari Lampiran II)</div>
+                        <div class="form1770-computed-value" id="f1771-hpp">Rp 0</div>
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label">3. Biaya Usaha Lainnya (otomatis dari Lampiran II)</div>
+                        <div class="form1770-computed-value" id="f1771-biayaUsaha">Rp 0</div>
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label"><strong>4. Penghasilan Neto dari Usaha (1 − 2 − 3)</strong></div>
+                        <div class="form1770-computed-value" id="f1771-netoKomersial">Rp 0</div>
+                    </div>
+
+                    <h5 style="margin-top: 24px;">Penghasilan dari Luar Usaha (jika ada)</h5>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Contoh: jasa konsultasi tambahan, sewa, laba penjualan aset tetap, jasa manajemen ke anak usaha, dll — di luar kegiatan usaha utama.</p>
+                    <div class="form1770-row">
+                        <div class="form1770-row-label">Penghasilan Bruto Luar Usaha (Rp)</div>
+                        <input type="text" inputmode="numeric" class="form1770-input" id="f1771-luarUsahaBruto" oninput="recalcForm1771()" placeholder="0">
+                    </div>
+                    <div class="form1770-row">
+                        <div class="form1770-row-label">Biaya Terkait Luar Usaha (Rp)</div>
+                        <input type="text" inputmode="numeric" class="form1770-input" id="f1771-biayaLuarUsaha" oninput="recalcForm1771()" placeholder="0">
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label"><strong>Penghasilan Neto Luar Usaha</strong></div>
+                        <div class="form1770-computed-value" id="f1771-netoLuarUsaha">Rp 0</div>
+                    </div>
+
+                    <h5 style="margin-top: 24px;">Penghasilan Neto Komersial Luar Negeri (jika ada cabang/usaha di luar negeri)</h5>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Diisi dari Lampiran Khusus 7A — penghasilan neto komersial dari cabang/usaha di luar negeri. Kredit pajak luar negeri (Pasal 24) atas penghasilan ini diisi terpisah di Lampiran III.</p>
+                    <div class="form1770-row">
+                        <div class="form1770-row-label">Penghasilan Neto Komersial Luar Negeri (Rp)</div>
+                        <input type="text" inputmode="numeric" class="form1770-input" id="f1771-penghasilanLN" oninput="recalcForm1771()" placeholder="0">
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label"><strong>Jumlah Penghasilan Neto Komersial (Usaha + Luar Usaha + Luar Negeri)</strong></div>
+                        <div class="form1770-computed-value" id="f1771-jumlahNetoKomersial">Rp 0</div>
+                    </div>
+
+                    <h5 style="margin-top: 24px;">Koreksi Fiskal Positif</h5>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Contoh: sumbangan tidak dapat dikurangkan, sanksi administrasi pajak, biaya kepentingan pribadi pemegang saham, dll — menambah penghasilan fiskal.</p>
+                    <div id="f1771-koreksipositif-rows"></div>
+                    <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addKoreksiPositifRow()">+ Tambah Koreksi Positif</button>
+                    <div class="form1770-row form1770-row-computed" style="margin-top: 12px;">
+                        <div class="form1770-row-label"><strong>Total Koreksi Fiskal Positif</strong></div>
+                        <div class="form1770-computed-value" id="f1771-totalKoreksiPositif">Rp 0</div>
+                    </div>
+
+                    <h5 style="margin-top: 24px;">Koreksi Fiskal Negatif</h5>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Contoh: penghasilan yang sudah dikenakan PPh final, penghasilan bukan objek pajak yang masih tercatat di komersial — mengurangi penghasilan fiskal.</p>
+                    <div id="f1771-koreksinegatif-rows"></div>
+                    <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addKoreksiNegatifRow()">+ Tambah Koreksi Negatif</button>
+                    <div class="form1770-row form1770-row-computed" style="margin-top: 12px;">
+                        <div class="form1770-row-label"><strong>Total Koreksi Fiskal Negatif</strong></div>
+                        <div class="form1770-computed-value" id="f1771-totalKoreksiNegatif">Rp 0</div>
+                    </div>
+
+                    <div class="form1770-row form1770-row-computed form1770-row-final" style="margin-top: 16px;">
+                        <div class="form1770-row-label"><strong>5. Penghasilan Neto Fiskal (Jumlah Neto Komersial + Koreksi Positif − Koreksi Negatif)</strong></div>
+                        <div class="form1770-computed-value" id="f1771-netoFiskal">Rp 0</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Nilai ini otomatis mengalir ke Induk SPT (tab ⑥).</p>
+
+                    <h5 style="margin-top: 24px;">Penghasilan Tidak Teratur (jika ada)</h5>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Bagian dari Penghasilan Neto Fiskal di atas yang sifatnya insidental/tidak rutin (mis. laba penjualan aset tetap) — HARUS dikeluarkan dari dasar penghitungan Angsuran PPh 25 tahun depan (Angka 14 di Induk), karena angsuran hanya dihitung dari penghasilan yang bersifat teratur.</p>
+                    <div class="form1770-row">
+                        <div class="form1770-row-label">Penghasilan Tidak Teratur / Insidental (Rp)</div>
+                        <input type="text" inputmode="numeric" class="form1770-input" id="f1771-penghasilanTidakTeratur" oninput="recalcForm1771()" placeholder="0">
+                    </div>
+                </div>
+
+                <!-- Skema UMKM Final PP 55/2022 -->
+                <div id="f1771-lampiran1-umkm" style="display:none;">
+                    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">Badan ini memakai skema <strong>PPh Final UMKM (PP 55/2022)</strong> — rekonsiliasi fiskal, koreksi positif/negatif, dan fasilitas Pasal 31E <strong>tidak berlaku</strong> untuk skema ini. Cukup isi peredaran usaha bruto.</p>
+                    <div class="form1770-row">
+                        <div class="form1770-row-label">1. Peredaran Usaha Bruto Setahun (Rp)</div>
+                        <input type="text" inputmode="numeric" class="form1770-input" id="f1771-umkmPeredaranUsaha" oninput="recalcForm1771()" placeholder="0">
+                    </div>
+                    <div class="form1770-row form1770-row-computed form1770-row-final">
+                        <div class="form1770-row-label"><strong>PPh Final Terutang (0,5% × Peredaran Usaha)</strong></div>
+                        <div class="form1770-computed-value" id="f1771-umkmPphFinal">Rp 0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: LAMPIRAN II — RINCIAN HPP & BIAYA -->
+            <div class="card form1770-sheet" id="f1771-tab-2" style="display:none;">
+                <div id="f1771-lampiran2-normal">
+                    <h4 class="form1770-sheet-title">LAMPIRAN II — Perincian Harga Pokok Penjualan dan Biaya Usaha Lainnya</h4>
+
+                    <h5 style="margin-top: 10px;">Rincian Harga Pokok Penjualan (HPP)</h5>
+                    <div id="f1771-hpprincian-rows"></div>
+                    <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addHppRincianRow()">+ Tambah Komponen HPP</button>
+                    <div class="form1770-row form1770-row-computed" style="margin-top: 12px;">
+                        <div class="form1770-row-label"><strong>Total HPP</strong></div>
+                        <div class="form1770-computed-value" id="f1771-totalHppRincian">Rp 0</div>
+                    </div>
+
+                    <h5 style="margin-top: 30px;">Rincian Biaya Usaha Lainnya</h5>
+                    <div id="f1771-biayarincian-rows"></div>
+                    <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addBiayaRincianRow()">+ Tambah Komponen Biaya</button>
+                    <div class="form1770-row form1770-row-computed" style="margin-top: 12px;">
+                        <div class="form1770-row-label"><strong>Total Biaya Usaha Lainnya</strong></div>
+                        <div class="form1770-computed-value" id="f1771-totalBiayaRincian">Rp 0</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Kedua total ini otomatis mengalir ke baris HPP &amp; Biaya Usaha di Lampiran I.</p>
+                </div>
+                <div id="f1771-lampiran2-umkm" style="display:none;">
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Tidak berlaku untuk skema PPh Final UMKM — skema ini tidak memerlukan rincian HPP/biaya karena pajak dihitung langsung dari peredaran bruto.</p>
+                </div>
+            </div>
+
+            <!-- TAB 3: LAMPIRAN III — KREDIT PAJAK -->
+            <div class="card form1770-sheet" id="f1771-tab-3" style="display:none;">
+                <h4 class="form1770-sheet-title">LAMPIRAN III — Kredit Pajak Dalam Negeri</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Termasuk PPh 22/23/24 yang dipotong/dipungut pihak lain, PPh Pasal 25 (angsuran bulanan), atau setoran sendiri PPh Final UMKM — sesuai skema yang berlaku pada badan ini.</p>
+
+                <div id="f1771-kreditpajak-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addKreditPajakRow1771()">+ Tambah Kredit Pajak</button>
+
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Total Kredit Pajak</strong></div>
+                    <div class="form1770-computed-value" id="f1771-totalKreditPajak">Rp 0</div>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Total ini otomatis mengalir ke Induk SPT (tab ⑥).</p>
+            </div>
+
+            <!-- TAB 4: LAMPIRAN IV — FINAL & BUKAN OBJEK -->
+            <div class="card form1770-sheet" id="f1771-tab-4" style="display:none;">
+                <h4 class="form1770-sheet-title">LAMPIRAN IV — Penghasilan yang Dikenakan PPh Final dan Penghasilan Bukan Objek Pajak</h4>
+
+                <h5 style="margin-top: 10px;">A. Penghasilan yang Dikenakan PPh Final/Bersifat Final</h5>
+                <div id="f1771-final-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addPenghasilanFinalRow1771()">+ Tambah Penghasilan Final</button>
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Total PPh Final Terutang</strong></div>
+                    <div class="form1770-computed-value" id="f1771-totalPphFinal">Rp 0</div>
+                </div>
+
+                <h5 style="margin-top: 30px;">B. Penghasilan yang Tidak Termasuk Objek Pajak</h5>
+                <div id="f1771-bukanobjek-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addBukanObjekRow1771()">+ Tambah Penghasilan Bukan Objek</button>
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Total Penghasilan Bukan Objek Pajak</strong></div>
+                    <div class="form1770-computed-value" id="f1771-totalBukanObjek">Rp 0</div>
+                </div>
+            </div>
+
+            <!-- TAB 5: LAMPIRAN V & VI — PEMEGANG SAHAM, PENGURUS & CABANG -->
+            <div class="card form1770-sheet" id="f1771-tab-5" style="display:none;">
+                <h4 class="form1770-sheet-title">LAMPIRAN V &amp; VI — Pemegang Saham, Pengurus/Komisaris, dan Daftar Cabang</h4>
+
+                <h5 style="margin-top: 10px;">Daftar Pemegang Saham / Pemilik Modal</h5>
+                <div id="f1771-pemegangsaham-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addPemegangSahamRow()">+ Tambah Pemegang Saham</button>
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Jumlah Pemegang Saham Terdaftar</strong></div>
+                    <div class="form1770-computed-value" id="f1771-jumlahPemegangSaham">0</div>
+                </div>
+
+                <h5 style="margin-top: 30px;">Susunan Pengurus &amp; Komisaris</h5>
+                <div id="f1771-pengurus-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addPengurusRow()">+ Tambah Pengurus/Komisaris</button>
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Jumlah Pengurus/Komisaris Terdaftar</strong></div>
+                    <div class="form1770-computed-value" id="f1771-jumlahPengurus">0</div>
+                </div>
+
+                <h5 style="margin-top: 30px;">Daftar Cabang Utama Perusahaan</h5>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Kosongkan kalau perusahaan tidak punya cabang.</p>
+                <div id="f1771-cabang-rows"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addCabangRow()">+ Tambah Cabang</button>
+                <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
+                    <div class="form1770-row-label"><strong>Jumlah Cabang Terdaftar</strong></div>
+                    <div class="form1770-computed-value" id="f1771-jumlahCabang">0</div>
+                </div>
+            </div>
+
+            <!-- TAB 6: INDUK -->
+            <div class="card form1770-sheet" id="f1771-tab-6" style="display:none;">
+                <h4 class="form1770-sheet-title">INDUK SPT 1771</h4>
+
+                <!-- Skema NORMAL -->
+                <div id="f1771-induk-normal">
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label">1. Peredaran Usaha (dari Lampiran I — untuk cek Fasilitas Pasal 31E)</div>
+                        <div class="form1770-computed-value" id="f1771-peredaranUsaha-2">Rp 0</div>
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label">2. Penghasilan Neto Fiskal (dari Lampiran I)</div>
+                        <div class="form1770-computed-value" id="f1771-netoFiskal-2">Rp 0</div>
+                    </div>
+                    <div class="form1770-row">
+                        <div class="form1770-row-label">3. Kompensasi Kerugian Fiskal Tahun Sebelumnya (Rp)</div>
+                        <input type="text" inputmode="numeric" class="form1770-input" id="f1771-kompensasiKerugian" oninput="recalcForm1771()" placeholder="0">
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label"><strong>4. Penghasilan Kena Pajak / PKP (2 − 3)</strong></div>
+                        <div class="form1770-computed-value" id="f1771-pkp">Rp 0</div>
+                    </div>
+                    <div class="form1770-row form1770-row-computed" style="background: rgba(252,163,17,0.08);">
+                        <div class="form1770-row-label">ℹ️ Status Fasilitas Pasal 31E</div>
+                        <div class="form1770-computed-value" id="f1771-statusFasilitas" style="font-size: 0.85rem;"></div>
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label"><strong>5. PPh Terutang (Tarif 22% + Fasilitas Pasal 31E)</strong></div>
+                        <div class="form1770-computed-value" id="f1771-pphTerutang">Rp 0</div>
+                    </div>
+
+                    <h5 style="margin-top: 24px;">Angsuran PPh Pasal 25 Tahun Depan</h5>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label">14.a Dasar Penghitungan Angsuran (Neto Fiskal − Penghasilan Tidak Teratur)</div>
+                        <div class="form1770-computed-value" id="f1771-angsuranDasar">Rp 0</div>
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label">14.d PPh Dihitung dari Dasar Angsuran (tarif sesuai fasilitas Pasal 31E yang sama)</div>
+                        <div class="form1770-computed-value" id="f1771-angsuranPPhDihitung">Rp 0</div>
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label">14.e Kredit Pajak Dalam Negeri yang Diperhitungkan (tidak termasuk PPh 24 & angsuran PPh 25)</div>
+                        <div class="form1770-computed-value" id="f1771-angsuranKreditDN">Rp 0</div>
+                    </div>
+                    <div class="form1770-row form1770-row-computed form1770-row-final">
+                        <div class="form1770-row-label"><strong>14.g Angsuran PPh 25 per Bulan Tahun Depan (dibulatkan ke bawah ribuan)</strong></div>
+                        <div class="form1770-computed-value" id="f1771-angsuranPerBulan">Rp 0</div>
+                    </div>
+                </div>
+
+                <!-- Skema UMKM -->
+                <div id="f1771-induk-umkm" style="display:none;">
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label">1. Peredaran Usaha Bruto Setahun (dari Lampiran I)</div>
+                        <div class="form1770-computed-value" id="f1771-umkmPeredaranUsaha-2">Rp 0</div>
+                    </div>
+                    <div class="form1770-row form1770-row-computed">
+                        <div class="form1770-row-label"><strong>2. PPh Final Terutang (0,5% × Peredaran Usaha)</strong></div>
+                        <div class="form1770-computed-value" id="f1771-umkmPphFinal-2">Rp 0</div>
+                    </div>
+                </div>
+
+                <div class="form1770-row form1770-row-computed">
+                    <div class="form1770-row-label" id="f1771-kreditpajak-label">Kredit Pajak / Setoran Sendiri (otomatis dari total Lampiran III)</div>
+                    <div class="form1770-computed-value" id="f1771-kreditPajak">Rp 0</div>
+                </div>
+                <div class="form1770-row form1770-row-computed form1770-row-final">
+                    <div class="form1770-row-label"><strong>PPh Kurang / Lebih Bayar</strong></div>
+                    <div class="form1770-computed-value" id="f1771-kblb">Rp 0</div>
+                </div>
+            </div>
+
+            <div class="mt-3 text-right">
+                <button type="button" class="btn" onclick="checkForm1771Answers()">Selesai &amp; Cek Jawaban</button>
+            </div>
+        </div>
+
+        <!-- VIEW: RESULT -->
+        <div id="view-result" class="view">
+            <div class="card result-card">
+                <h2>Hasil Simulasi</h2>
+                <div class="score-circle" id="result-score">100</div>
+                <h3 id="result-category">Sangat Baik</h3>
+                <p class="mt-3" id="result-xp-gain">+50 XP Diperoleh!</p>
+
+                <div class="ai-explanation">
+                    <h4>🤖 Pembahasan AI & Dasar Hukum</h4>
+                    <p id="result-explanation" style="margin-top: 10px; font-size: 0.95rem; line-height: 1.6;"></p>
+                </div>
+
+                <div class="mt-3 d-flex no-print" style="justify-content: center; margin-top: 30px; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="window.print()">Cetak (Print)</button>
+                    <button class="btn btn-outline" id="btnDownloadResultPdf" onclick="downloadResultPDF()">Download PDF</button>
+                    <button class="btn" onclick="navigate('dashboard')">Kembali ke Dashboard</button>
+                </div>
+                <p class="no-print" id="resultPdfStatus" style="font-size: 0.85rem; margin-top: 8px; min-height: 18px;"></p>
+            </div>
+        </div>
+
+        <!-- VIEW: HISTORY -->
+        <div id="view-history" class="view">
+            <button class="btn btn-outline mb-3" onclick="navigate('dashboard')">← Kembali</button>
+            <div class="card">
+                <h3>Riwayat Latihan</h3>
+                <table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 15px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border);">
+                            <th style="padding: 10px;">Tanggal</th>
+                            <th>Modul</th>
+                            <th>Mode</th>
+                            <th>Skor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body">
+                        <!-- History Data -->
+                    </tbody>
+                </table>
+                <div style="display: flex; justify-content: flex-end; margin-top: 30px; margin-bottom: 20px;">
+    <button id="btn-hapus-riwayat" style="
+        background-color: #dc3545; 
+        color: white; 
+        padding: 10px 15px; 
+        border: none; 
+        border-radius: 5px; 
+        cursor: pointer;
+    ">
+      Hapus Riwayat Pembelajaran
+    </button>
+</div>
+            </div>
+        </div>
+
+        <!-- VIEW: PANDUAN CORETAX -->
+        <div id="view-coretax" class="view">
+            <button class="btn btn-outline mb-3" onclick="navigate('dashboard')">← Kembali</button>
+            <div class="card">
+                <div class="guide-hero">
+                    <h3 style="margin: 0; color: var(--primary);">Panduan Coretax</h3>
+                    <p style="margin: 0; color: var(--text-main); line-height: 1.7;">Coretax adalah sistem digital modern DJP yang membantu wajib pajak mengelola registrasi, pelaporan, dan pemantauan status administrasi perpajakan secara lebih terstruktur.</p>
+                    <div class="guide-pills">
+                        <span class="guide-pill">🧾 Registrasi & Login</span>
+                        <span class="guide-pill">📋 Pelaporan SPT</span>
+                        <span class="guide-pill">✅ Persiapan Data</span>
+                        <span class="guide-pill">🔐 E-FIN & Kuasa</span>
+                    </div>
+                </div>
+
+                <div class="guide-grid">
+                    <div class="guide-card">
+                        <h4 style="margin-bottom: 10px; color: var(--primary);">Apa yang perlu dipersiapkan?</h4>
+                        <ul class="checklist">
+                            <li><strong>1.</strong> Siapkan NIK, NPWP, dan data identitas yang valid.</li>
+                            <li><strong>2.</strong> Pastikan email dan nomor telepon aktif untuk verifikasi akun.</li>
+                            <li><strong>3.</strong> Kumpulkan dokumen usaha, transaksi, dan bukti pelaporan.</li>
+                            <li><strong>4.</strong> Catat data yang akan diisi agar prosesnya lebih cepat dan akurat.</li>
+                        </ul>
+                    </div>
+
+                    <div class="guide-card">
+                        <h4 style="margin-bottom: 10px; color: var(--success);">Langkah utama saat memakai Coretax</h4>
+                        <ul class="checklist">
+                            <li><strong>1.</strong> Login dengan akun resmi yang sudah terdaftar.</li>
+                            <li><strong>2.</strong> Periksa profil wajib pajak dan lengkapi data yang belum ada.</li>
+                            <li><strong>3.</strong> Buka menu pelaporan untuk melihat status SPT dan dokumen.</li>
+                            <li><strong>4.</strong> Review ulang sebelum mengirim agar tidak ada data yang salah.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="guide-grid">
+                    <div class="guide-card">
+                        <h4 style="margin-bottom: 10px; color: var(--warning);">Cara mendapatkan e-FIN</h4>
+                        <ul class="checklist">
+                            <li><strong>1.</strong> Daftarkan diri melalui layanan resmi DJP atau kanal yang ditentukan untuk memperoleh akun administrasi perpajakan.</li>
+                            <li><strong>2.</strong> Lengkapi data identitas, NPWP, dan dokumen pendukung sesuai kebutuhan Anda.</li>
+                            <li><strong>3.</strong> Verifikasi akun melalui proses yang disediakan oleh sistem resmi.</li>
+                            <li><strong>4.</strong> Setelah akun aktif, Anda dapat menggunakan akses terkait pelaporan dan administrasi elektronik.</li>
+                        </ul>
+                    </div>
+
+                    <div class="guide-card">
+                        <h4 style="margin-bottom: 10px; color: var(--info);">Akses sebagai kuasa perusahaan</h4>
+                        <ul class="checklist">
+                            <li><strong>1.</strong> Siapkan surat kuasa atau dokumen delegasi yang sah dari perusahaan.</li>
+                            <li><strong>2.</strong> Pastikan data perusahaan dan identitas kuasa sudah sesuai dengan data registrasi.</li>
+                            <li><strong>3.</strong> Gunakan akses resmi yang diberikan untuk mengelola administrasi perusahaan melalui sistem DJP.</li>
+                            <li><strong>4.</strong> Selalu cek kembali dokumen dan data yang dikirim karena akurasi sangat penting dalam proses pajak.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="guide-card">
+                    <h4 style="margin-bottom: 10px; color: var(--warning);">Tips penting untuk pemula</h4>
+                    <ul class="checklist">
+                        <li><strong>✓</strong> Jangan terburu-buru saat mengisi data; cek nomor, tanggal, dan nominal dengan teliti.</li>
+                        <li><strong>✓</strong> Selalu simpan bukti unggah dan catatan transaksi Anda sebagai arsip.</li>
+                        <li><strong>✓</strong> Gunakan fitur bantuan resmi jika ada bagian yang belum dipahami.</li>
+                        <li><strong>✓</strong> Latih diri Anda dengan simulasi SPT di aplikasi ini agar lebih siap menghadapi sistem nyata.</li>
+                    </ul>
+                </div>
+
+                <div class="actions">
+                    <a class="btn" href="https://www.pajak.go.id/index.php/id/reformdjp/coretax/" target="_blank" rel="noopener">Buka Coretax</a>
+                    <button class="btn btn-outline" onclick="navigate('dashboard')">Kembali ke Dashboard</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: TABLOID PAJAK -->
+        <div id="view-tabloid" class="view">
+            <button class="btn btn-outline mb-3" onclick="navigate('dashboard')">← Kembali</button>
+            <div class="card">
+                <h3>Tabloid Pajak</h3>
+                <p style="margin-bottom: 18px; color: var(--text-main); line-height: 1.7;">Info peraturan pajak terbaru selalu berasal dari sumber resmi Direktorat Jenderal Pajak. Klik link berikut untuk membuka halaman resmi dan memperoleh update langsung dari pemerintah.</p>
+                <div class="card" style="background: rgba(0, 75, 135, 0.04); border: 1px solid rgba(0, 75, 135, 0.15); margin-bottom: 18px;">
+                    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center;">
+                        <div>
+                            <h4 style="margin:0 0 8px 0; color: var(--primary);">Feed Update Realtime (Mockup)</h4>
+                            <p style="margin:0; color: var(--text-muted); line-height:1.5;">Memuat data dari API publik gratis sebagai demo fitur update otomatis.</p>
+                        </div>
+                        <button class="btn btn-outline" type="button" onclick="fetchRegulationUpdates(true)">Refresh Sekarang</button>
+                    </div>
+                    <div id="tabloid-status" style="margin-top: 16px; color: var(--text-main); font-weight: 600;">Menunggu update...</div>
+                    <div id="tabloid-feed" style="margin-top: 16px; display: grid; gap: 14px;"></div>
+                    <div id="tabloid-last-updated" style="margin-top: 14px; color: var(--text-muted); font-size: 0.95rem;"></div>
+                </div>
+                <div id="tabloid-links-container" style="display: grid; gap: 14px;"></div>
+                <div class="feedback success" style="margin-top: 18px; display: block;">
+                    🔔 Catatan: Karena aplikasi ini berjalan lokal, link resmi DJP adalah cara tercepat untuk akses update peraturan baru.
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: KALKULATOR TER & THR -->
+        <div id="view-calculator" class="view">
+            <div class="card mb-3" style="background:linear-gradient(135deg,rgba(0,75,135,.08),rgba(252,163,17,.06));border:1px solid var(--border);">
+                <h3 style="margin:0 0 6px;">🧮 Simulasi TER &amp; Dampak THR</h3>
+                <p style="margin:0;color:var(--text-muted);font-size:.95rem;">Lihat loncatan lapisan Tarif Efektif Rata-rata (TER) dan bagaimana THR menaikkan tarif PPh 21 di bulan penerimaannya.</p>
+            </div>
+            <div class="calc-tabs" role="tablist">
+                <button type="button" class="calc-tab active" data-calc="ter">Simulasi Dampak TER</button>
+                <button type="button" class="calc-tab" data-calc="thr">Analisis Dampak THR</button>
+                <button type="button" class="calc-tab" data-calc="banding">TER vs Progresif</button>
+            </div>
+            <div class="calc-panel active" data-calc-panel="ter">
+                <div class="card">
+                    <h4>Simulasi dampak tarif progresif TER (Jan–Nov)</h4>
+                    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 0;">Bandingkan bruto sebelum vs sesudah. Sistem menampilkan apakah Anda <strong>pindah lapisan TER</strong>.</p>
+                    <div class="calc-grid">
+                        <div class="form-group">
+                            <label>Status PTKP</label>
+                            <select id="ter-ptkp" class="form-control">
+                                <option value="TK/0">TK/0 (kat. A)</option>
+                                <option value="TK/1">TK/1 (kat. A)</option>
+                                <option value="K/0">K/0 (kat. A)</option>
+                                <option value="K/1" selected>K/1 (kat. B)</option>
+                                <option value="K/2">K/2 (kat. B)</option>
+                                <option value="TK/2">TK/2 (kat. B)</option>
+                                <option value="TK/3">TK/3 (kat. B)</option>
+                                <option value="K/3">K/3 (kat. C)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Bruto bulanan saat ini (Rp)</label>
+                            <input type="number" id="ter-bruto0" class="form-control" min="0" step="100000" value="10000000">
+                        </div>
+                        <div class="form-group">
+                            <label>Bruto bulanan baru (Rp)</label>
+                            <input type="number" id="ter-bruto1" class="form-control" min="0" step="100000" value="15000000">
+                        </div>
+                    </div>
+                    <button type="button" class="btn" onclick="runSimulasiTER()">Simulasikan Dampak TER</button>
+                    <div class="calc-result" id="result-ter" hidden></div>
+                </div>
+            </div>
+            <div class="calc-panel" data-calc-panel="thr" hidden>
+                <div class="card">
+                    <h4>Analisis dampak THR terhadap tarif TER</h4>
+                    <p style="color:var(--text-muted);font-size:.9rem;margin:6px 0 0;">THR menambah bruto di bulan dibayarkan dan bisa menaikkan tarif efektif bulan tersebut.</p>
+                    <div class="calc-grid">
+                        <div class="form-group">
+                            <label>Status PTKP</label>
+                            <select id="thr-ptkp" class="form-control">
+                                <option value="TK/0">TK/0</option>
+                                <option value="K/0">K/0</option>
+                                <option value="K/1" selected>K/1</option>
+                                <option value="K/2">K/2</option>
+                                <option value="K/3">K/3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Gaji / bruto rutin bulanan (Rp)</label>
+                            <input type="number" id="thr-gaji" class="form-control" min="0" step="100000" value="12000000">
+                        </div>
+                        <div class="form-group">
+                            <label>Nominal THR (Rp)</label>
+                            <input type="number" id="thr-nominal" class="form-control" min="0" step="100000" value="12000000">
+                        </div>
+                        <div class="form-group">
+                            <label>Penghasilan lain di bulan yang sama (Rp)</label>
+                            <input type="number" id="thr-lain" class="form-control" min="0" step="100000" value="0">
+                        </div>
+                    </div>
+                    <button type="button" class="btn" onclick="runAnalisisTHR()">Analisis Dampak THR</button>
+                    <div class="calc-result" id="result-thr" hidden></div>
+                </div>
+            </div>
+            <div class="calc-panel" data-calc-panel="banding" hidden>
+                <div class="card">
+                    <h4>Perbandingan kasar: TER bulanan vs progresif tahunan</h4>
+                    <div class="calc-grid">
+                        <div class="form-group">
+                            <label>Status PTKP</label>
+                            <select id="bd-ptkp" class="form-control">
+                                <option value="TK/0">TK/0</option>
+                                <option value="K/1" selected>K/1</option>
+                                <option value="K/3">K/3</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Bruto bulanan tetap (Rp)</label>
+                            <input type="number" id="bd-bruto" class="form-control" min="0" step="100000" value="12000000">
+                        </div>
+                        <div class="form-group">
+                            <label>THR setahun (1×)</label>
+                            <input type="number" id="bd-thr" class="form-control" min="0" step="100000" value="12000000">
+                        </div>
+                    </div>
+                    <button type="button" class="btn" onclick="runBandingTERvsProgresif()">Bandingkan</button>
+                    <div class="calc-result" id="result-banding" hidden></div>
+                </div>
+            </div>
+            <p class="calc-disclaimer">⚠️ Edukasi — TER (PP 58/2023 &amp; PMK terkait) dan tarif progresif Pasal 17 UU HPP. Verifikasi ketentuan aktual sebelum dipakai untuk pelaporan.</p>
+        </div>
+
+        </main>
+
+    </div>
+
+    <!-- Firebase SDK (CDN — cached by SW after first visit) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <!-- Module scripts (separated for maintainability) -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/app-main.js"></script>
+    <script src="js/calculators.js"></script>
+    <script src="js/sw-register.js"></script>
+
+    <!-- Shared portal helpers -->
+    <script src="../../js/back-to-portal.js"></script>
+    <script src="../../js/knowledge-base.js"></script>
+    <script src="../../js/shared/pdf-export.js"></script>
+    <script src="data/knowledge-spt.js"></script>
+    <script src="js/knowledge-init.js"></script>
+</body>
+</html>
