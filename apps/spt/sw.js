@@ -11,7 +11,7 @@
 //
 // Hanya app shell lokal (HTML, manifest, ikon) yang di-cache untuk PWA / offline shell.
 
-const CACHE_NAME = 'sim-spt-shell-v5-pdf'; // naikkan versi tiap update signifikan app shell / strategi SW
+const CACHE_NAME = 'sim-spt-shell-v6-pdf'; // bumped: fix knowledge-base.js PDF (blank-page bug, migrated to js/shared/pdf-export.js)
 
 // File dari domain sendiri — wajib berhasil di-cache saat install.
 const APP_SHELL_LOCAL = [

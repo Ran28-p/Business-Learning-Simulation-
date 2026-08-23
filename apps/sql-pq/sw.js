@@ -4,7 +4,7 @@
 // ikut tercache otomatis begitu dipakai pertama kali, jadi kunjungan
 // berikutnya tidak perlu network untuk mengaktifkan SQL engine-nya.
 
-const CACHE_NAME = 'sim-sqlpq-shell-v2-pdf'; // bumped: index.html menambahkan js/shared/pdf-export.js
+const CACHE_NAME = 'sim-sqlpq-shell-v3-pdf'; // bumped: fix knowledge-base.js PDF (blank-page bug, migrated to js/shared/pdf-export.js)
 
 const APP_SHELL_LOCAL = [
     './',

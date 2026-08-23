@@ -12,34 +12,11 @@
 
   const STATE = { content: null, overlay: null, pdfBusy: false };
 
-  function resolveBase() {
-    const scripts = document.getElementsByTagName('script');
-    for (let i = scripts.length - 1; i >= 0; i--) {
-      const src = scripts[i].src || '';
-      if (src.indexOf('knowledge-base.js') !== -1) {
-        return src.replace(/\/js\/knowledge-base\.js(?:\?.*)?$/, '/');
-      }
-    }
-    return '../../';
-  }
-  const PORTAL_BASE = resolveBase();
-
-  function ensureHtml2Pdf() {
-    if (typeof window.html2pdf !== 'undefined') return Promise.resolve();
-    return new Promise((resolve, reject) => {
-      const local = document.createElement('script');
-      local.src = PORTAL_BASE + 'vendor/html2pdf/html2pdf.bundle.min.js';
-      local.onload = () => resolve();
-      local.onerror = () => {
-        const cdn = document.createElement('script');
-        cdn.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        cdn.onload = () => resolve();
-        cdn.onerror = () => reject(new Error('html2pdf gagal dimuat'));
-        document.head.appendChild(cdn);
-      };
-      document.head.appendChild(local);
-    });
-  }
+  // Catatan: dulu file ini punya loader html2pdf sendiri (ensureHtml2Pdf +
+  // resolveBase) yang terpisah dari js/shared/pdf-export.js -- itu sumber
+  // duplikasi implementasi PDF yang menyebabkan bug (lihat downloadPdf()).
+  // Sekarang seluruhnya memakai window.PDFExport (engine terpusat yang sama
+  // dipakai Accounting/SPT/Excel/SQL-PQ), jadi loader lokal ini dihapus.
 
   function escapeAttr(s) {
     return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
@@ -305,7 +282,7 @@
     function buildBodyHtml() {
       var html = '';
       html += '<div class="kbpdf-cover">';
-      html += '<div class="kbpdf-cover-eyebrow">Portal Belajar · SPT</div>';
+      html += '<div class="kbpdf-cover-eyebrow">Portal Belajar</div>';
       html += '<div class="kbpdf-cover-title">' + escapeHtml(content.title || 'Modul Pengetahuan') + '</div>';
       if (content.subtitle) {
         html += '<div class="kbpdf-cover-sub">' + escapeHtml(content.subtitle) + '</div>';
@@ -371,97 +348,36 @@
 
     var fileName = slug(content.title, 'modul-pengetahuan') + '.pdf';
 
-    function removeHost() {
-      var n = document.getElementById('kbPdfHost');
-      if (n && n.parentNode) n.parentNode.removeChild(n);
+    if (!window.PDFExport) {
+      setStatus('Mesin PDF tidak tersedia. Coba muat ulang halaman.', true);
+      STATE.pdfBusy = false;
+      return;
     }
 
-    ensureHtml2Pdf()
-      .then(function () {
-        removeHost();
-        var host = document.createElement('div');
-        host.id = 'kbPdfHost';
-        host.className = 'kbpdf-root';
-        host.setAttribute('style',
-          'position:absolute;left:0;top:0;width:794px;min-height:1123px;background:#ffffff;color:#0f172a;' +
-          'z-index:2147483646;overflow:visible;visibility:visible;opacity:1;'
-        );
-        host.innerHTML = '<style>' + pdfCss + '</style>' + buildBodyHtml();
-        document.body.appendChild(host);
+    // Dulu bagian ini punya pipeline html2canvas sendiri (position:absolute
+    // + onclone manual) yang terbukti rapuh -- hasil unduhan kadang jadi
+    // halaman kosong. Sekarang memakai window.PDFExport.exportHTMLToPDF(),
+    // engine terpusat yang sama dan sudah terbukti bekerja di modul
+    // Accounting/SPT/Excel/SQL-PQ (position:fixed + overlay "Membuat PDF...",
+    // bukan absolute+z-index yang gampang salah ukur oleh html2canvas).
+    var html = '<div class="kbpdf-root">' + buildBodyHtml() + '</div>';
 
-        // Tunggu paint
-        return new Promise(function (resolve) {
-          requestAnimationFrame(function () {
-            requestAnimationFrame(function () {
-              setTimeout(resolve, 100);
-            });
-          });
-        }).then(function () {
-          return window.html2pdf()
-            .set({
-              margin: [10, 12, 12, 12],
-              filename: fileName,
-              image: { type: 'jpeg', quality: 0.98 },
-              html2canvas: {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true,
-                backgroundColor: '#ffffff',
-                logging: false,
-                width: 794,
-                windowWidth: 794,
-                scrollX: 0,
-                scrollY: 0,
-                onclone: function (clonedDoc) {
-                  var clonedHost = clonedDoc.getElementById('kbPdfHost');
-                  if (clonedHost) {
-                    clonedHost.style.position = 'absolute';
-                    clonedHost.style.left = '0';
-                    clonedHost.style.top = '0';
-                    clonedHost.style.width = '794px';
-                    clonedHost.style.maxHeight = 'none';
-                    clonedHost.style.height = 'auto';
-                    clonedHost.style.overflow = 'visible';
-                    clonedHost.style.visibility = 'visible';
-                    clonedHost.style.opacity = '1';
-                  }
-                }
-              },
-              jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-              pagebreak: { mode: ['css', 'legacy'] }
-            })
-            .from(host)
-            .outputPdf('blob')
-            .then(function (blob) {
-              if (!(blob instanceof Blob) || blob.size < 1000) {
-                throw new Error('PDF blob kosong/tidak valid.');
-              }
-              var url = URL.createObjectURL(blob);
-              var link = document.createElement('a');
-              link.href = url;
-              link.download = fileName;
-              link.style.display = 'none';
-              document.body.appendChild(link);
-              link.click();
-              setTimeout(function () {
-                if (link.parentNode) link.parentNode.removeChild(link);
-                URL.revokeObjectURL(url);
-              }, 1500);
-            });
-        });
-      })
+    window.PDFExport.exportHTMLToPDF(html, {
+      filename: fileName,
+      widthPx: 794,
+      scale: 2,
+      extraCss: pdfCss,
+      margin: [10, 12, 12, 12]
+    })
       .then(function () {
-        removeHost();
         setStatus('PDF berhasil diunduh.');
         setTimeout(function () { setStatus(''); }, 2500);
       })
       .catch(function (err) {
         console.error('[knowledge-base] PDF error:', err);
-        removeHost();
-        // JANGAN buka blob HTML. Minta user pakai tombol Cetak di toolbar.
-        setStatus('Gagal unduh otomatis. Klik tombol Cetak → pilih "Save as PDF".', true);
+        setStatus(err && err.message ? err.message : 'Gagal membuat PDF. Silakan coba lagi.', true);
       })
-      .finally(function () {
+      .then(function () {
         STATE.pdfBusy = false;
       });
   }
