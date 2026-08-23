@@ -108,11 +108,11 @@
           "ref": "UU PPN"
         },
         {
-          "q": "Tarif PPN umum saat ini adalah ... %",
+          "q": "Untuk penyerahan barang/jasa NONMEWAH, tarif PPN EFEKTIF yang dipungut PKP saat ini adalah ... % (bukan tarif menurut undang-undang, tapi tarif yang benar-benar dibebankan ke konsumen)",
           "type": "number",
           "answer": 11,
-          "explanation": "Tarif PPN umum saat ini adalah 11% sesuai ketentuan yang berlaku.",
-          "ref": "UU PPN"
+          "explanation": "Tarif PPN menurut UU HPP sebenarnya sudah 12% sejak 1 Januari 2025. Namun PMK 131/2024 menetapkan Dasar Pengenaan Pajak (DPP) Nilai Lain sebesar 11/12 dari harga jual/nilai impor khusus untuk barang/jasa NONMEWAH, sehingga PPN yang efektif dipungut tetap setara 11%. Barang/jasa tergolong mewah (kena PPnBM) dikenakan tarif 12% penuh tanpa mekanisme ini.",
+          "ref": "UU HPP No. 7/2021 Pasal 7 jo. PMK 131/2024"
         }
       ]
     },
@@ -523,6 +523,114 @@
           "answer": "energi",
           "explanation": "Sektor energi, industri, dan transportasi adalah contoh bidang yang sering dikaitkan dengan emisi karbon.",
           "ref": "Pajak Karbon"
+        }
+      ]
+    },
+    {
+      "key": "pph23",
+      "title": "PPh Pasal 23",
+      "summary": "Pajak yang dipotong oleh pihak pemberi penghasilan (bukan penerima) atas dividen, bunga, royalti, hadiah/penghargaan, sewa harta (selain tanah/bangunan), dan imbalan jasa tertentu yang dibayarkan kepada Wajib Pajak dalam negeri atau BUT. Dua kelompok tarif: 15% dari jumlah bruto untuk dividen, bunga, royalti, serta hadiah/penghargaan; dan 2% dari jumlah bruto untuk sewa harta (selain tanah/bangunan, yang masuk PPh Final Pasal 4(2)) serta imbalan jasa teknik, manajemen, konsultan, dan jasa lain sesuai PMK 141/PMK.03/2015. Jika pihak yang dipotong tidak memiliki NPWP, tarif menjadi 100% lebih tinggi (30% dan 4%). Bunga yang dibayarkan ke bank dikecualikan dari pemotongan ini.",
+      "questions": [
+        {
+          "q": "Siapa yang WAJIB memotong PPh Pasal 23?",
+          "type": "mcq",
+          "options": [
+            "Pihak yang membayarkan penghasilan (mis. perusahaan pemberi jasa/penyewa)",
+            "Pihak yang menerima penghasilan",
+            "Kantor pajak setempat",
+            "Bank tempat transaksi dilakukan"
+          ],
+          "answer": "Pihak yang membayarkan penghasilan (mis. perusahaan pemberi jasa/penyewa)",
+          "explanation": "Berbeda dengan pajak yang dibayar sendiri, PPh 23 dipotong oleh pihak PEMBERI penghasilan pada saat pembayaran dilakukan, lalu disetorkan ke kas negara atas nama pihak yang menerima penghasilan.",
+          "ref": "UU PPh Pasal 23"
+        },
+        {
+          "q": "PT Sejahtera membayar royalti sebesar Rp 60.000.000 kepada PT Kreasi (badan, ber-NPWP). Berapa PPh 23 yang harus dipotong? (Rp)",
+          "type": "number",
+          "answer": 9000000,
+          "explanation": "Royalti dikenakan tarif 15% dari jumlah bruto: 15% x Rp 60.000.000 = Rp 9.000.000.",
+          "ref": "UU HPP Pasal 23"
+        },
+        {
+          "q": "Sebuah kantor membayar jasa konsultan sebesar Rp 10.000.000 kepada penyedia jasa yang TIDAK memiliki NPWP. Berapa PPh 23 yang harus dipotong? (Rp)",
+          "type": "number",
+          "answer": 400000,
+          "explanation": "Jasa konsultan termasuk kelompok tarif 2%, tetapi karena penerima tidak ber-NPWP, tarifnya menjadi 2 kali lipat (4%): 4% x Rp 10.000.000 = Rp 400.000.",
+          "ref": "UU PPh Pasal 23 jo. Pasal 21 ayat (5a)"
+        },
+        {
+          "q": "Manakah dari berikut ini yang DIKECUALIKAN dari pemotongan PPh Pasal 23?",
+          "type": "mcq",
+          "options": [
+            "Bunga yang dibayarkan kepada bank",
+            "Royalti kepada pencipta lagu",
+            "Sewa alat berat kepada perusahaan penyewaan",
+            "Jasa konsultan manajemen"
+          ],
+          "answer": "Bunga yang dibayarkan kepada bank",
+          "explanation": "Pembayaran bunga kepada bank dikecualikan dari objek PPh Pasal 23 karena bank sudah dikenai skema perpajakan tersendiri atas penghasilan bunganya.",
+          "ref": "UU PPh Pasal 23 ayat (4)"
+        },
+        {
+          "q": "Sewa tanah dan/atau bangunan dikenakan pajak final berdasarkan pasal berapa, BUKAN PPh Pasal 23?",
+          "type": "text",
+          "answer": "pasal 4 ayat 2",
+          "explanation": "Sewa tanah dan/atau bangunan secara khusus dikeluarkan dari objek PPh Pasal 23 dan masuk ke PPh Final Pasal 4 ayat (2) dengan tarif 10% dari nilai bruto persewaan.",
+          "ref": "PP 34/2017"
+        }
+      ]
+    },
+    {
+      "key": "pph-final",
+      "title": "PPh Final Pasal 4 Ayat (2)",
+      "summary": "Pajak penghasilan yang bersifat FINAL atas jenis penghasilan tertentu — artinya dipotong/disetor sekali saat transaksi terjadi dan TIDAK diperhitungkan lagi (tidak jadi kredit pajak) dalam SPT Tahunan. Beberapa tarif utama: sewa tanah/bangunan 10% dari nilai bruto sewa (PP 34/2017); UMKM (peredaran bruto tidak lebih dari Rp4,8 miliar setahun) 0,5% dari peredaran bruto (PP 23/2018, berlaku maksimal 7 tahun untuk WP orang pribadi sejak terdaftar); bunga deposito dan tabungan 20% (PP 131/2000); dividen kepada WP orang pribadi dalam negeri 10% (PP 19/2009); hadiah undian 25% (PP 132/2000); jasa konstruksi bertarif final bervariasi (sekitar 1,75%-6%) tergantung kualifikasi usaha (PP 9/2022).",
+      "questions": [
+        {
+          "q": "Apa arti \"final\" pada PPh Final Pasal 4 ayat (2)?",
+          "type": "mcq",
+          "options": [
+            "Pajak yang dipotong sudah menyelesaikan kewajiban pajak atas penghasilan itu, tidak dihitung ulang di SPT Tahunan",
+            "Pajak yang hanya dibayar satu kali seumur hidup Wajib Pajak",
+            "Pajak yang jumlahnya sudah pasti sama setiap tahun",
+            "Pajak yang hanya berlaku untuk transaksi terakhir dalam setahun"
+          ],
+          "answer": "Pajak yang dipotong sudah menyelesaikan kewajiban pajak atas penghasilan itu, tidak dihitung ulang di SPT Tahunan",
+          "explanation": "Sifat final berarti PPh yang sudah dipotong/disetor atas penghasilan tersebut dianggap SELESAI kewajibannya -- tidak digabung ke penghasilan lain dan tidak menjadi kredit pajak di SPT Tahunan.",
+          "ref": "UU PPh Pasal 4 ayat (2)"
+        },
+        {
+          "q": "Pak Rudi menyewakan ruko miliknya seharga Rp 40.000.000 setahun. Berapa PPh Final yang harus dipotong penyewa? (Rp)",
+          "type": "number",
+          "answer": 4000000,
+          "explanation": "Sewa tanah/bangunan dikenakan PPh Final 10% dari nilai bruto sewa: 10% x Rp 40.000.000 = Rp 4.000.000.",
+          "ref": "PP 34/2017"
+        },
+        {
+          "q": "Sebuah usaha UMKM (peredaran bruto di bawah Rp4,8 miliar/tahun) mencatat omzet Rp 20.000.000 pada suatu bulan. Berapa PPh Final terutang? (Rp)",
+          "type": "number",
+          "answer": 100000,
+          "explanation": "PPh Final UMKM dihitung dari PEREDARAN BRUTO (omzet), bukan laba: 0,5% x Rp 20.000.000 = Rp 100.000.",
+          "ref": "PP 23/2018"
+        },
+        {
+          "q": "Berapa lama jangka waktu maksimal WP orang pribadi boleh memakai skema PPh Final UMKM 0,5% sejak terdaftar?",
+          "type": "number",
+          "answer": 7,
+          "explanation": "PP 23/2018 membatasi penggunaan tarif final 0,5% untuk WP orang pribadi maksimal 7 tahun pajak sejak terdaftar (lebih pendek untuk WP badan berbentuk CV/firma: 4 tahun, dan PT: 3 tahun).",
+          "ref": "PP 23/2018"
+        },
+        {
+          "q": "Mengapa PPh Final UMKM (0,5% dari omzet) TIDAK selalu lebih menguntungkan dibanding tarif normal (PPh Pasal 17 dari laba)?",
+          "type": "mcq",
+          "answer": "Karena dasarnya peredaran bruto (omzet), bukan laba -- usaha rugi tetap kena pajak",
+          "explanation": "Karena dasar pengenaannya adalah PEREDARAN BRUTO (omzet), bukan laba, usaha yang sedang rugi atau bermargin tipis tetap harus membayar PPh Final -- berbeda dengan tarif normal yang dihitung dari penghasilan neto (laba), sehingga usaha rugi bisa nihil pajak.",
+          "ref": "PP 23/2018",
+          "options": [
+            "Karena dasarnya peredaran bruto (omzet), bukan laba -- usaha rugi tetap kena pajak",
+            "Karena tarifnya lebih tinggi dari tarif normal",
+            "Karena hanya berlaku untuk usaha yang sudah untung besar",
+            "Karena harus dibayar dua kali dalam setahun"
+          ]
         }
       ]
     }

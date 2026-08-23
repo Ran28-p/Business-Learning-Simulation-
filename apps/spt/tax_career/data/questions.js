@@ -279,6 +279,42 @@ window.TAX_CAREER_QUESTIONS = [
     answer: "Analisis klasifikasi PPN (karakter produk) dan PPh atas komisi secara terpisah, dengan posisi + risiko + dokumen masing-masing",
     explanation: "Kasus multi-pajak membutuhkan isu-per-isu, bukan satu jawaban generik."
   },
+  {
+    id: "TCO-005",
+    category: "tax-consultant",
+    level: "intermediate",
+    type: "mcq",
+    skill: "Compliance Timing",
+    title: "Kesalahan ditemukan sebelum SPT diperiksa",
+    scenario: "Saat menyusun laporan tahun berjalan, konsultan menemukan klien SALAH menghitung PPh Badan tahun lalu (kurang bayar) pada SPT yang sudah dilaporkan. Belum ada Surat Pemberitahuan Pemeriksaan (SP2) dari DJP.",
+    question: "Langkah yang paling tepat disarankan konsultan?",
+    options: [
+      "Biarkan saja, toh belum ada pemeriksaan sehingga tidak akan ketahuan",
+      "Sarankan pembetulan SPT dengan kemauan sendiri sesegera mungkin — sanksi bunga keterlambatan jauh lebih ringan dibanding menunggu DJP menemukannya sendiri",
+      "Tunggu sampai DJP menerbitkan SP2, baru dibetulkan lewat jalur pemeriksaan",
+      "Cukup sampaikan secara lisan ke Account Representative tanpa dokumen tertulis"
+    ],
+    answer: "Sarankan pembetulan SPT dengan kemauan sendiri sesegera mungkin — sanksi bunga keterlambatan jauh lebih ringan dibanding menunggu DJP menemukannya sendiri",
+    explanation: "Pasal 8 ayat (1) UU KUP: WP dengan kemauan sendiri boleh membetulkan SPT sepanjang DJP belum melakukan tindakan pemeriksaan (ditandai SP2 terbit). Pembetulan yang menambah utang pajak tetap kena sanksi bunga (Pasal 8 ayat 2), tapi jauh lebih ringan dibanding jika DJP menemukannya lewat pemeriksaan. Begitu SP2 terbit, hak pembetulan hilang — opsi yang tersisa hanya jalur Pengungkapan Ketidakbenaran (Pasal 8 ayat 4), dan hanya sebelum SPHP terbit."
+  },
+  {
+    id: "TCO-006",
+    category: "tax-consultant",
+    level: "advanced",
+    type: "mcq",
+    skill: "Related Party",
+    title: "Transaksi afiliasi & kewajaran harga",
+    scenario: "PT Alpha (klien) membeli bahan baku dari PT Beta, anak perusahaan di luar negeri yang sahamnya 100% dimiliki induk yang sama. Harga beli jauh di atas harga pasar untuk barang sejenis dari pemasok independen.",
+    question: "Risiko utama yang harus disampaikan konsultan kepada klien?",
+    options: [
+      "Tidak ada risiko selama ada kontrak tertulis antara kedua perusahaan",
+      "DJP berwenang menguji prinsip kewajaran & kelaziman usaha (arm's length) pada transaksi hubungan istimewa — selisih dari harga wajar berpotensi dikoreksi dan menambah PPh terutang",
+      "Transaksi antar perusahaan dalam satu grup otomatis bebas pajak",
+      "Risiko hanya muncul jika kedua perusahaan berlokasi di Indonesia"
+    ],
+    answer: "DJP berwenang menguji prinsip kewajaran & kelaziman usaha (arm's length) pada transaksi hubungan istimewa — selisih dari harga wajar berpotensi dikoreksi dan menambah PPh terutang",
+    explanation: "Pasal 18 UU PPh memberi kewenangan DJP menguji kewajaran transaksi antar pihak yang punya hubungan istimewa (transfer pricing). Harga pembelian yang tidak wajar bisa dikoreksi ke harga pasar, menambah penghasilan kena pajak. Konsultan yang baik menyarankan dokumentasi Transfer Pricing (TP Doc) dan analisis pembanding untuk memitigasi risiko ini, bukan mengabaikannya karena ada kontrak."
+  },
 
   /* ========== TAX PLANNER ========== */
   {
