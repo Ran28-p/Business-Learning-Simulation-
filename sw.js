@@ -15,6 +15,8 @@ const APP_SHELL_LOCAL = [
     './index.html',
     './css/portal.css',
     './css/knowledge-base.css',
+    './css/responsive-foundation.css',
+    './js/shared/firebase-config.js',
     './js/auth.js',
     './js/portal.js',
     './js/back-to-portal.js',
