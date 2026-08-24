@@ -33,21 +33,22 @@ img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
   display: none;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   min-width: 44px;
   min-height: 44px;
   border-radius: 10px;
-  border: 1px solid var(--border, var(--border-color, #d7e3f0));
+  border: 1px solid var(--border, #e2e8f0);
   background: transparent;
   color: inherit;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   line-height: 1;
   cursor: pointer;
   flex-shrink: 0;
   padding: 0;
+  transition: background 0.15s;
 }
-.bls-hamburger:hover { background: rgba(127, 127, 127, 0.12); }
+.bls-hamburger:hover { background: rgba(0,0,0,0.04); }
 @media (max-width: 1023px) {
   .bls-hamburger { display: inline-flex; }
 }
@@ -56,7 +57,7 @@ img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
 .bls-drawer-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.4);
   z-index: 950;
   opacity: 0;
   pointer-events: none;
@@ -72,18 +73,18 @@ img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
   position: fixed;
   right: 16px;
   bottom: calc(80px + env(safe-area-inset-bottom));
-  z-index: 500; /* above normal content & sidebars, below modals/drawers/toasts */
+  z-index: 500;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #0b5cab;
+  background: var(--primary, #0b5cab);
   color: #fff;
-  font: 700 13px/1 "Segoe UI", system-ui, sans-serif;
-  padding: 10px 14px;
+  font: 600 13px/1 'Inter', system-ui, sans-serif;
+  padding: 10px 16px;
   border-radius: 999px;
   text-decoration: none;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(11,92,171,0.25);
+  border: none;
   opacity: 0.92;
   max-width: calc(100vw - 32px);
   white-space: nowrap;
@@ -91,11 +92,7 @@ img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 .bls-back-to-portal:hover,
-.bls-back-to-portal:focus-visible { opacity: 1; }
-/* While the user is actively scrolling, the button fades out so it never sits
-   on top of a chart/table/CTA underneath it — see js/back-to-portal.js, which
-   toggles this class on scroll and brings the button back on scroll-up/pause
-   or when it's focused (so it's never hidden from keyboard/screen-reader use). */
+.bls-back-to-portal:focus-visible { opacity: 1; transform: translateY(-1px); }
 .bls-back-to-portal.bls-back-to-portal--hidden {
   opacity: 0;
   transform: translateY(8px);
@@ -108,7 +105,7 @@ img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
 }
 @media (max-width: 480px) {
   .bls-back-to-portal {
-    padding: 10px 12px;
+    padding: 10px 14px;
     font-size: 12px;
     bottom: calc(72px + env(safe-area-inset-bottom));
     right: 12px;

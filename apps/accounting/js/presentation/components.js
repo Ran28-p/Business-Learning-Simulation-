@@ -166,19 +166,42 @@ export function exportToPDF() {
 
   showToast('⏳ Membuat PDF laporan keuangan…');
 
+  var sel = document.getElementById('laporanPaperSize');
+  var paperFmt = (sel && sel.value === 'f4') ? [210, 330] : 'a4';
   window.PDFExport.exportElementToPDF(element, {
     filename: 'Laporan_Keuangan_ActMaster.pdf',
-    scale: 2.5,
-    widthPx: 720,
+    scale: 2,
+    widthPx: 794,
+    margin: [12, 14, 14, 14],
+    format: paperFmt,
+    extraCss: [
+      '*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}',
+      'body{margin:0;padding:0;font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:#0f172a;background:#fff;}',
+      'h1,h2,h3,h4{font-weight:800;color:#0f172a;margin:0 0 8px;}',
+      'h2{font-size:16px;border-bottom:2px solid #0f172a;padding-bottom:6px;margin-bottom:12px;}',
+      'table{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0 14px;}',
+      'th{background:#0f172a;color:#fff;padding:7px 10px;text-align:left;font-weight:700;border:1px solid #0f172a;}',
+      'td{padding:6px 10px;border:1px solid #e2e8f0;vertical-align:top;}',
+      'tr:nth-child(even) td{background:#f8fafc;}',
+      '.section-title{font-size:14px;font-weight:800;color:#0f172a;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0;}'
+    ].join(''),
     onClone: (clone) => {
+      clone.querySelectorAll('[style]').forEach((el) => {
+        el.style.color = '#0f172a';
+      });
       clone.querySelectorAll('table').forEach((t) => {
         t.style.width = '100%';
         t.style.borderCollapse = 'collapse';
-        t.style.fontSize = '9pt';
       });
       clone.querySelectorAll('th, td').forEach((c) => {
-        c.style.border = '1px solid #cbd5e1';
-        c.style.padding = '5px 6px';
+        c.style.border = '1px solid #e2e8f0';
+        c.style.padding = '6px 10px';
+        c.style.fontSize = '11px';
+      });
+      clone.querySelectorAll('th').forEach((c) => {
+        c.style.background = '#0f172a';
+        c.style.color = '#fff';
+        c.style.fontWeight = '700';
       });
     }
   }).then(() => {

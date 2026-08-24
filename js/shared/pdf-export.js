@@ -200,7 +200,45 @@
   }
 
   /* ────────────────────────────────────────────────────────────────
-     6. exportElementToPDF — pipeline utama.
+     6. Footer PDF — digambar langsung ke tiap halaman jsPDF SETELAH
+        konten selesai dirender, sehingga nomor halaman selalu akurat
+        (mengikuti jumlah halaman sebenarnya, bukan hard-code).
+     ──────────────────────────────────────────────────────────────── */
+  function paintPdfFooter(pdf, footer) {
+    if (!pdf || !footer) return;
+    var total;
+    try { total = pdf.internal.getNumberOfPages(); } catch (e) { return; }
+    if (!total) return;
+
+    var fontSize = footer.fontSize || 8;
+    var color = Array.isArray(footer.color) ? footer.color : [148, 163, 184];
+    var marginMm = (typeof footer.marginMm === 'number') ? footer.marginMm : 14;
+
+    for (var i = 1; i <= total; i++) {
+      pdf.setPage(i);
+      var pw = pdf.internal.pageSize.getWidth();
+      var ph = pdf.internal.pageSize.getHeight();
+
+      // Garis pemisah tipis di atas footer
+      pdf.setDrawColor(226, 232, 240);
+      pdf.setLineWidth(0.2);
+      pdf.line(marginMm, ph - 10, pw - marginMm, ph - 10);
+
+      // Teks kiri: judul dokumen
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(fontSize);
+      pdf.setTextColor(color[0], color[1], color[2]);
+      pdf.text(String(footer.text || ''), marginMm, ph - 6);
+
+      // Teks kanan: Halaman X / Y (X mengikuti halaman sebenarnya)
+      if (footer.pageNumbers !== false) {
+        pdf.text('Halaman ' + i + ' / ' + total, pw - marginMm, ph - 6, { align: 'right' });
+      }
+    }
+  }
+
+  /* ────────────────────────────────────────────────────────────────
+     7. exportElementToPDF — pipeline utama.
      ──────────────────────────────────────────────────────────────── */
   function exportElementToPDF(element, options) {
     options = options || {};
@@ -229,7 +267,10 @@
       host.appendChild(clone);
 
       return waitForPaint().then(function () {
-        return global.html2pdf()
+        // Worker pattern: .toPdf() dulu, hook footer via .get('pdf')
+        // (dieksekusi sebelum output), lalu output blob. Ini satu-satunya
+        // cara menambah footer dengan nomor halaman AKURAT di html2pdf.
+        var worker = global.html2pdf()
           .set({
             margin: margin,
             filename: filename,
@@ -247,10 +288,21 @@
             pagebreak: options.pagebreak || { mode: ['css', 'legacy'], avoid: ['tr', 'table'] }
           })
           .from(clone)
-          .outputPdf('blob')
-          .then(function (blob) {
-            return validateBlob(blob, 'application/pdf').then(function () { return blob; });
-          });
+          .toPdf();
+
+        if (options.footer) {
+          try {
+            worker.get('pdf').then(function (pdf) {
+              paintPdfFooter(pdf, options.footer);
+            });
+          } catch (e) {
+            console.warn('[pdf-export] footer error:', e);
+          }
+        }
+
+        return worker.outputPdf('blob').then(function (blob) {
+          return validateBlob(blob, 'application/pdf').then(function () { return blob; });
+        });
       });
     }).then(function (blob) {
       downloadBlob(blob, filename);
@@ -294,15 +346,30 @@
     iframe.setAttribute('style', 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;');
     document.body.appendChild(iframe);
 
+    // Ukuran halaman: selalu lewat PaperConfig bila tersedia (satu sumber
+    // kebenaran untuk A4/F4), fallback ke opsi mentah bila tidak ada.
+    var pageCss;
+    if (typeof global.PaperConfig !== 'undefined') {
+      pageCss = global.PaperConfig.getPageCss(options.paperSize || options.format);
+    } else {
+      var pageSize = options.paperSize || options.format || 'a4';
+      if (Array.isArray(pageSize)) {
+        pageCss = '@page{size:' + pageSize[0] + 'mm ' + pageSize[1] + 'mm;margin:10mm 12mm;}';
+      } else if (String(pageSize).toLowerCase() === 'f4') {
+        pageCss = '@page{size:210mm 330mm;margin:10mm 12mm;}';
+      } else {
+        pageCss = '@page{size:A4;margin:10mm 12mm;}';
+      }
+    }
+
     var doc = iframe.contentWindow.document;
     doc.open();
     doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>' +
       (options.title || document.title) + '</title>');
-    // Salin stylesheet <link> dari halaman induk supaya style tetap konsisten.
     Array.prototype.forEach.call(document.querySelectorAll('link[rel="stylesheet"]'), function (link) {
       doc.write('<link rel="stylesheet" href="' + link.href + '">');
     });
-    doc.write('<style>body{margin:0;padding:16px;background:#fff;color:#0f172a;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;} ' +
+    doc.write('<style>' + pageCss + ' body{margin:0;padding:0;background:#fff;color:#0f172a;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;} ' +
       (options.extraCss || '') + '</style></head><body></body></html>');
     doc.close();
     doc.body.appendChild(clone);
@@ -310,10 +377,9 @@
     function cleanup() {
       setTimeout(function () {
         if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-      }, 500);
+      }, 800);
     }
 
-    // Tunggu stylesheet ter-load sebelum memicu dialog print.
     setTimeout(function () {
       try {
         iframe.contentWindow.focus();
@@ -323,7 +389,7 @@
       } finally {
         cleanup();
       }
-    }, 350);
+    }, 450);
   }
 
   global.PDFExport = {

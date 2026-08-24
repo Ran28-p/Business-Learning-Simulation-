@@ -609,12 +609,56 @@ function handleCloseInvoiceModal() {
   _currentInvoiceViewId = null;
 }
 
+function _resolvePaperSize() {
+  var sel = document.getElementById('laporanPaperSize');
+  var v = sel ? sel.value : 'a4';
+  // Satu sumber kebenaran ukuran kertas: js/shared/paper-config.js
+  if (window.PaperConfig) {
+    var p = window.PaperConfig.getPaper(v);
+    return { jsPDF: [p.widthMm, p.heightMm], css: p.cssSize, label: p.label };
+  }
+  if (v === 'f4') return { jsPDF: [210, 330], css: '210mm 330mm', label: 'F4' };
+  return { jsPDF: 'a4', css: 'A4', label: 'A4' };
+}
+
 function handlePrintInvoice() {
+  // Use isolated iframe print — reliable regardless of @media print chrome hiding
+  var source = document.getElementById('invoicePrintArea');
+  if (!source || !source.innerHTML.trim()) {
+    showToast('❌ Belum ada invoice untuk dicetak. Buka invoice terlebih dahulu.');
+    return;
+  }
+  if (window.PDFExport && window.PDFExport.printElement) {
+    var paper = _resolvePaperSize();
+    window.PDFExport.printElement(source, {
+      title: 'Invoice — ActMaster Pro',
+      extraCss: '@page{size:' + paper.css + ';margin:10mm 12mm;} body{font-size:12px;color:#0f172a;background:#fff;} table{width:100%;border-collapse:collapse;font-size:11px;} th{background:#0f172a;color:#fff;padding:7px 10px;border:1px solid #0f172a;text-align:left;} td{padding:6px 10px;border:1px solid #e2e8f0;}'
+    });
+    return;
+  }
+  // Fallback: native print with @media print doing the targeting
+  window.print();
+}
+
+function handlePrintReport() {
+  var source = document.getElementById('financialReportContainer');
+  if (!source || !source.innerHTML.trim()) {
+    showToast('❌ Belum ada laporan untuk dicetak. Buat transaksi dan coba lagi.');
+    return;
+  }
+  if (window.PDFExport && window.PDFExport.printElement) {
+    var paper = _resolvePaperSize();
+    window.PDFExport.printElement(source, {
+      title: 'Laporan Keuangan — ActMaster Pro',
+      extraCss: '@page{size:' + paper.css + ';margin:10mm 12mm;} body{font-size:12px;color:#0f172a;background:#fff;} h2{font-size:16px;font-weight:800;color:#0f172a;border-bottom:2px solid #0f172a;padding-bottom:6px;margin-bottom:12px;} table{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0 14px;} th{background:#0f172a;color:#fff;padding:7px 10px;text-align:left;font-weight:700;border:1px solid #0f172a;} td{padding:6px 10px;border:1px solid #e2e8f0;vertical-align:top;}'
+    });
+    return;
+  }
   window.print();
 }
 
 function handlePrintInvoicePDF() {
-  const source = document.getElementById('invoicePrintArea');
+  var source = document.getElementById('invoicePrintArea');
   if (!source) {
     showToast('❌ Area invoice tidak ditemukan.');
     return;
@@ -628,11 +672,21 @@ function handlePrintInvoicePDF() {
 
   showToast('⏳ Membuat PDF invoice…');
 
+  var paper = _resolvePaperSize();
   window.PDFExport.exportElementToPDF(source, {
     filename,
-    scale: 2.5,
-    widthPx: 720,
-    extraCss: 'body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;font-size:10.5pt;line-height:1.4;}',
+    scale: 2,
+    widthPx: paper.jsPDF === 'a4' ? 794 : 794,
+    margin: [12, 14, 14, 14],
+    format: paper.jsPDF,
+    extraCss: [
+      '*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}',
+      'body{margin:0;padding:0;font-family:Inter,system-ui,-apple-system,sans-serif;font-size:12px;color:#0f172a;background:#fff;}',
+      'h1,h2,h3,h4{font-weight:800;color:#0f172a;}',
+      'table{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0 14px;}',
+      'th{background:#0f172a;color:#fff;padding:7px 10px;text-align:left;font-weight:700;border:1px solid #0f172a;}',
+      'td{padding:6px 10px;border:1px solid #e2e8f0;vertical-align:top;}'
+    ].join(''),
     onClone: (clone) => {
       clone.querySelectorAll('table').forEach((t) => {
         t.style.width = '100%';
@@ -913,6 +967,7 @@ export function bindTaxUIEvents() {
 
       case 'view-invoice': handleViewInvoice(target.dataset.id); break;
       case 'close-invoice-modal': handleCloseInvoiceModal(); break;
+      case 'print-report': handlePrintReport(); break;
       case 'print-invoice': handlePrintInvoice(); break;
       case 'print-invoice-pdf': handlePrintInvoicePDF(); break;
       case 'duplicate-invoice': handleDuplicateInvoice(); break;

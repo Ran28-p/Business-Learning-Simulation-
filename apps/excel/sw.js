@@ -4,7 +4,7 @@
 // diambil dari pivot-dashboard/ dan dari ../../vendor/hyperformula di root
 // portal — keduanya tetap same-origin jadi otomatis tercakup).
 
-const CACHE_NAME = 'sim-excel-shell-v3-pdf'; // bumped: fix knowledge-base.js PDF (blank-page bug) + pivot-dashboard now loads js/shared/pdf-export.js
+const CACHE_NAME = 'sim-excel-shell-v5-docfix'; // bumped: fix PaperConfig key casing (a4/f4 lookups)
 
 const APP_SHELL_LOCAL = [
     './',

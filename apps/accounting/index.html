@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Accounting Master - Simulation & Learning System</title>
 
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <!-- Styles -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="../../css/knowledge-base.css">
@@ -296,9 +301,16 @@
             <!-- 8. LAPORAN KEUANGAN -->
             <section id="laporan" class="page-view">
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                         <h2>Laporan Keuangan</h2>
-                        <button class="btn btn-success" data-action="export-pdf">📄 Download PDF</button>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <select id="laporanPaperSize" style="padding:6px 8px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;background:#fff;">
+                                <option value="a4">A4</option>
+                                <option value="f4">F4</option>
+                            </select>
+                            <button class="btn btn-sm" data-action="print-report">🖨️ Cetak</button>
+                            <button class="btn btn-success btn-sm" data-action="export-pdf">📄 Download PDF</button>
+                        </div>
                     </div>
                     <div id="financialReportContainer"></div>
                 </div>
@@ -749,6 +761,7 @@
   <script src="../../js/back-to-portal.js"></script>
 
   <!-- Modul Pengetahuan (e-book) -->
+  <script src="../../js/shared/paper-config.js"></script>
   <script src="../../js/knowledge-base.js"></script>
   <script src="data/knowledge-accounting.js"></script>
   <script>

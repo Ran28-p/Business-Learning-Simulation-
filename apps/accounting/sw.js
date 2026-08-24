@@ -4,7 +4,7 @@
 // lain yang diminta (css/js/data) — jadi tidak perlu daftar file manual yang
 // gampang basi tiap kali ada file baru ditambahkan.
 
-const CACHE_NAME = 'sim-accounting-shell-v3-pdf'; // bumped: fix knowledge-base.js PDF (blank-page bug, migrated to js/shared/pdf-export.js)
+const CACHE_NAME = 'sim-accounting-shell-v5-docfix'; // bumped: fix PaperConfig key casing (a4/f4 lookups)
 
 const APP_SHELL_LOCAL = [
     './',

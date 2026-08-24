@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="./css/style.css" />
 <link rel="stylesheet" href="./css/responsive.css" />
 <link rel="stylesheet" href="../../css/responsive-foundation.css" />
+<link rel="stylesheet" href="../../css/knowledge-base.css" />
 </head>
 <body>
 
@@ -31,6 +32,7 @@
       </div>
     </div>
     <div class="app-header__meta">
+      <button class="btn btn--ghost btn--small" id="btnOpenKnowledgeExcel" type="button">📘 Modul Pengetahuan</button>
       <a class="badge-pill" href="pivot-dashboard/index.html" style="text-decoration:none;">🧮 Latihan Baru: Pivot &amp; Dashboard</a>
       <span class="badge-pill" id="datasetStatusPill">Belum ada dataset</span>
     </div>
@@ -199,13 +201,22 @@
   </footer>
 </div>
 
+<script src="../../js/shared/paper-config.js"></script>
+<script src="../../js/knowledge-base.js"></script>
 <script src="./vendor/exceljs/exceljs.min.js"></script>
 <script src="./js/export/workbook-theme.js"></script>
 <script src="./js/export/format-engine.js"></script>
 <script src="./js/export/workbook-blueprint.js"></script>
 <script src="./js/export/workbook-renderer.js"></script>
 <script src="../../js/shared/pdf-export.js"></script>
+<script src="./data/knowledge-excel.js"></script>
 <script type="module" src="./js/app.js"></script>
+<script>
+  document.getElementById('btnOpenKnowledgeExcel')?.addEventListener('click', function() {
+    if (window.KnowledgeBase && window.KNOWLEDGE_CONTENT_EXCEL) window.KnowledgeBase.open(window.KNOWLEDGE_CONTENT_EXCEL);
+    else console.warn('KnowledgeBase belum siap');
+  });
+</script>
   <script src="../../js/back-to-portal.js"></script>
 
   <!-- PWA: daftarkan service worker (gratis, agar modul bisa dibuka offline) -->

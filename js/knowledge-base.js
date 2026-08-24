@@ -1,6 +1,15 @@
 /**
  * Knowledge Base — engine e-book bersama (Accounting, SPT, Excel, SQL & PQ).
- * Upgrade: accordion navigasi (subtopik tersembunyi sampai TOPIK diklik) + pencarian.
+ *
+ * ARSITEKTUR (3 layer):
+ *   A. SCREEN UI      → modal, sidebar, search, accordion (buildOverlay)
+ *   B. DOCUMENT MODEL → struktur print murni, lepas dari modal (buildPrintDocument)
+ *   C. OUTPUT         → Browser Print (iframe) ATAU PDF Export (html2pdf)
+ *
+ * Print & PDF memakai DOCUMENT MODEL + CSS yang SAMA, hanya beda output.
+ * Ukuran kertas (A4/F4) adalah konfigurasi dokumen (PaperConfig), BUKAN
+ * dropdown yang berdiri sendiri — dipilih lewat dialog konfigurasi saat
+ * user menekan "Cetak" atau "Unduh PDF".
  *
  * Pakai:
  *   KnowledgeBase.open(window.KNOWLEDGE_CONTENT_SPT)
@@ -11,12 +20,6 @@
   if (window.KnowledgeBase) return;
 
   const STATE = { content: null, overlay: null, pdfBusy: false };
-
-  // Catatan: dulu file ini punya loader html2pdf sendiri (ensureHtml2Pdf +
-  // resolveBase) yang terpisah dari js/shared/pdf-export.js -- itu sumber
-  // duplikasi implementasi PDF yang menyebabkan bug (lihat downloadPdf()).
-  // Sekarang seluruhnya memakai window.PDFExport (engine terpusat yang sama
-  // dipakai Accounting/SPT/Excel/SQL-PQ), jadi loader lokal ini dihapus.
 
   function escapeAttr(s) {
     return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
@@ -31,6 +34,270 @@
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '') || fallback;
   }
+  function paper(id) {
+    return window.PaperConfig ? window.PaperConfig.getPaper(id) : null;
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     LAYER B — PRINT DOCUMENT MODEL
+     Struktur DOM murni untuk print/PDF. TIDAK membawa UI interaktif:
+     tanpa sidebar, tombol, search, dropdown, overlay, background app.
+     Satu-satunya sumber styling adalah DOC_BASE_CSS (di bawah) —
+     dipakai identik oleh Browser Print dan PDF Export.
+     ════════════════════════════════════════════════════════════════ */
+
+  function buildPrintDocument(content) {
+    var doc = document.createElement('div');
+    doc.className = 'kb-print-doc';
+
+    // ── Document header (bukan header modal) ──
+    var header = document.createElement('header');
+    header.className = 'print-doc-header';
+    header.innerHTML =
+      '<div class="print-doc-eyebrow">Portal Belajar &middot; Tax Knowledge Center</div>' +
+      '<h1 class="print-doc-title">' + escapeHtml(content.title || 'Modul Pengetahuan') + '</h1>' +
+      (content.subtitle ? '<div class="print-doc-sub">' + escapeHtml(content.subtitle) + '</div>' : '');
+    doc.appendChild(header);
+
+    // ── Chapters: tiap topik = unit pagination (mulai halaman baru,
+    //    tapi boleh memanjang beberapa halaman bila kontennya panjang) ──
+    var chapters = content.chapters || [];
+    for (var ci = 0; ci < chapters.length; ci++) {
+      var chapter = chapters[ci];
+      var ch = document.createElement('section');
+      ch.className = 'print-chapter';
+
+      var chTitle = document.createElement('h2');
+      chTitle.className = 'print-chapter-title';
+      chTitle.textContent = chapter.title || '';
+      ch.appendChild(chTitle);
+
+      var sections = chapter.sections || [];
+      for (var si = 0; si < sections.length; si++) {
+        var section = sections[si];
+        var art = document.createElement('article');
+        art.className = 'print-section';
+
+        var h3 = document.createElement('h3');
+        h3.className = 'print-section-title';
+        h3.textContent = section.heading || '';
+        art.appendChild(h3);
+
+        var body = document.createElement('div');
+        body.className = 'print-body';
+        body.innerHTML = section.body || '';
+        art.appendChild(body);
+
+        ch.appendChild(art);
+      }
+      doc.appendChild(ch);
+    }
+    return doc;
+  }
+
+  /**
+   * CSS dokumen bersama — SATU sumber kebenaran untuk Print & PDF.
+   * Memakai satuan fisik (pt) + aturan pagination eksplisit:
+   *   - chapter  → break-before: page (kecuali pertama)
+   *   - heading  → break-after: avoid (heading tidak pernah sendirian)
+   *   - callout/formula/journal/row → break-inside: avoid (atomic)
+   *   - thead    → table-header-group (header tabel berulang saat print)
+   *   - orphans/widows → paragraf tidak menyisakan 1 baris yatim
+   */
+  var DOC_BASE_CSS = [
+    /* === Global === */
+    '.kb-print-doc{color:#0f172a;font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:1.6;}',
+    '.kb-print-doc *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}',
+
+    /* Document header — centered, professional */
+    '.print-doc-header{text-align:center;padding-bottom:10pt;margin-bottom:14pt;border-bottom:2pt solid #0f172a;}',
+    '.print-doc-eyebrow{font-family:Arial,Helvetica,sans-serif;font-size:9pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin-bottom:5pt;}',
+    '.print-doc-title{font-family:Arial,Helvetica,sans-serif;font-size:20pt;font-weight:800;line-height:1.25;margin:0 0 4pt;color:#0f172a;}',
+    '.print-doc-sub{font-family:Arial,Helvetica,sans-serif;font-size:15pt;color:#475569;line-height:1.45;}',
+
+    /* Chapters — pagination unit */
+    '.print-chapter{break-before:page;}',
+    '.print-chapter:first-of-type{break-before:auto;}',
+
+    /* Chapter title — Arial 15pt, always stick with first content */
+    '.print-chapter-title{font-family:Arial,Helvetica,sans-serif;font-size:15pt;font-weight:800;margin:0 0 10pt;padding-bottom:5pt;border-bottom:1.5pt solid #0f172a;break-after:avoid;}',
+
+    /* Section title — Arial 12pt, stick with next content */
+    '.print-section{margin:0 0 14pt;}',
+    '.print-section-title{font-family:Arial,Helvetica,sans-serif;font-size:12pt;font-weight:700;color:#1e293b;margin:14pt 0 5pt;break-after:avoid;}',
+
+    /* Body typography — Times New Roman 12pt */
+    '.print-body{font-family:"Times New Roman",Times,serif;font-size:12pt;line-height:1.6;color:#0f172a;}',
+    '.print-body p,.print-body .kb-lead{margin:0 0 8pt;orphans:3;widows:3;}',
+    '.print-body .kb-lead{font-size:12pt;color:#334155;}',
+    '.print-body ul,.print-body ol{margin:0 0 8pt;padding-left:18pt;orphans:3;widows:3;}',
+    '.print-body li{margin-bottom:3pt;}',
+    '.print-body strong{color:#0f172a;font-weight:700;}',
+    '.print-body code{font-family:ui-monospace,Consolas,"SFMono-Regular",Menlo,monospace;font-size:10pt;background:#f1f5f9;padding:0.5pt 3pt;border-radius:2pt;}',
+    '.print-body .kb-legal{font-size:9pt;color:#64748b;font-style:italic;}',
+    '.print-body .kb-callout-title{display:block;font-weight:700;margin-bottom:3pt;}',
+
+    /* Tables — unit atomic, header repeats, must not overflow */
+    '.print-body .kb-table-wrap{overflow:visible;margin:8pt 0 10pt;break-inside:avoid;}',
+    '.print-body table{width:100%;border-collapse:collapse;font-size:11pt;margin:6pt 0 8pt;}',
+    '.print-body thead{display:table-header-group;}',
+    '.print-body tr{break-inside:avoid;}',
+    '.print-body th,.print-body td{border:0.75pt solid #cbd5e1;padding:5pt 6pt;text-align:left;vertical-align:top;word-wrap:break-word;}',
+    '.print-body th{background:#0f172a;color:#fff;font-weight:700;}',
+    '.print-body table.kb-table th{background:#0f172a;color:#fff;font-weight:700;}',
+    '.print-body td.kb-num,.print-body th.kb-num{text-align:right;font-variant-numeric:tabular-nums;}',
+    '.print-body tr.kb-total-row td{font-weight:800;border-top:1.5pt solid #0f172a;}',
+    '.print-body tr.kb-subtotal-row td{font-weight:700;background:#f8fafc;}',
+
+    /* Journal (jurnal umum) */
+    '.print-body .kb-journal{margin:8pt 0 10pt;border:0.75pt solid #cbd5e1;border-radius:4pt;overflow:hidden;break-inside:avoid;}',
+    '.print-body .kb-journal-caption{background:#f8fafc;font-size:10pt;font-weight:700;padding:5pt 8pt;border-bottom:0.75pt solid #cbd5e1;color:#334155;}',
+    '.print-body table.kb-journal-table{font-family:ui-monospace,Consolas,monospace;font-size:9.5pt;margin:0;}',
+    '.print-body table.kb-journal-table td{border:0;border-bottom:0.5pt solid #f1f5f9;padding:4pt 8pt;}',
+    '.print-body table.kb-journal-table td.kb-jr-desc-d{padding-left:8pt;}',
+    '.print-body table.kb-journal-table td.kb-jr-desc-k{padding-left:24pt;color:#64748b;}',
+
+    /* Callouts — atomic, never cut */
+    '.print-body .kb-tip,.print-body .kb-warning,.print-body .kb-example{border-radius:4pt;padding:8pt 10pt;margin:8pt 0;font-size:11pt;break-inside:avoid;}',
+    '.print-body .kb-tip{background:#f0fdf4;border:0.75pt solid #86efac;color:#065f46;}',
+    '.print-body .kb-warning{background:#fef2f2;border:0.75pt solid #fca5a5;color:#991b1b;}',
+    '.print-body .kb-example{background:#eff6ff;border:0.75pt solid #93c5fd;color:#1e40af;}',
+
+    /* Formula — atomic */
+    '.print-body .kb-formula{background:#f8fafc;border:0.75pt solid #cbd5e1;border-radius:4pt;padding:8pt 10pt;margin:8pt 0;text-align:center;font-family:ui-monospace,Consolas,monospace;font-weight:700;font-size:10.5pt;color:#0f172a;break-inside:avoid;}',
+
+    /* Quick facts */
+    '.print-body .kb-quickfact{display:flex;flex-wrap:wrap;gap:6pt;margin:8pt 0;break-inside:avoid;}',
+    '.print-body .kb-quickfact-item{flex:1 1 90pt;background:#f8fafc;border:0.75pt solid #cbd5e1;border-radius:4pt;padding:6pt 8pt;text-align:center;}',
+    '.print-body .qf-label{font-family:Arial,Helvetica,sans-serif;font-size:8pt;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;}',
+    '.print-body .qf-value{font-family:"Times New Roman",Times,serif;font-size:11pt;font-weight:800;margin-top:2pt;}',
+
+    /* Footer berjalan */
+    '.print-running-footer{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;gap:12pt;font-family:Arial,Helvetica,sans-serif;font-size:8pt;color:#94a3b8;border-top:0.5pt solid #e2e8f0;padding-top:3pt;}',
+    '.kb-print-doc{padding-bottom:26pt;}'
+  ].join('');
+
+  function docCss(paperId) {
+    var pageCss = window.PaperConfig ? window.PaperConfig.getPageCss(paperId) : '@page{size:A4;margin:15mm 14mm;}';
+    return pageCss + DOC_BASE_CSS;
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     LAYER C — OUTPUT (Browser Print / PDF Export)
+     Keduanya menerima paperId ('a4'|'f4') + document model yang sama.
+     ════════════════════════════════════════════════════════════════ */
+
+  function printDocument(paperId) {
+    var content = STATE.content;
+    var docTitle = content.title || 'Modul Pengetahuan';
+
+    // Build print document
+    var holder = document.createElement('div');
+    holder.id = 'kb-print-fallback';
+    holder.appendChild(buildPrintDocument(content));
+    var footer = document.createElement('div');
+    footer.className = 'print-running-footer';
+    footer.innerHTML = '<span>' + escapeHtml(docTitle) + '</span><span>Portal Belajar &middot; DJP</span>';
+    holder.appendChild(footer);
+    document.body.appendChild(holder);
+
+    // Inject print CSS: @page for paper size + DOC_BASE_CSS + hide everything except holder
+    var styleId = 'kb-print-fallback-style';
+    var old = document.getElementById(styleId);
+    if (old) old.remove();
+    var st = document.createElement('style');
+    st.id = styleId;
+    // @page size via PaperConfig (A4/F4). Browser native print dialog will honor this as default.
+    var pageCss = window.PaperConfig ? window.PaperConfig.getPageCss(paperId) : '@page{size:F4;margin:15mm 14mm;}';
+    st.textContent =
+      pageCss +
+      DOC_BASE_CSS +
+      '@media print{body>*:not(#kb-print-fallback){display:none!important;}' +
+      '#kb-print-fallback{display:block!important;}}';
+    document.head.appendChild(st);
+
+    // Native print dialog → user chooses paper size (A4/F4), color, pages/sheet, etc.
+    var cleanup = function () {
+      setTimeout(function () {
+        holder.remove();
+        var s = document.getElementById(styleId);
+        if (s) s.remove();
+        window.removeEventListener('afterprint', cleanup);
+      }, 400);
+    };
+    window.addEventListener('afterprint', cleanup);
+    window.print();
+    cleanup();
+  }
+
+  function downloadDocument(paperId, setStatus) {
+    if (STATE.pdfBusy) return;
+    var content = STATE.content;
+    var chapters = (content && content.chapters) || [];
+    if (!chapters.length) {
+      setStatus('Konten modul kosong.', true);
+      return;
+    }
+    if (!window.PDFExport || !window.PDFExport.exportElementToPDF) {
+      setStatus('Mesin PDF tidak tersedia. Gunakan tombol Cetak sebagai alternatif.', true);
+      return;
+    }
+
+    STATE.pdfBusy = true;
+    setStatus('Menyiapkan PDF…');
+
+    var p = paper(paperId);
+    var docTitle = content.title || 'Modul Pengetahuan';
+    var fileName = slug(docTitle, 'modul-pengetahuan') + '.pdf';
+
+    var docEl = buildPrintDocument(content);
+
+    window.PDFExport.exportElementToPDF(docEl, {
+      filename: fileName,
+      widthPx: p ? p.pxWidthAt96dpi : 794,
+      scale: 2,
+      format: p ? [p.widthMm, p.heightMm] : 'a4',
+      margin: window.PaperConfig ? window.PaperConfig.getMarginArray(paperId) : [15, 14, 15, 14],
+      extraCss: docCss(paperId),
+      footer: {
+        text: docTitle,
+        pageNumbers: true,
+        fontSize: 8,
+        color: [148, 163, 184],
+        marginMm: 14
+      },
+      // Chapter break ditangani oleh CSS `break-before:page` pada
+      // `.print-chapter` (mode 'css'). Tidak pakai opsi `before` legacy
+      // untuk menghindari double-break → halaman kosong. Opsi `avoid`
+      // mencegah elemen atomik terpotong.
+      pagebreak: {
+        mode: ['css', 'legacy'],
+        avoid: ['tr', '.kb-tip', '.kb-warning', '.kb-example', '.kb-formula', '.kb-journal', '.kb-quickfact-item', '.print-chapter-title', '.print-section-title']
+      }
+    })
+      .then(function () {
+        setStatus('PDF berhasil diunduh.');
+        setTimeout(function () { setStatus(''); }, 2500);
+      })
+      .catch(function (err) {
+        console.error('[knowledge-base] PDF error:', err);
+        setStatus((err && err.message ? err.message : 'Gagal membuat PDF.') + ' Silakan coba lagi atau gunakan Cetak → Simpan sebagai PDF.', true);
+      })
+      .then(function () {
+        STATE.pdfBusy = false;
+      });
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     OUTPUT CONFIG DIALOG — A4/F4 sebagai bagian dari fungsi Cetak/Unduh
+     (bukan dropdown yang berdiri sendiri di header).
+     Accessible: role=dialog, ESC menutup, radio berlabel, focus trap.
+     Tidak pernah ikut tercetak (hanya ada di screen layer).
+     ════════════════════════════════════════════════════════════════ */
+
+  /* ════════════════════════════════════════════════════════════════
+     LAYER A — SCREEN / INTERACTIVE UI (modal)
+     ════════════════════════════════════════════════════════════════ */
 
   function buildOverlay(content) {
     const overlay = document.createElement('div');
@@ -45,7 +312,6 @@
     (content.chapters || []).forEach((chapter, ci) => {
       const chapterId = chapter.id || slug(chapter.title, 'bab-' + (ci + 1));
       const hasSub = chapter.sections && chapter.sections.length;
-      // Accordion: sublist collapsed by default (hidden until chapter toggled)
       navHtml += `<li class="kb-nav-chapter" data-kb-chapter="${escapeAttr(chapterId)}">`;
       navHtml += `<button type="button" class="kb-nav-toggle" aria-expanded="false" aria-controls="kb-sub-${escapeAttr(chapterId)}" data-kb-toggle="${escapeAttr(chapterId)}">`;
       navHtml += `<span class="kb-chevron" aria-hidden="true">▸</span>`;
@@ -55,7 +321,6 @@
         navHtml += `<ul class="kb-nav-sublist" id="kb-sub-${escapeAttr(chapterId)}" hidden>`;
         chapter.sections.forEach((section, si) => {
           const sectionId = section.id || slug(section.heading, chapterId + '-' + (si + 1));
-          // Heading tampil tanpa nomor 1.1 jika user prefer — tetap pakai heading dari data
           navHtml += `<li><a href="#${escapeAttr(sectionId)}" class="kb-nav-link" data-kb-target="${escapeAttr(sectionId)}">${escapeHtml(section.heading)}</a></li>`;
         });
         navHtml += `</ul>`;
@@ -144,7 +409,6 @@
         const id = toggle.getAttribute('data-kb-toggle');
         const open = toggle.getAttribute('aria-expanded') === 'true';
         setChapterExpanded(overlay, id, !open);
-        // Scroll ke chapter saat dibuka
         if (!open) {
           const targetEl = overlay.querySelector('#' + CSS.escape(id));
           if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -156,8 +420,8 @@
       if (actionEl) {
         const action = actionEl.getAttribute('data-kb-action');
         if (action === 'close') close();
-        if (action === 'print') window.print();
-        if (action === 'download') downloadPdf(content, setStatus);
+        if (action === 'print') printDocument('f4');
+        if (action === 'download') downloadDocument('f4', setStatus);
         return;
       }
 
@@ -167,7 +431,6 @@
         const targetId = link.getAttribute('data-kb-target');
         const targetEl = overlay.querySelector('#' + CSS.escape(targetId));
         if (targetEl) {
-          // Pastikan parent chapter terbuka
           const parent = targetEl.getAttribute('data-kb-chapter-parent');
           if (parent) setChapterExpanded(overlay, parent, true);
           targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -180,7 +443,9 @@
 
     // Keyboard: Escape + Enter/Space on toggle
     function onKeydown(e) {
-      if (e.key === 'Escape') close();
+      if (e.key === 'Escape') {
+        close();
+      }
     }
     document.addEventListener('keydown', onKeydown);
 
@@ -208,7 +473,6 @@
       chapters.forEach((chapter, ci) => {
         const chapterId = chapter.id || slug(chapter.title, 'bab-' + (ci + 1));
         let chapterHit = (chapter.title || '').toLowerCase().includes(query);
-        const sectionHits = [];
         (chapter.sections || []).forEach((section, si) => {
           const sectionId = section.id || slug(section.heading, chapterId + '-' + (si + 1));
           const text = ((section.heading || '') + ' ' + (section.body || '').replace(/<[^>]+>/g, ' ')).toLowerCase();
@@ -221,7 +485,6 @@
             if (ok) {
               art.classList.add('kb-search-hit');
               hits++;
-              sectionHits.push(sectionId);
               chapterHit = true;
             }
           }
@@ -267,121 +530,6 @@
     };
   }
 
-  function downloadPdf(content, setStatus) {
-    if (STATE.pdfBusy) return;
-    STATE.pdfBusy = true;
-    setStatus('Menyiapkan PDF…');
-
-    var chapters = (content && content.chapters) || [];
-    if (!chapters.length) {
-      setStatus('Konten modul kosong.', true);
-      STATE.pdfBusy = false;
-      return;
-    }
-
-    function buildBodyHtml() {
-      var html = '';
-      html += '<div class="kbpdf-cover">';
-      html += '<div class="kbpdf-cover-eyebrow">Portal Belajar</div>';
-      html += '<div class="kbpdf-cover-title">' + escapeHtml(content.title || 'Modul Pengetahuan') + '</div>';
-      if (content.subtitle) {
-        html += '<div class="kbpdf-cover-sub">' + escapeHtml(content.subtitle) + '</div>';
-      }
-      html += '</div>';
-      for (var ci = 0; ci < chapters.length; ci++) {
-        var chapter = chapters[ci];
-        html += '<div class="kbpdf-chapter">';
-        html += '<h1 class="kbpdf-h1">' + escapeHtml(chapter.title || '') + '</h1>';
-        var sections = chapter.sections || [];
-        for (var si = 0; si < sections.length; si++) {
-          var section = sections[si];
-          html += '<div class="kbpdf-section">';
-          html += '<h2 class="kbpdf-h2">' + escapeHtml(section.heading || '') + '</h2>';
-          html += '<div class="kbpdf-body">' + (section.body || '') + '</div>';
-          html += '</div>';
-        }
-        html += '</div>';
-      }
-      return html;
-    }
-
-    var pdfCss = [
-      '*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}',
-      '.kbpdf-root{background:#fff;color:#0f172a;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:13.5px;line-height:1.6;padding:20px 24px;width:794px;--kb-primary:#2563eb;--kb-primary-dark:#1d4ed8;--kb-ink:#0f172a;--kb-muted:#55627a;--kb-border:#e2e8f0;--kb-surface:#ffffff;--kb-canvas:#f4f6fb;--kb-tip-bg:#ecfdf5;--kb-tip-border:#10b981;--kb-warn-bg:#fffbeb;--kb-warn-border:#f59e0b;--kb-example-bg:#eff6ff;--kb-example-border:#93c5fd;}',
-      '.kbpdf-cover{text-align:center;margin:0 0 18px;padding:0 0 14px;border-bottom:3px solid #1e3a5f;}',
-      '.kbpdf-cover-eyebrow{font-size:11px;font-weight:800;color:#1e3a5f;letter-spacing:.12em;text-transform:uppercase;margin:0 0 8px;}',
-      '.kbpdf-cover-title{font-size:22px;font-weight:800;color:#0f172a;margin:0 0 6px;line-height:1.25;}',
-      '.kbpdf-cover-sub{font-size:13px;color:#334155;margin:0;line-height:1.45;}',
-      '.kbpdf-chapter{margin:0 0 18px;page-break-before:always;}',
-      '.kbpdf-chapter:first-child{page-break-before:auto;}',
-      '.kbpdf-h1{font-size:17px;font-weight:800;color:#0f172a;margin:0 0 10px;padding:0 0 6px;border-bottom:2px solid #1e3a5f;}',
-      '.kbpdf-h2{font-size:14px;font-weight:700;color:#1e3a5f;margin:12px 0 6px;}',
-      '.kbpdf-section{margin:0 0 12px;page-break-inside:avoid;}',
-      '.kbpdf-body,.kbpdf-body p,.kb-lead{color:#0f172a!important;font-size:13px;line-height:1.65;margin:0 0 8px;}',
-      '.kbpdf-body li{color:#0f172a;margin-bottom:3px;}',
-      '.kbpdf-body ul,.kbpdf-body ol{margin:0 0 8px;padding-left:20px;}',
-      '.kbpdf-body strong{color:#0f172a;font-weight:700;}',
-      '.kb-legal{font-size:11.5px;color:#475569;font-style:italic;}',
-      '.kb-callout-title{display:block;font-weight:800;margin-bottom:4px;}',
-      'table.kb-table td.kb-num,table.kb-table th.kb-num{text-align:right;font-variant-numeric:tabular-nums;}',
-      'table.kb-table tr.kb-total-row td{font-weight:800;border-top:2px solid #0f172a;}',
-      'table.kb-table tr.kb-subtotal-row td{font-weight:700;background:#fafbfd;}',
-      '.kb-journal{margin:12px 0 18px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;page-break-inside:avoid;}',
-      '.kb-journal-caption{background:#f4f6fb;font-size:12.5px;font-weight:700;padding:8px 12px;border-bottom:1px solid #e2e8f0;}',
-      'table.kb-journal-table{width:100%;border-collapse:collapse;font-size:12.5px;font-family:Consolas,"SFMono-Regular",Menlo,monospace;table-layout:auto;}',
-      'table.kb-journal-table td{padding:6px 12px;border-bottom:1px solid #f1f5f9;}',
-      'table.kb-journal-table td.kb-jr-desc-d{padding-left:12px;}',
-      'table.kb-journal-table td.kb-jr-desc-k{padding-left:36px;color:#55627a;}',
-      'table.kb-journal-table td.kb-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}',
-      '.kb-tip{background:#fef9c3;border:1px solid #a16207;border-left:4px solid #ca8a04;border-radius:6px;padding:10px 12px;margin:8px 0;color:#713f12;font-size:12.5px;}',
-      '.kb-warning{background:#fee2e2;border:1px solid #b91c1c;border-left:4px solid #dc2626;border-radius:6px;padding:10px 12px;margin:8px 0;color:#7f1d1d;font-size:12.5px;}',
-      '.kb-example{background:#e0f2fe;border:1px solid #0369a1;border-left:4px solid #0284c7;border-radius:6px;padding:10px 12px;margin:8px 0;color:#0c4a6e;font-size:12.5px;}',
-      '.kb-formula{background:#f1f5f9;border:1px solid #64748b;border-radius:6px;padding:10px 12px;margin:8px 0;text-align:center;font-family:ui-monospace,Consolas,monospace;font-weight:700;color:#0f172a;}',
-      '.kb-quickfact{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;}',
-      '.kb-quickfact-item{flex:1 1 120px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:8px;text-align:center;}',
-      '.qf-label{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;}',
-      '.qf-value{font-size:13px;font-weight:800;color:#0f172a;margin-top:2px;}',
-      'table{width:100%;border-collapse:collapse;font-size:11.5px;table-layout:fixed;margin:6px 0 10px;}',
-      'th{background:#1e3a5f;color:#fff;padding:6px 8px;border:1px solid #1e3a5f;text-align:left;font-weight:700;}',
-      'td{padding:6px 8px;border:1px solid #94a3b8;vertical-align:top;color:#0f172a;word-break:break-word;}'
-    ].join('');
-
-    var fileName = slug(content.title, 'modul-pengetahuan') + '.pdf';
-
-    if (!window.PDFExport) {
-      setStatus('Mesin PDF tidak tersedia. Coba muat ulang halaman.', true);
-      STATE.pdfBusy = false;
-      return;
-    }
-
-    // Dulu bagian ini punya pipeline html2canvas sendiri (position:absolute
-    // + onclone manual) yang terbukti rapuh -- hasil unduhan kadang jadi
-    // halaman kosong. Sekarang memakai window.PDFExport.exportHTMLToPDF(),
-    // engine terpusat yang sama dan sudah terbukti bekerja di modul
-    // Accounting/SPT/Excel/SQL-PQ (position:fixed + overlay "Membuat PDF...",
-    // bukan absolute+z-index yang gampang salah ukur oleh html2canvas).
-    var html = '<div class="kbpdf-root">' + buildBodyHtml() + '</div>';
-
-    window.PDFExport.exportHTMLToPDF(html, {
-      filename: fileName,
-      widthPx: 794,
-      scale: 2,
-      extraCss: pdfCss,
-      margin: [10, 12, 12, 12]
-    })
-      .then(function () {
-        setStatus('PDF berhasil diunduh.');
-        setTimeout(function () { setStatus(''); }, 2500);
-      })
-      .catch(function (err) {
-        console.error('[knowledge-base] PDF error:', err);
-        setStatus(err && err.message ? err.message : 'Gagal membuat PDF. Silakan coba lagi.', true);
-      })
-      .then(function () {
-        STATE.pdfBusy = false;
-      });
-  }
-
   function open(content) {
     if (!content || !content.chapters || !content.chapters.length) {
       console.error('[knowledge-base] Konten kosong atau tidak valid.');
@@ -389,6 +537,7 @@
     }
     close();
     STATE.content = content;
+    STATE.pdfBusy = false;
     const overlay = buildOverlay(content);
     document.body.appendChild(overlay);
     document.body.classList.add('kb-scroll-lock');
