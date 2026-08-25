@@ -11,7 +11,7 @@
 //
 // Hanya app shell lokal (HTML, manifest, ikon) yang di-cache untuk PWA / offline shell.
 
-const CACHE_NAME = 'sim-spt-shell-v9-open-portal'; // force refresh after removing the portal-login hint
+const CACHE_NAME = 'sim-spt-shell-v10-transparent-scroll'; // transparent scrollbar styles
 
 // File dari domain sendiri — wajib berhasil di-cache saat install.
 const APP_SHELL_LOCAL = [

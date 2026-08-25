@@ -91,6 +91,8 @@ body {
     color: var(--sidebar-text);
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 20px 14px;
     gap: 16px;
     transition: width 0.25s ease, padding 0.25s ease, transform 0.25s ease;

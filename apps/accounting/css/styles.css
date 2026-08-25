@@ -90,6 +90,7 @@ body {
     list-style: none;
     padding: 12px 8px;
     overflow-y: auto;
+    overscroll-behavior: contain;
     flex-grow: 1;
 }
 

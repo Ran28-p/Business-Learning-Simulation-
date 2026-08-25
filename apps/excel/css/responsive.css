@@ -57,9 +57,14 @@
     line-height: 1.3;
   }
 
+  .app-shell {
+    height: auto;
+    overflow: visible;
+  }
   .app-body {
     display: flex;
     flex-direction: column;
+    overflow: visible;
     padding: 12px 12px 88px; /* ruang tombol ← Portal */
     gap: 14px;
   }
@@ -69,6 +74,10 @@
     gap: 12px;
     width: 100%;
     min-width: 0;
+    overflow: visible;
+  }
+  .main-content {
+    overflow: visible;
   }
 
   .dataset-nav, .level-path {

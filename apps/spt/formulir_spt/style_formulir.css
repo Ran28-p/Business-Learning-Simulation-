@@ -1,5 +1,10 @@
-* { box-sizing: border-box; font-family: Arial, sans-serif; }
+* { box-sizing: border-box; font-family: Arial, sans-serif; scrollbar-width: thin; scrollbar-color: transparent transparent; }
 body { background-color: #f0f2f5; padding: 20px; }
+*::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-thumb:hover { background: transparent; border: 0; border-radius: 0; }
 .spt-container { max-width: 900px; margin: 0 auto; background-color: white; padding: 30px; border: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 .spt-header { display: flex; justify-content: space-between; text-align: center; margin-bottom: 10px; }
 .header-left, .header-right { font-size: 12px; font-weight: bold; width: 20%; }

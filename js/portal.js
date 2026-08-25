@@ -53,7 +53,12 @@
     if (btnLogout) btnLogout.style.display = user.isGuest ? "none" : "inline-flex";
   }
 
-  function openModule(path) {
+  let isOpeningModule = false;
+
+  function openModule(path, selectedCard) {
+    if (!path || isOpeningModule) return;
+    isOpeningModule = true;
+
     // Remember which module was opened (optional analytics / resume)
     try {
       sessionStorage.setItem("unified_last_module", path);
@@ -62,7 +67,22 @@
       const label = (PortalAuth.user && (PortalAuth.user.displayName || PortalAuth.user.email)) || "";
       if (label) sessionStorage.setItem("portal_user_name", label);
     } catch (_) { /* ignore */ }
-    window.location.href = path;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (selectedCard) {
+      const cards = document.querySelectorAll("[data-module]");
+      cards.forEach((card) => {
+        card.disabled = true;
+        card.setAttribute("aria-disabled", "true");
+        card.classList.toggle("is-selected", card === selectedCard);
+        card.classList.toggle("is-not-selected", card !== selectedCard);
+      });
+    }
+
+    // Give a selected card a short, deliberate visual confirmation before navigation.
+    window.setTimeout(() => {
+      window.location.href = path;
+    }, selectedCard && !reduceMotion ? 520 : 0);
   }
 
   function renderResumeBanner() {
@@ -78,11 +98,11 @@
 
   function bindHub() {
     document.querySelectorAll("[data-module]").forEach((card) => {
-      card.addEventListener("click", () => openModule(card.getAttribute("data-module")));
+      card.addEventListener("click", () => openModule(card.getAttribute("data-module"), card));
       card.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          openModule(card.getAttribute("data-module"));
+          openModule(card.getAttribute("data-module"), card);
         }
       });
     });

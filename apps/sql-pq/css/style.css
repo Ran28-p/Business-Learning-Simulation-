@@ -99,7 +99,7 @@ ul{margin:0;padding:0;list-style:none;}
 .app-body{display:flex;flex:1;min-height:0;}
 
 /* ============================== SIDEBAR ============================== */
-.sidebar{width:236px;flex-shrink:0;background:var(--sqlpq-panel);border-right:1px solid var(--sqlpq-line);padding:14px 10px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
+.sidebar{width:236px;flex-shrink:0;background:var(--sqlpq-panel);border-right:1px solid var(--sqlpq-line);padding:14px 10px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;overscroll-behavior:contain;}
 .sidebar-nav__label{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--sqlpq-ink-500);font-weight:800;padding:0 8px;margin-bottom:6px;}
 .nav-list{display:flex;flex-direction:column;gap:2px;}
 .nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--radius-sm);color:var(--sqlpq-ink-700);font-size:.86rem;font-weight:600;border:none;background:transparent;width:100%;text-align:left;}

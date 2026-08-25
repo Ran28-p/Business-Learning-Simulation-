@@ -73,8 +73,10 @@ input, select { font-family: var(--font-ui); }
 
 .app-shell {
   min-height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .app-header {
@@ -118,6 +120,7 @@ input, select { font-family: var(--font-ui); }
 
 .app-body {
   flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 20px;
@@ -125,6 +128,7 @@ input, select { font-family: var(--font-ui); }
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .app-footer {
@@ -141,6 +145,15 @@ input, select { font-family: var(--font-ui); }
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.main-content {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .sidebar-nav__label {

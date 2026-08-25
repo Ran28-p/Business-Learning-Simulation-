@@ -17,8 +17,21 @@
    ========================================================================== */
 
 /* ---- Safety net (does NOT replace fixing the real overflow source) ---- */
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Keep Firefox scrollbars visually merged with the page surface. */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
 body { overflow-x: hidden; }
+
+/* ---- Minimal transparent scrollbar: no visible track or shaped thumb ---- */
+* { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: transparent; border: 0; border-radius: 0; }
+*::-webkit-scrollbar-corner { background: transparent; }
+*::-webkit-scrollbar-thumb:hover { background: transparent; }
 img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
 
 /* ---- Accessible hide ---- */
@@ -114,6 +127,16 @@ img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
 
 /* ---- Utility: viewport height that behaves correctly on mobile browsers ---- */
 .bls-min-vh-100 { min-height: 100vh; min-height: 100dvh; }
+
+/* ---- Isolate nested scrolling so sidebar scroll never moves page content ---- */
+.sidebar,
+.sidebar-menu,
+.sidebar-nav,
+.dataset-nav,
+.level-path {
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+}
 
 /* ---- Utility: force any table into a horizontally-scrollable container ---- */
 .bls-table-responsive {
