@@ -1488,3 +1488,37 @@ select.form1770-input {
 
     a[href]::after { content: ""; }
 }
+
+
+/* ============================================================================
+   2026 workspace polish — SIM-SPT
+   ============================================================================ */
+.sidebar { border-right: 1px solid rgba(255,255,255,0.07); }
+.sidebar-top { padding-bottom: 4px; }
+.nav-item { transition: background .15s ease, color .15s ease, transform .15s ease; }
+.nav-item:hover:not(.active) { background: rgba(255,255,255,.075); }
+.nav-item.active { box-shadow: inset 3px 0 0 var(--secondary); }
+.topbar {
+  background: color-mix(in srgb, var(--bg-body) 92%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.hero-card { box-shadow: 0 12px 30px rgba(11,92,171,.16); }
+.stat, .chart-card, .card {
+  box-shadow: 0 1px 2px rgba(15,23,42,.03), 0 8px 24px rgba(15,23,42,.035);
+}
+.btn:focus-visible, .btn-icon:focus-visible, .nav-item:focus-visible, .collapse-btn:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+}
+@media (max-width: 768px) {
+  .main-content { padding-left: 16px; padding-right: 16px; padding-bottom: 96px; }
+  .topbar { margin-bottom: 16px; }
+  .topbar h1 { font-size: 1.45rem; }
+}
+

@@ -688,3 +688,52 @@ td.cell[data-fill-preview="true"] {
 }
 .fx-hint__fn { font-weight: 700; color: var(--efpg-green-700); }
 .fx-hint__desc { margin-top: 4px; font-family: var(--font-ui); font-size: 0.72rem; color: var(--efpg-ink-500); }
+
+
+/* ============================================================================
+   2026 workspace polish — Excel learning experience
+   ============================================================================ */
+.app-header {
+  background: color-mix(in srgb, var(--efpg-paper) 94%, var(--efpg-green-50));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.app-header__brand { min-width: 0; }
+.brand-title { letter-spacing: -0.02em; }
+.badge-pill { box-shadow: 0 1px 0 rgba(18, 53, 36, 0.04); }
+.app-body { gap: 24px; padding-top: 24px; padding-bottom: 32px; }
+.sidebar { gap: 24px; }
+.dataset-nav__item, .level-path__item {
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.dataset-nav__item:not([disabled]):hover, .level-path__item:not([disabled]):hover {
+  background: var(--efpg-green-50);
+  border-color: var(--efpg-green-100);
+  color: var(--efpg-green-700);
+}
+.dataset-nav__item[data-active="true"]:hover, .level-path__item[data-active="true"]:hover {
+  background: var(--efpg-green-600);
+  border-color: var(--efpg-green-600);
+  color: #fff;
+}
+.panel {
+  border-color: var(--efpg-line);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 8px 24px rgba(15, 23, 42, 0.035);
+}
+.setup-field select:focus, .setup-field input:focus {
+  outline: none;
+  border-color: var(--efpg-green-600);
+  box-shadow: 0 0 0 3px rgba(47, 163, 99, 0.14);
+}
+.btn:focus-visible, .dataset-nav__item:focus-visible, .level-path__item:focus-visible {
+  outline: 2px solid var(--efpg-green-600);
+  outline-offset: 2px;
+}
+.workspace-toolbar { margin-bottom: 18px; }
+.formula-bar { box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04); }
+.spreadsheet-scroll { border-radius: 0 0 var(--radius-md) var(--radius-md); }
+@media (max-width: 720px) {
+  .app-body { padding-top: 16px; }
+  .sidebar-progress { padding: 14px; border: 1px solid var(--efpg-line); border-radius: var(--radius-lg); background: var(--efpg-paper); }
+}
+

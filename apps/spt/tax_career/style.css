@@ -605,3 +605,16 @@ body {
   border-color: #ffe082 !important;
   background: #fffde7 !important;
 }
+
+
+/* 2026 Tax Career refinement */
+body { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; }
+.tc-shell { max-width: 1080px; padding-top: 32px; }
+.tc-top { margin-bottom: 28px; }
+.tc-top h1 { letter-spacing: -0.025em; }
+.tc-card, .tc-panel { box-shadow: 0 1px 2px rgba(15,23,42,.03), 0 10px 28px rgba(15,23,42,.045); }
+.tc-card { transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.tc-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--tc-primary) 35%, var(--tc-border)); }
+.btn:focus-visible, .tc-back:focus-visible { outline: 2px solid var(--tc-primary); outline-offset: 3px; }
+@media (max-width: 640px) { .tc-shell { padding: 20px 12px 100px; } }
+

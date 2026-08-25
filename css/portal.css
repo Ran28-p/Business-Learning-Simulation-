@@ -364,3 +364,24 @@ button, input { font-family: inherit; }
   color: var(--muted);
   font-size: 0.82rem;
 }
+
+
+/* ===== 2026 portal refinement ===== */
+.auth-wrap {
+  background:
+    radial-gradient(circle at 15% 10%, rgba(13,148,136,.08), transparent 30%),
+    radial-gradient(circle at 85% 90%, rgba(11,92,171,.08), transparent 32%),
+    var(--bg);
+}
+.auth-card { box-shadow: 0 18px 40px rgba(15,23,42,.08), var(--shadow-lg); }
+.hub-main { padding-top: 48px; }
+.hub-hero h2 { letter-spacing: -0.03em; }
+.module-card { min-height: 230px; }
+.module-card:focus-visible { outline: 3px solid rgba(11,92,171,.35); outline-offset: 3px; }
+.btn:focus-visible, .guest-row button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+@media (max-width: 760px) {
+  .hub-main { padding: 28px 16px 96px; }
+  .hub-user .meta { display: none; }
+  .auth-card { padding: 28px 22px; }
+}
+

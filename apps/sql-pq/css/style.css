@@ -289,3 +289,37 @@ html[data-theme="dark"] .cheat-card h4{color:var(--sqlpq-code-accent);}
   .app-header__actions{flex-wrap:wrap;justify-content:flex-end;row-gap:6px;}
   .badge-pill{max-width:120px;overflow:hidden;text-overflow:ellipsis;}
 }
+
+
+/* ============================================================================
+   2026 workspace polish — database lab
+   ============================================================================ */
+.app-header {
+  background: linear-gradient(115deg, var(--sqlpq-blue-900), var(--sqlpq-blue-700));
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.app-header__brand { min-width: 0; }
+.sidebar { padding-top: 18px; }
+.nav-item { transition: background .15s ease, color .15s ease, transform .15s ease; }
+.nav-item:hover:not(.active) { color: var(--sqlpq-blue-700); }
+.nav-item.active { box-shadow: 0 4px 12px rgba(29,58,130,.2); }
+.card, .stat-card {
+  box-shadow: 0 1px 2px rgba(15,23,42,.03), 0 8px 24px rgba(15,23,42,.035);
+}
+.card:hover, .stat-card:hover { border-color: var(--sqlpq-line-strong); }
+.view-head { margin-bottom: 20px; }
+.field select:focus, .field input[type=text]:focus, .field input[type=number]:focus {
+  outline: none;
+  border-color: var(--sqlpq-blue-500);
+  box-shadow: 0 0 0 3px rgba(47,85,181,.14);
+}
+.btn:focus-visible, .nav-item:focus-visible, .icon-btn:focus-visible, .pd-tab:focus-visible {
+  outline: 2px solid var(--sqlpq-blue-500);
+  outline-offset: 2px;
+}
+.table-wrap { box-shadow: inset 0 1px 0 rgba(15,23,42,.02); }
+@media (max-width: 640px) {
+  .main-view { padding: 16px 12px 96px; }
+  .app-header { padding: 10px 12px; }
+}
+
