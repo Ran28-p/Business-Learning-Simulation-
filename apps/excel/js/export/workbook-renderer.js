@@ -97,6 +97,15 @@
     r += 1;
 
     blueprint.practice.questions.forEach((q) => {
+      // Blueprint menetapkan alamat input sebagai kontrak. Renderer menurunkan
+      // baris awal soal dari alamat itu, bukan menjadikannya hasil samping dari
+      // counter layout; dengan demikian, alamat di Kunci Jawaban tidak bergeser.
+      if (q.answerCell) {
+        const answerRow = Number(q.answerCell.match(/\d+$/)?.[0]);
+        if (!Number.isInteger(answerRow)) throw new Error(`Alamat jawaban tidak valid: ${q.answerCell}`);
+        r = answerRow - 2 - (q.suggestedFunctions.length ? 1 : 0);
+      }
+
       // Baris judul: badge nomor (A) + judul (B:J)
       ws.mergeCells(`A${r}:A${r + 1}`);
       const badge = ws.getCell(`A${r}`);
@@ -211,10 +220,10 @@
   // ===========================================================================
   function renderAnswerKeySheet(wb, blueprint) {
     const ws = wb.addWorksheet('Kunci Jawaban', { state: 'hidden', properties: { tabColor: { argb: 'FF9E2A22' } } });
-    const headers = ['No', 'Soal', 'Formula yang Diharapkan', 'Hasil yang Diharapkan', 'Fungsi', 'Penjelasan'];
+    const headers = ['No', 'Sel Jawaban', 'Soal', 'Formula yang Diharapkan', 'Hasil yang Diharapkan', 'Fungsi', 'Penjelasan'];
     const headerRowIdx = 2;
 
-    setMergedText(ws, `A1:F1`, '🔒  KUNCI JAWABAN — Jangan dilihat sebelum mencoba sendiri!', T().workbookTitle, 22);
+    setMergedText(ws, `A1:G1`, '🔒  KUNCI JAWABAN — Jangan dilihat sebelum mencoba sendiri!', T().workbookTitle, 22);
 
     headers.forEach((h, c) => {
       const cell = ws.getCell(headerRowIdx, c + 1);
@@ -224,18 +233,27 @@
 
     blueprint.answerKey.questions.forEach((q, i) => {
       const rowIdx = headerRowIdx + 1 + i;
-      const values = [q.number, q.instruction, q.expectedFormula, q.expectedValue, q.acceptedFunctions, q.explanation];
+            const answerCell = q.answerCell || '—';
+      const values = [q.number, answerCell, q.instruction, q.expectedFormula, q.expectedValue, q.acceptedFunctions, q.explanation];
       values.forEach((v, c) => {
         const cell = ws.getCell(rowIdx, c + 1);
         cell.value = v;
-        const isNum = c === 0 || c === 3;
+        const isNum = c === 0 || c === 4;
         applyStyle(cell, isNum ? T().tableCellNumber : T().tableCellText);
         cell.alignment = { ...cell.alignment, wrapText: true, vertical: 'top' };
+        if (c === 1 && q.answerCell) {
+          cell.value = {
+            text: q.answerCell,
+            hyperlink: `#'Latihan'!${q.answerCell}`,
+            tooltip: `Buka sel ${q.answerCell} di Sheet Latihan`,
+          };
+          cell.font = { ...(cell.font || {}), underline: true, color: { argb: 'FF004C87' } };
+        }
       });
       ws.getRow(rowIdx).height = wrappedRowHeight(q.instruction, 40);
     });
 
-    ws.columns = [{ width: 6 }, { width: 40 }, { width: 26 }, { width: 16 }, { width: 20 }, { width: 45 }];
+    ws.columns = [{ width: 6 }, { width: 14 }, { width: 40 }, { width: 26 }, { width: 16 }, { width: 20 }, { width: 45 }];
     ws.views = [{ state: 'frozen', ySplit: headerRowIdx }];
     return ws;
   }

@@ -69,6 +69,30 @@
     };
 
     // ---- practice (soal + area jawaban) ----
+    // Satu-satunya planner untuk alamat sel Sheet "Latihan". Renderer dilarang
+    // menghitung alamat jawaban sendiri; ia hanya merender kontrak ini.
+    const planPracticeLayout = (items) => {
+      // Dengan layout renderer saat ini, baris 1..13 dipakai header, tujuan,
+      // empat petunjuk, dan spacer; soal pertama mulai pada baris 14.
+      let questionStartRow = 14;
+      return items.map((q) => {
+        const hasSuggestedFunctions = (q.acceptedFunctions || []).length > 0;
+        const hasHint = Boolean(q.hints && q.hints[0]);
+        const answerRow = questionStartRow + 2 + (hasSuggestedFunctions ? 1 : 0);
+        const resultRow = answerRow + 1;
+        const layout = {
+          questionStartRow,
+          answerCell: `D${answerRow}`,
+          answerRange: `D${answerRow}:J${answerRow}`,
+          resultCell: `D${resultRow}`,
+          resultRange: `D${resultRow}:F${resultRow}`,
+        };
+        questionStartRow = resultRow + 1 + (hasHint ? 1 : 0) + 1;
+        return layout;
+      });
+    };
+    const practiceLayout = planPracticeLayout(questions);
+
     const practiceQuestions = questions.map((q, i) => ({
       number: i + 1,
       title: q.title || `Soal ${i + 1}`,
@@ -76,6 +100,12 @@
       suggestedFunctions: q.acceptedFunctions || [],
       hint: (q.hints && q.hints[0]) || '',
       points: q.points || 0,
+      // targetCell dipertahankan sebagai alias kompatibilitas untuk consumer lama.
+      targetCell: practiceLayout[i].answerCell,
+      answerCell: practiceLayout[i].answerCell,
+      answerRange: practiceLayout[i].answerRange,
+      resultCell: practiceLayout[i].resultCell,
+      resultRange: practiceLayout[i].resultRange,
     }));
 
     // ---- dataset sheet ----
@@ -98,6 +128,9 @@
         expectedValue: q.expectedValue,
         explanation: q.explanation || '',
         acceptedFunctions: (q.acceptedFunctions || []).join(', '),
+        answerCell: practiceLayout[i].answerCell,
+        answerRange: practiceLayout[i].answerRange,
+        resultCell: practiceLayout[i].resultCell,
       })),
     };
 
@@ -129,6 +162,8 @@
       level,
       questionCount: questions.length,
       questionFingerprints: questions.map((q) => q.fingerprint).filter(Boolean),
+      answerCells: practiceLayout.map((item) => item.answerCell),
+      resultCells: practiceLayout.map((item) => item.resultCell),
       generatedAt: generatedAt.toISOString(),
     };
 
