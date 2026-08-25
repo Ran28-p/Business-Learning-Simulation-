@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Portal Belajar — SPT Pajak · Akuntansi · Excel · SQL &amp; Power Query</title>
-  <meta name="description" content="Satu portal untuk latihan SPT Pajak, Akuntansi, Rumus Excel, dan SQL &amp; Power Query. Login tanpa password via email link." />
+  <meta name="description" content="Satu portal untuk latihan SPT Pajak, Akuntansi, Rumus Excel, dan SQL &amp; Power Query." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,50 +21,6 @@
     </div>
   </section>
 
-  <!-- Auth -->
-  <section id="screen-auth" class="screen">
-    <div class="auth-wrap">
-      <div class="auth-card">
-        <div class="brand">
-          <div class="brand-mark">PB</div>
-          <div>
-            <h1>Portal Belajar</h1>
-            <p>SPT Pajak · Akuntansi · Excel · SQL &amp; Power Query</p>
-          </div>
-        </div>
-
-        <h2>Masuk tanpa password</h2>
-        <p class="lead">
-          Masukkan email Anda. Kami kirim <strong>link login</strong> — tidak perlu password.
-          Progres bisa disinkron antar perangkat dengan email yang sama.
-        </p>
-
-        <div id="auth-feedback" class="feedback" role="status"></div>
-
-        <form id="auth-form" class="auth-form" autocomplete="on">
-          <div class="field">
-            <label for="auth-email">Email</label>
-            <input id="auth-email" type="email" placeholder="nama@gmail.com" required />
-          </div>
-          <div class="field">
-            <label for="auth-name">Nama tampilan (opsional)</label>
-            <input id="auth-name" type="text" placeholder="Nama Anda" maxlength="60" />
-          </div>
-          <button type="submit" class="btn btn-primary" id="auth-submit">Kirim Link Login</button>
-        </form>
-
-        <div class="guest-row">
-          <button type="button" id="btn-guest">Lanjutkan sebagai Tamu</button>
-        </div>
-
-        <p class="auth-note">
-          Dengan login, Anda bisa menyimpan progres latihan di cloud dan mengaksesnya dari perangkat lain.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  
   <!-- Hub -->
   <section id="screen-hub" class="screen">
     <header class="hub-header">
@@ -81,16 +37,38 @@
           <div class="name" id="hub-user-name">—</div>
           <div class="email" id="hub-user-email">—</div>
         </div>
-        <button type="button" class="btn btn-ghost" id="btn-logout" style="padding:8px 12px;margin-left:8px">Keluar</button>
+        <button type="button" class="btn btn-ghost" id="btn-login" style="padding:8px 12px;margin-left:8px">Masuk</button>
+        <button type="button" class="btn btn-ghost" id="btn-logout" style="padding:8px 12px;margin-left:8px;display:none">Keluar</button>
       </div>
     </header>
 
+    <!-- Inline login modal -->
+    <div class="login-modal" id="loginModal">
+      <div class="login-modal__backdrop" id="loginBackdrop"></div>
+      <div class="login-modal__card">
+        <h3>Masuk dengan Email</h3>
+        <p>Kami akan mengirimkan link login ke email Anda — tidak perlu password.</p>
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="nama@contoh.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="login-name">Nama Tampilan <span style="color:var(--muted);font-weight:400">(opsional)</span></label>
+          <input type="text" id="login-name" placeholder="Nama Anda" autocomplete="name">
+        </div>
+        <div class="feedback" id="login-feedback"></div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button type="button" class="btn btn-primary" id="btn-send-link" style="flex:1">Kirim Link Login</button>
+          <button type="button" class="btn btn-ghost" id="btn-cancel-login">Batal</button>
+        </div>
+      </div>
+    </div>
+
     <main class="hub-main">
       <div class="hub-hero">
-        <h2>Selamat datang 👋</h2>
-        <p>
-          Beberapa simulator latihan dalam satu sistem. Pilih modul di bawah — masing-masing
-          berjalan mandiri, data progres tersimpan di browser (dan di cloud jika Anda login).
+        <h2>Belajar Lebih Siap untuk Dunia Profesional</h2>
+        <p class="lead justified">
+          Kembangkan kompetensi pajak, akuntansi, Excel, serta SQL dan Power Query melalui simulasi yang praktis dan relevan. Setiap modul dirancang untuk membantu Anda membangun pemahaman, mengasah ketelitian, dan meningkatkan kesiapan kerja secara bertahap. Pilih modul yang ingin dikuasai, lalu mulai perjalanan belajar Anda hari ini.
         </p>
       </div>
 
@@ -163,7 +141,7 @@
       </div>
 
       <p class="hub-footer">
-        Portal Belajar · Berjalan di browser · Login email-link Firebase · Data modul lokal per aplikasi
+        Portal Belajar · Berjalan di browser · Data modul lokal per aplikasi
       </p>
     </main>
   </section>

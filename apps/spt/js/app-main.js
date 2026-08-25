@@ -1032,16 +1032,6 @@
             const profileRole = document.getElementById('profile-role');
             if(profileRole) profileRole.innerText = appState.user.email ? appState.user.email : 'Pelajar Pajak';
 
-            // Login UI hanya ada di Portal. Di SPT: tampilkan tombol "Login di Portal" jika masih tamu.
-            const portalHint = document.getElementById('auth-portal-hint');
-            if (portalHint) {
-                if (appState.user.email) {
-                    portalHint.style.display = 'none';
-                } else {
-                    portalHint.style.display = 'inline-flex';
-                    portalHint.textContent = 'Login di Portal';
-                }
-            }
         }
 // --- DEKLARASI FIREBASE (aman kalau SDK gagal dimuat, misal saat offline) ---
 let auth = null;

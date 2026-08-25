@@ -8,7 +8,7 @@
 // 2. Apapun di bawah ./apps/ → tiap modul punya service worker sendiri
 //    dengan scope masing-masing; root SW ini hanya menjaga shell hub.
 
-const CACHE_NAME = 'portal-shell-v1';
+const CACHE_NAME = 'portal-shell-v4-single-viewport';
 
 const APP_SHELL_LOCAL = [
     './',

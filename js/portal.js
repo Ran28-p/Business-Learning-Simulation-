@@ -6,7 +6,6 @@
 
   const screens = {
     boot: $("#screen-boot"),
-    auth: $("#screen-auth"),
     hub: $("#screen-hub")
   };
 
@@ -41,11 +40,17 @@
     const nameEl = $("#hub-user-name");
     const emailEl = $("#hub-user-email");
     const avatarEl = $("#hub-user-avatar");
+    const btnLogin = $("#btn-login");
+    const btnLogout = $("#btn-logout");
     if (!user) return;
     const label = user.displayName || user.email || "Pengguna";
     nameEl.textContent = label + (user.isGuest ? " (Tamu)" : "");
     emailEl.textContent = user.isGuest ? "Mode tanpa akun — data hanya di perangkat ini" : (user.email || "");
     avatarEl.textContent = PortalAuth.initials(label);
+
+    // Toggle Masuk / Keluar buttons based on guest state
+    if (btnLogin) btnLogin.style.display = user.isGuest ? "inline-flex" : "none";
+    if (btnLogout) btnLogout.style.display = user.isGuest ? "none" : "inline-flex";
   }
 
   function openModule(path) {
@@ -71,39 +76,6 @@
     banner.classList.add("show");
   }
 
-  function bindAuthForm() {
-    const form = $("#auth-form");
-    const feedback = $("#auth-feedback");
-    const submitBtn = $("#auth-submit");
-    const guestBtn = $("#btn-guest");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      clearFeedback(feedback);
-      const email = $("#auth-email").value;
-      const name = $("#auth-name").value;
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Mengirim…";
-      try {
-        const sentTo = await PortalAuth.sendLoginLink(email, name);
-        setFeedback(
-          feedback,
-          "ok",
-          "Link login sudah dikirim ke " + sentTo + ". Buka email Anda, lalu klik link tersebut (boleh di perangkat manapun)."
-        );
-      } catch (err) {
-        setFeedback(feedback, "err", err.message || "Gagal mengirim link login.");
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Kirim Link Login";
-      }
-    });
-
-    guestBtn.addEventListener("click", () => {
-      PortalAuth.continueAsGuest();
-    });
-  }
-
   function bindHub() {
     document.querySelectorAll("[data-module]").forEach((card) => {
       card.addEventListener("click", () => openModule(card.getAttribute("data-module")));
@@ -115,39 +87,74 @@
       });
     });
 
+    const loginModal = $("#loginModal");
+    const loginEmail = $("#login-email");
+    const loginName = $("#login-name");
+    const loginFeedback = $("#login-feedback");
+    const sendLinkButton = $("#btn-send-link");
+
+    function closeLoginModal() {
+      if (!loginModal) return;
+      loginModal.classList.remove("show");
+      clearFeedback(loginFeedback);
+    }
+
+    $("#btn-login").addEventListener("click", () => {
+      if (!loginModal) return;
+      loginModal.classList.add("show");
+      clearFeedback(loginFeedback);
+      window.setTimeout(() => loginEmail && loginEmail.focus(), 0);
+    });
+
+    $("#btn-cancel-login").addEventListener("click", closeLoginModal);
+    $("#loginBackdrop").addEventListener("click", closeLoginModal);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeLoginModal();
+    });
+
+    sendLinkButton.addEventListener("click", async () => {
+      const email = loginEmail.value.trim();
+      const name = loginName.value.trim();
+      clearFeedback(loginFeedback);
+      sendLinkButton.disabled = true;
+      sendLinkButton.textContent = "Mengirim…";
+      try {
+        await PortalAuth.sendLoginLink(email, name);
+        setFeedback(loginFeedback, "ok", "Link login sudah dikirim. Periksa inbox email Anda.");
+      } catch (error) {
+        setFeedback(loginFeedback, "err", error.message || "Gagal mengirim link login. Coba lagi.");
+      } finally {
+        sendLinkButton.disabled = false;
+        sendLinkButton.textContent = "Kirim Link Login";
+      }
+    });
+
     $("#btn-logout").addEventListener("click", async () => {
       await PortalAuth.logout();
+      PortalAuth.continueAsGuest();
     });
   }
 
   function onAuthChange(user) {
-    if (user) {
-      renderUser(user);
-      renderResumeBanner();
-      showScreen("hub");
-    } else {
-      showScreen("auth");
-    }
+    const activeUser = user || {
+      uid: "guest",
+      email: "",
+      displayName: "Tamu",
+      isGuest: true
+    };
+    renderUser(activeUser);
+    renderResumeBanner();
+    showScreen("hub");
   }
 
   function boot() {
-    bindAuthForm();
+    // The hub is always accessible; authentication is no longer a gate.
     bindHub();
     PortalAuth.onChange = onAuthChange;
+    PortalAuth.continueAsGuest();
     PortalAuth.init();
-
-    // If Firebase is slow / offline, still show something after a short wait
-    setTimeout(() => {
-      if (screens.boot.classList.contains("active")) {
-        if (PortalAuth.user) {
-          renderUser(PortalAuth.user);
-          renderResumeBanner();
-          showScreen("hub");
-        } else {
-          showScreen("auth");
-        }
-      }
-    }, 1200);
+    onAuthChange(PortalAuth.user);
   }
 
   if (document.readyState === "loading") {

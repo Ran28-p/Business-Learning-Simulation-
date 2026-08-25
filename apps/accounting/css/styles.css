@@ -796,3 +796,30 @@ body.sidebar-collapsed .main-wrapper {
 }
 #invoiceItemsTable { min-width: 900px; }
 #buat-invoice .table-responsive { overflow-x: auto; }
+
+/* ============================================================================
+   2026 workspace refinement — Accounting Simulator
+   Appended overrides preserve the established markup and JavaScript behavior.
+   ============================================================================ */
+:root { accent-color: var(--accent-color); }
+::selection { background: color-mix(in srgb, var(--accent-color) 20%, transparent); color: var(--text-primary); }
+.sidebar { border-right: 1px solid rgba(255,255,255,.07); }
+.sidebar-menu li a { transition: background-color .15s ease, color .15s ease, transform .15s ease; }
+.sidebar-menu li a:hover:not(.active) { transform: translateX(2px); }
+.sidebar-menu li a.active { box-shadow: inset 3px 0 0 var(--warning); }
+.navbar { background: color-mix(in srgb, var(--bg-secondary) 92%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.card { box-shadow: 0 1px 2px rgba(15,23,42,.03), 0 10px 26px rgba(15,23,42,.035); }
+.card-header { gap: 12px; }
+.btn, .navbar-icon-btn { transition: background-color .15s ease, border-color .15s ease, color .15s ease, transform .15s ease, box-shadow .15s ease; }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 5px 12px color-mix(in srgb, var(--accent-color) 18%, transparent); }
+.btn:active { transform: translateY(0); box-shadow: none; }
+.btn:focus-visible, .navbar-icon-btn:focus-visible, .sidebar-menu li a:focus-visible, .theme-toggle:focus-visible { outline: 2px solid var(--warning); outline-offset: 3px; }
+input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 15%, transparent); }
+table { font-variant-numeric: tabular-nums; }
+tbody tr { transition: background-color .15s ease; }
+tbody tr:hover td { background: color-mix(in srgb, var(--accent-light) 55%, transparent); }
+.modal-overlay { background: rgba(15,23,42,.56); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.modal-content { box-shadow: 0 24px 56px rgba(15,23,42,.24); }
+@media (max-width: 1023px) { .navbar { backdrop-filter: none; -webkit-backdrop-filter: none; } }
+@media (max-width: 600px) { .card { padding: 18px; margin-bottom: 16px; } input[type="text"], input[type="number"], select { font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }

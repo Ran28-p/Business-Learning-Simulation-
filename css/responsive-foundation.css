@@ -135,6 +135,18 @@ img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
   }
 }
 
+/* ---- 2026 interaction baseline: shared, non-structural visual refinement ---- */
+:root { accent-color: var(--primary, #0b5cab); }
+::selection { background: color-mix(in srgb, var(--primary, #0b5cab) 20%, transparent); color: inherit; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button, [role="button"], a { touch-action: manipulation; }
+@media (hover: hover) {
+  button:not(:disabled), [role="button"], a { transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background-color .16s ease, color .16s ease; }
+}
+@media (max-width: 640px) {
+  input, select, textarea { font-size: max(16px, 1em); }
+}
+
 /* ---- Shared accessible hide alias ---- */
 .sr-only {
   position: absolute;

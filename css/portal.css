@@ -57,24 +57,9 @@ button, input { font-family: inherit; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ===== Auth ===== */
-.auth-wrap {
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: var(--bg);
-}
-.auth-card {
-  width: 100%;
-  max-width: 420px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 40px 36px;
-}
+/* ===== Portal auth removed (2026 polish) ===== */
+.auth-wrap { display: none; }
+.auth-card { display: none; }
 .brand {
   display: flex;
   align-items: center;
@@ -206,6 +191,43 @@ button, input { font-family: inherit; }
 }
 .guest-row button:hover {
   background: var(--primary-soft);
+}
+
+/* ===== Login modal ===== */
+.login-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.login-modal.show { display: flex; }
+.login-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(4px);
+}
+.login-modal__card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 420px);
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+}
+.login-modal__card h3 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+}
+.login-modal__card > p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 /* ===== Hub ===== */
@@ -366,22 +388,130 @@ button, input { font-family: inherit; }
 }
 
 
-/* ===== 2026 portal refinement ===== */
-.auth-wrap {
+/* ===== Portal Belajar 2026 Polish ===== */
+
+/* --- Sticky hub header with backdrop blur --- */
+.hub-header {
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: background 0.2s ease;
+}
+
+/* --- Hub background: layered gradient + decorative orbs --- */
+body {
   background:
-    radial-gradient(circle at 15% 10%, rgba(13,148,136,.08), transparent 30%),
-    radial-gradient(circle at 85% 90%, rgba(11,92,171,.08), transparent 32%),
+    radial-gradient(circle at 20% 20%, rgba(13,148,136,.08), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(11,92,171,.07), transparent 38%),
+    radial-gradient(circle at 60% 40%, rgba(11,92,171,.05), transparent 32%),
     var(--bg);
 }
-.auth-card { box-shadow: 0 18px 40px rgba(15,23,42,.08), var(--shadow-lg); }
-.hub-main { padding-top: 48px; }
-.hub-hero h2 { letter-spacing: -0.03em; }
-.module-card { min-height: 230px; }
-.module-card:focus-visible { outline: 3px solid rgba(11,92,171,.35); outline-offset: 3px; }
-.btn:focus-visible, .guest-row button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-@media (max-width: 760px) {
-  .hub-main { padding: 28px 16px 96px; }
-  .hub-user .meta { display: none; }
-  .auth-card { padding: 28px 22px; }
+body::after {
+  content:"";
+  position:fixed;
+  bottom:0; right:0;
+  width:460px; height:460px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(13,148,136,.14), transparent 55%),
+             radial-gradient(circle, rgba(11,92,171,.08), transparent 50%);
+  pointer-events:none;
+  z-index:-1;
+  opacity:0.65;
 }
+
+/* --- Hub cards: softer shadow, hover lift --- */
+.hub-hero { margin-bottom:32px; }
+.hub-hero h2 { letter-spacing:-.02em; }
+.module-card { min-height:230px; background:var(--surface); border:1px solid var(--border); box-shadow:var(--shadow-md); }
+.module-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); }
+.module-card:focus-visible { outline:3px solid rgba(11,92,171,.35); outline-offset:3px; }
+
+/* --- Button refinements --- */
+.btn { transition:background .18s ease, transform .05s ease, box-shadow .18s ease; }
+.btn-primary { background:var(--primary); color:#fff; box-shadow:var(--shadow); }
+.btn-primary:hover { background:var(--primary-dark); transform:translateY(-1px); }
+.btn-primary:active { transform:translateY(0); }
+.btn-primary:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+.btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); }
+.btn-ghost:hover { background:var(--primary-soft); color:var(--primary); }
+
+/* --- Guest mode status pill --- */
+.hub-user .guest-tag { font-size:.72rem; color:var(--primary); margin-left:6px; padding:2px 8px; border-radius:6px; background:var(--primary-soft); border:1px solid var(--primary); }
+
+/* --- Hub main padding adjustments --- */
+.hub-main { padding:48px 24px 60px; }
+
+/* ===== Single-viewport hub layout ===== */
+@media (min-width: 1000px) and (min-height: 650px) {
+  #screen-hub.active {
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .hub-header { flex: 0 0 auto; padding: 10px 24px; }
+  .hub-main {
+    width: min(100%, 1440px);
+    max-width: none;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: clamp(16px, 2.4vh, 28px) clamp(24px, 4vw, 64px) 14px;
+  }
+  .hub-hero { margin-bottom: clamp(12px, 1.8vh, 20px); }
+  .hub-hero h2 { margin-bottom: 5px; font-size: clamp(1.35rem, 2vw, 1.7rem); }
+  .hub-hero p { max-width: 920px; font-size: clamp(.82rem, 1.1vw, .94rem); line-height: 1.48; }
+  .resume-banner { margin-bottom: 12px; padding: 10px 14px; }
+  .module-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(10px, 1.25vw, 16px);
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .module-card {
+    min-height: 0;
+    padding: clamp(14px, 1.5vw, 20px);
+    gap: clamp(7px, 1vh, 10px);
+  }
+  .module-card .icon { width: 42px; height: 42px; font-size: 1.2rem; }
+  .module-card h3 { font-size: clamp(.9rem, 1.1vw, 1.02rem); }
+  .module-card p { font-size: clamp(.75rem, .92vw, .84rem); line-height: 1.45; }
+  .module-card .tags { gap: 4px; }
+  .tag { font-size: .64rem; padding: 2px 7px; }
+  .module-card .cta { margin-top: 0; font-size: .78rem; }
+  .hub-footer { margin-top: 10px; font-size: .72rem; }
+}
+
+/* Text alignment for the introductory and module descriptions. */
+.justified,
+.module-card p {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
+/* ==== Mobile proportional scaling ==== */
+@media (max-width:760px) {
+  .hub-main { padding:28px 16px 96px; }
+  .hub-user .meta { display:none; }
+  .hub-header { flex-wrap:wrap; }
+  .module-grid { grid-template-columns:1fr; }
+  .module-card { min-height:220px; padding:20px; }
+  .hub-hero h2 { font-size:clamp(1.45rem,7vw,1.8rem); }
+  body::after { width:320px; height:320px; opacity:0.5; }
+}
+
+/* ==== Reduced motion ==== */
+@media (prefers-reduced-motion:reduce) {
+  .module-card, .btn { transition:none; }
+  .module-card:hover { transform:none; }
+  body { background:var(--bg); }
+  body::after { display:none; }
+}
+
+/* ==== Focus-visible for all interactive elements ==== */
+.module-card:focus-visible, .btn:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
 

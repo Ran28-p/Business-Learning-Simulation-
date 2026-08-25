@@ -1091,13 +1091,6 @@ input:focus, select:focus {
         flex: 1 1 auto;
         padding: 8px 12px;
     }
-
-    #auth-portal-hint.btn-outline {
-        padding: 8px 12px !important;
-        font-size: 0.82rem;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
 }
 
 @media (max-width: 400px) {
@@ -1344,12 +1337,6 @@ select.form1770-input {
     }
     .topbar-right {
         flex-wrap: wrap;
-    }
-    #auth-portal-hint.btn-outline {
-        padding: 8px 12px !important;
-        font-size: 0.82rem;
-        white-space: nowrap;
-        flex-shrink: 0;
     }
 }
 
