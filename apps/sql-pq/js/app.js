@@ -1016,6 +1016,29 @@
     $("#btnStartChallenge").addEventListener("click", startChallenge);
   }
 
+
+  /** Generate an actual Power Query M challenge question (not SQL). */
+  function generatePqChallengeQuestion() {
+    const scenarios = [
+      {
+        prompt: "Tulis pipeline Power Query M untuk membersihkan data: mulai dari Source, hapus duplikat, filter baris Quantity yang lebih besar dari 0, lalu ubah tipe Total_Sales menjadi number.",
+        requiredTerms: ["let", "in", "table.distinct", "table.selectrows", "table.transformcolumntypes"],
+        solutionM: "let\n    Source = Excel.CurrentWorkbook(){[Name=\"Sales\"]}[Content],\n    RemovedDuplicates = Table.Distinct(Source),\n    FilteredRows = Table.SelectRows(RemovedDuplicates, each [Quantity] > 0),\n    ChangedTypes = Table.TransformColumnTypes(FilteredRows, {{\"Total_Sales\", type number}})\nin\n    ChangedTypes"
+      },
+      {
+        prompt: "Tulis pipeline Power Query M untuk Source data pelanggan: trim kolom Name, filter nilai Customer_ID yang null, lalu tambahkan kolom Segment dengan Conditional Column / Table.AddColumn.",
+        requiredTerms: ["let", "in", "text.trim", "table.selectrows", "table.addcolumn"],
+        solutionM: "let\n    Source = Excel.CurrentWorkbook(){[Name=\"Customers\"]}[Content],\n    TrimmedName = Table.TransformColumns(Source, {{\"Name\", Text.Trim, type text}}),\n    FilteredRows = Table.SelectRows(TrimmedName, each [Customer_ID] <> null),\n    AddedSegment = Table.AddColumn(FilteredRows, \"Segment\", each if [Total_Purchase] >= 10000000 then \"High\" else \"Regular\")\nin\n    AddedSegment"
+      }
+    ];
+    const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+    return Object.assign({
+      id: "pq-concept-" + Date.now(), concept: "pipeline", conceptLabel: "Power Query Pipeline", level: 1,
+      hints: ["Gunakan struktur let ... in.", "Setiap Applied Step menerima hasil dari step sebelumnya.", "Fungsi M dan nama kolom bersifat case-sensitive."],
+      solutionSql: "", orderMatters: false
+    }, scenario);
+  }
+
   async function startChallenge() {
     await ensureCategoryLoaded(App.currentCategory || "sales", { forceDirty: true });
     await ensureRelationalLoaded();
@@ -1024,7 +1047,7 @@
       { key: "cleaning", label: "Data Cleaning", weight: window.SQLPQ_Projects.CHALLENGE_WEIGHTS.cleaning, question: window.SQLPQ_Questions.generateQuestion(5, App.currentCategory) },
       { key: "joinAgg", label: "JOIN & Aggregation", weight: window.SQLPQ_Projects.CHALLENGE_WEIGHTS.joinAgg, question: window.SQLPQ_Questions.generateQuestion(3, App.currentCategory) },
       { key: "advancedSql", label: "Advanced SQL", weight: window.SQLPQ_Projects.CHALLENGE_WEIGHTS.advancedSql, question: window.SQLPQ_Questions.generateQuestion(4, App.currentCategory) },
-      { key: "powerQuery", label: "Power Query (konsep)", weight: window.SQLPQ_Projects.CHALLENGE_WEIGHTS.powerQuery, question: window.SQLPQ_Questions.generateQuestion(2, App.currentCategory) },
+      { key: "powerQuery", label: "Power Query (konsep)", weight: window.SQLPQ_Projects.CHALLENGE_WEIGHTS.powerQuery, question: generatePqChallengeQuestion() },
       { key: "problemSolving", label: "Problem Solving", weight: window.SQLPQ_Projects.CHALLENGE_WEIGHTS.problemSolving, question: window.SQLPQ_Questions.generateQuestion(2, App.currentCategory) }
     ];
     App.challenge = { started: true, components, answers: {} };
@@ -1040,6 +1063,8 @@
       const ta = document.createElement("textarea");
       ta.className = "sql-editor"; ta.style.minHeight = "90px";
       ta.id = "challengeInput_" + idx;
+      ta.placeholder = comp.key === "powerQuery" ? "Tulis M code di sini (let ... in)" : "Tulis query SQL di sini";
+      ta.setAttribute("aria-label", comp.key === "powerQuery" ? "Editor kode Power Query M" : "Editor query SQL");
       card.appendChild(ta);
       area.appendChild(card);
     });
@@ -1053,7 +1078,22 @@
     const weakAreas = [];
     App.challenge.components.forEach((comp, idx) => {
       const sql = $("#challengeInput_" + idx).value;
-      const verdict = window.SQLPQ_Grading.gradeQuery(sql, comp.question);
+      let verdict;
+      if (comp.key === "powerQuery") {
+        // M is not executable in this browser simulator. Validate the required
+        // M-language structure and transformations instead of treating any long
+        // free text as correct.
+        const normalizedM = String(sql || "").toLowerCase().replace(/\s+/g, " ");
+        const requiredTerms = comp.question.requiredTerms || ["let", "in"];
+        const missingTerms = requiredTerms.filter((term) => !normalizedM.includes(term));
+        const validLetIn = /\blet\b[\s\S]*\bin\b/.test(normalizedM);
+        verdict = {
+          correct: validLetIn && missingTerms.length === 0,
+          error: missingTerms.length ? "Kode M belum memuat: " + missingTerms.join(", ") : ""
+        };
+      } else {
+        verdict = window.SQLPQ_Grading.gradeQuery(sql, comp.question);
+      }
       comp.correct = !!verdict.correct;
       if (verdict.correct) scoreSum += comp.weight;
       else weakAreas.push(comp.label);

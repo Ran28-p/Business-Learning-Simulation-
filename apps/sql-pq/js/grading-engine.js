@@ -106,13 +106,29 @@
    *  { expectedSql, orderMatters }
    * Returns { correct, error?, reason?, detail?, userResult?, expectedResult? }
    */
+  function isReadOnlyQuery(sql) {
+    // Grading must never alter the shared in-browser practice database. SQL
+    // comments are removed first so keyword checks cannot be bypassed there.
+    const stripped = String(sql || "")
+      .replace(/\/\*[\s\S]*?\*\//g, " ")
+      .replace(/--[^\r\n]*/g, " ")
+      .trim();
+    if (!stripped) return false;
+    const statements = stripped.split(";").map((s) => s.trim()).filter(Boolean);
+    if (statements.length !== 1) return false;
+    return /^(SELECT|WITH\b|EXPLAIN\s+(QUERY\s+PLAN\s+)?SELECT\b)/i.test(statements[0]);
+  }
+
   function gradeQuery(userSql, question) {
     if (!userSql || !userSql.trim()) {
       return { correct: false, error: "Query masih kosong. Tulis query SQL Anda terlebih dahulu." };
     }
+    if (!isReadOnlyQuery(userSql)) {
+      return { correct: false, error: "Untuk penilaian, gunakan tepat satu query baca saja (SELECT atau WITH ... SELECT). Statement seperti INSERT, UPDATE, DELETE, DROP, dan multi-statement tidak diizinkan agar dataset latihan tetap aman." };
+    }
     let userResult;
     try {
-      userResult = global.SQLPQ_Engine.runMulti(userSql);
+      userResult = global.SQLPQ_Engine.run(userSql);
     } catch (e) {
       return { correct: false, error: "Query Anda menghasilkan error: " + e.message };
     }
@@ -126,5 +142,5 @@
     return Object.assign({ userResult, expectedResult }, verdict);
   }
 
-  global.SQLPQ_Grading = { gradeQuery, compareResultSets, normalizeCell };
+  global.SQLPQ_Grading = { gradeQuery, compareResultSets, normalizeCell, isReadOnlyQuery };
 })(window);

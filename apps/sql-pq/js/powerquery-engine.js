@@ -462,6 +462,121 @@
       },
       mCode: (p, prev) => `Table.Combine({${prev}, ${JSON.stringify(p.otherLabel)}})`
     }
+,
+    promoteHeaders: {
+      label: (p) => "Promote Headers: Baris pertama dijadikan header kolom",
+      apply: (t, p) => {
+        const nt = cloneTable(t);
+        if (nt.rows.length === 0) return nt;
+        const firstRow = nt.rows.shift();
+        nt.columns.forEach((c) => { if (firstRow[c.name] != null) c.name = String(firstRow[c.name]); });
+        return nt;
+      },
+      mCode: (p, prev) => `Table.PromoteHeaders(${prev}, [PromoteAllScalars=true])`
+    },
+    removeEmptyRows: {
+      label: (p) => "Hapus Baris Kosong",
+      apply: (t, p) => {
+        const nt = cloneTable(t);
+        nt.rows = nt.rows.filter((r) => Object.values(r).some((v) => v !== null && v !== undefined && String(v).trim() !== ""));
+        return nt;
+      },
+      mCode: (p, prev) => `Table.SelectRows(${prev}, each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {null})))`
+    },
+    keepDuplicates: {
+      label: (p) => `Simpan Hanya Duplikat: ${(p.columns || []).join(", ")}`,
+      apply: (t, p) => {
+        const nt = cloneTable(t);
+        const cols = p.columns || [];
+        const seen = {};
+        const dupes = [];
+        nt.rows.forEach((r) => {
+          const key = cols.map((c) => String(r[c] || "")).join("\u0001");
+          if (seen[key]) dupes.push(Object.assign({}, r));
+          else seen[key] = true;
+        });
+        nt.rows = dupes;
+        return nt;
+      },
+      mCode: (p, prev) => `Table.Group(${prev}, {${(p.columns || []).map((c) => '"' + c + '"').join(", ")}}, {{"Count", each Table.RowCount(_), Int64.Type}}, 0, GroupKind.Global)`
+    },
+    reverseRows: {
+      label: (p) => "Balik Urutan Baris (Reverse)",
+      apply: (t, p) => { const nt = cloneTable(t); nt.rows.reverse(); return nt; },
+      mCode: (p, prev) => `Table.ReverseRows(${prev})`
+    },
+    removeErrors: {
+      label: (p) => "Hapus Baris dengan Error",
+      apply: (t, p) => {
+        const nt = cloneTable(t);
+        nt.rows = nt.rows.filter((r) => Object.values(r).every((v) => !(v instanceof Error)));
+        return nt;
+      },
+      mCode: (p, prev) => `Table.RemoveRowsWithErrors(${prev})`
+    },
+    duplicateColumn: {
+      label: (p) => `Gandakan Kolom: "${p.from}" \u2192 "${p.to}"`,
+      apply: (t, p) => {
+        const nt = cloneTable(t);
+        nt.columns.push({ name: p.to, type: (t.columns.find((c) => c.name === p.from) || {}).type || "TEXT" });
+        nt.rows.forEach((r) => { r[p.to] = r[p.from]; });
+        return nt;
+      },
+      mCode: (p, prev) => `Table.DuplicateColumn(${prev}, "${p.from}", "${p.to}")`
+    },
+    extractDatePart: {
+      label: (p) => `Ekstrak ${p.part || "Year"} dari Kolom: "${p.column}"`,
+      apply: (t, p) => {
+        const nt = cloneTable(t);
+        nt.rows.forEach((r) => {
+          const v = r[p.column];
+          if (typeof v === "string" && v.includes("-")) {
+            const parts = v.split("-");
+            if (p.part === "Year" && parts[0]) r[p.column] = parseInt(parts[0], 10) || v;
+            else if (p.part === "Month" && parts[1]) r[p.column] = parseInt(parts[1], 10) || v;
+            else if (p.part === "Day" && parts[2]) r[p.column] = parseInt(parts[2], 10) || v;
+          }
+        });
+        return nt;
+      },
+      mCode: (p, prev) => `Table.TransformColumns(${prev},{{"${p.column}", each Date.${p.part || "Year"}(_), Int64.Type}})`
+    },
+    changeCase: {
+      label: (p) => `Ubah "${(p.case || "Upper")}" Kolom: "${p.column}"`,
+      apply: (t, p) => {
+        const nt = cloneTable(t);
+        nt.rows.forEach((r) => {
+          if (typeof r[p.column] === "string") {
+            r[p.column] = p.case === "lower" ? r[p.column].toLowerCase() : r[p.column].toUpperCase();
+          }
+        });
+        return nt;
+      },
+      mCode: (p, prev) => `Table.TransformColumns(${prev},{{"${p.column}", Text.${p.case || "Upper"}, type text}})`
+    },
+    roundNumber: {
+      label: (p) => `Bulatkan Kolom: "${p.column}" (${p.digits || 0} digit)`,
+      apply: (t, p) => {
+        const nt = cloneTable(t);
+        const factor = Math.pow(10, p.digits || 0);
+        nt.rows.forEach((r) => {
+          if (typeof r[p.column] === "number") r[p.column] = Math.round(r[p.column] * factor) / factor;
+        });
+        return nt;
+      },
+      mCode: (p, prev) => `Table.TransformColumns(${prev},{{"${p.column}", each Number.Round(_, ${p.digits || 0}), type number}})`
+    },
+    filterTextContains: {
+      label: (p) => `Filter Teks: "${p.column}" berisi "${p.value}"`,
+      apply: (t, p) => {
+        const nt = cloneTable(t);
+        const search = String(p.value).toLowerCase();
+        nt.rows = nt.rows.filter((r) => r[p.column] != null && String(r[p.column]).toLowerCase().includes(search));
+        return nt;
+      },
+      mCode: (p, prev) => `Table.SelectRows(${prev}, each Text.Contains([${p.column}], "${p.value}"))`
+    }
+
   };
 
   function applyStep(table, step) {

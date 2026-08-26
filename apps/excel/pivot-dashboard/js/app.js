@@ -115,12 +115,30 @@
     return `=SUMIFS(${range(valueField)},${parts})`;
   }
 
+  function showPivotMessage(message, type) {
+    const table = document.getElementById('pdPivotTable');
+    table.innerHTML = `<tbody><tr><td class="pd-pivot-message pd-pivot-message--${type}" colspan="20">${message}</td></tr></tbody>`;
+  }
+
   function buildPivot() {
+    const button = document.getElementById('btnBuildPivot');
     const rowField = document.getElementById('pdRowField').value;
     const colField = document.getElementById('pdColField').value;
     const valueField = document.getElementById('pdValueField').value;
     const aggFn = document.getElementById('pdAggFn').value;
 
+    if (!hf || !dataRowCount) {
+      showPivotMessage('\u26a0\ufe0f Engine data belum siap. Muat ulang halaman dan pastikan dibuka melalui HTTP/HTTPS, bukan file://.', 'error');
+      return;
+    }
+    if (!rowField || !valueField) {
+      showPivotMessage('\u26a0\ufe0f Pilih minimal field Baris dan Nilai, lalu klik tombol Buat / Perbarui Pivot.', 'error');
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = '\u23f3 Membuat Pivot...';
+    try {
     const rowVals = uniqueValues(rowField);
     const colVals = colField ? uniqueValues(colField) : ['__TOTAL__'];
 
@@ -179,6 +197,14 @@
     document.getElementById('pdFormulaPreview').innerHTML =
       '<strong>Contoh formula yang dipakai di balik layar (dihitung HyperFormula):</strong><br>' +
       previewLines.slice(0, 3).map((f) => f.replace(/</g, '&lt;')).join('<br>');
+  } catch (err) {
+      console.error('Pivot build failed:', err);
+      showPivotMessage(`\u26a0\ufe0f Pivot tidak dapat dibuat: ${err.message}`, 'error');
+      document.getElementById('pdFormulaPreview').textContent = '';
+    } finally {
+      button.disabled = false;
+      button.textContent = '\u2699\ufe0f Buat / Perbarui Pivot';
+    }
   }
 
   function formatAggValue(val, aggFn, valueField) {
@@ -283,7 +309,7 @@
       wireKnowledgeButton();
       document.getElementById('btnBuildPivot').addEventListener('click', buildPivot);
       document.getElementById('pdSlicerWilayah').addEventListener('change', renderDashboard);
-      buildPivot();
+      showPivotMessage('Mulai dari data mentah di Tab 1. Setelah memilih susunan field di sebelah kiri, klik tombol Buat / Perbarui Pivot untuk melihat ringkasannya.', 'info');
       renderDashboard();
       const status = document.getElementById('pdEngineStatus');
       status.textContent = '✅ HyperFormula siap (' + dataRowCount + ' baris data)';
