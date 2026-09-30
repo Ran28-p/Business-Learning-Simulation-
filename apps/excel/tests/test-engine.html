@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <title>Test Spreadsheet Engine</title>
+</head>
+<body>
+  <h1>Test Spreadsheet Engine - Level 3 Functions</h1>
+  <pre id="out"></pre>
+  <script type="module">
+    import {
+      createGrid, setCellRaw, evaluateFormula, cellAddress
+    } from '../js/spreadsheet-engine.js';
+
+    const out = document.getElementById('out');
+    function write(...args) { out.textContent += args.join(' ') + '\n'; }
+
+    // build a small table A1:C5
+    const grid = createGrid(10, 5);
+    // headers
+    setCellRaw(grid, cellAddress(0,0), 'Key');
+    setCellRaw(grid, cellAddress(1,0), 'Val1');
+    setCellRaw(grid, cellAddress(2,0), 'Val2');
+
+    // data rows (A2..A5)
+    setCellRaw(grid, cellAddress(0,1), 'A'); setCellRaw(grid, cellAddress(1,1), 10); setCellRaw(grid, cellAddress(2,1), 100);
+    setCellRaw(grid, cellAddress(0,2), 'B'); setCellRaw(grid, cellAddress(1,2), 20); setCellRaw(grid, cellAddress(2,2), 200);
+    setCellRaw(grid, cellAddress(0,3), 'C'); setCellRaw(grid, cellAddress(1,3), 30); setCellRaw(grid, cellAddress(2,3), 300);
+    setCellRaw(grid, cellAddress(0,4), 'D'); setCellRaw(grid, cellAddress(1,4), 40); setCellRaw(grid, cellAddress(2,4), 400);
+
+    // VLOOKUP exact
+    write('VLOOKUP exact (B):', JSON.stringify(evaluateFormula('=VLOOKUP("B",A2:C5,3,FALSE)', grid)));
+    // MATCH exact
+    write('MATCH exact (C):', JSON.stringify(evaluateFormula('=MATCH("C",A2:A5,0)', grid)));
+    // INDEX
+    write('INDEX B row 2 col 3:', JSON.stringify(evaluateFormula('=INDEX(A2:C5,2,3)', grid)));
+    // SUMIFS: sum Val2 where Val1 >= 20 and Key <> "D"
+    write('SUMIFS:', JSON.stringify(evaluateFormula('=SUMIFS(C2:C5,B2:B5,">=20",A2:A5,"<>D")', grid)));
+    // COUNTIFS
+    write('COUNTIFS:', JSON.stringify(evaluateFormula('=COUNTIFS(B2:B5,">=20",C2:C5,">=200")', grid)));
+
+    write('\nCatatan: buka file ini via server lokal (python -m http.server) lalu lihat console atau teks di halaman.');
+  </script>
+</body>
+</html>

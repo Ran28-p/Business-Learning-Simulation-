@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Modul Pembuatan Faktur Pajak &amp; Bukti Potong — SIM-SPT</title>
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../../css/responsive-foundation.css">
+</head>
+<body>
+  <header>
+    <h1>🧾 Modul Pembuatan Faktur Pajak &amp; Bukti Potong Pajak</h1>
+    <p>Simulasi pengisian Faktur Pajak (PPN) dan Bukti Pemotongan/Pemungutan PPh Unifikasi mengikuti struktur data resmi sistem Coretax DJP — lengkap dengan perhitungan otomatis dan dasar hukum tiap kolom.</p>
+    <nav><a href="../index.html">← Kembali ke SIM-SPT</a></nav>
+  </header>
+
+  <div class="disclaimer">⚠️ Ini adalah <strong>simulator edukasi</strong>, bukan aplikasi resmi DJP. Nomor faktur/bukti potong yang dihasilkan di sini <strong>hanya ilustrasi format</strong> — nomor yang sah hanya diterbitkan oleh sistem Coretax DJP setelah faktur/bukti potong diunggah dan disetujui.</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tabBtnFaktur">📄 Faktur Pajak (PPN)</button>
+    <button class="tab-btn" id="tabBtnBupot">🧮 Bukti Potong / Pungut PPh Unifikasi</button>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ================= VIEW: FAKTUR PAJAK ================= -->
+    <section id="view-faktur" class="view active">
+      <div class="grid2">
+        <div>
+          <div class="card">
+            <h2>Data Transaksi</h2>
+
+            <h3>1. Identitas Penjual (PKP Penerbit)</h3>
+            <div class="field">
+              <label>Nama PKP Penjual</label>
+              <input type="text" id="fk-penjual-nama" placeholder="PT Sumber Makmur Sejahtera">
+            </div>
+            <div class="row">
+              <div class="field">
+                <label>NPWP Penjual (16 digit)</label>
+                <input type="text" id="fk-penjual-npwp" placeholder="0016000000123000" maxlength="16">
+                <small class="npwp-hint" id="fk-penjual-npwp-hint"></small>
+              </div>
+              <div class="field">
+                <label>Tanggal Faktur</label>
+                <input type="date" id="fk-tanggal">
+              </div>
+            </div>
+
+            <h3>2. Identitas Pembeli</h3>
+            <div class="field">
+              <label>Nama Pembeli (Perusahaan/Perorangan)</label>
+              <input type="text" id="fk-pembeli-nama" placeholder="PT Mitra Jaya Abadi">
+            </div>
+            <div class="field">
+              <label>NPWP / NIK Pembeli</label>
+              <input type="text" id="fk-pembeli-npwp" placeholder="16 digit NPWP atau 16 digit NIK">
+                <small class="npwp-hint" id="fk-pembeli-npwp-hint"></small>
+            </div>
+
+            <h3>3. Kode &amp; Status Transaksi <span class="hint">— PER-11/PJ/2025</span></h3>
+            <div class="field">
+              <label>Kode Transaksi</label>
+              <select id="fk-kode-transaksi">
+                <option value="01">01 — Penyerahan BKP/JKP, PPN dipungut sendiri oleh PKP penjual</option>
+                <option value="02">02 — Penyerahan kepada pemungut PPN Instansi Pemerintah</option>
+                <option value="03">03 — Penyerahan kepada pemungut PPN lainnya (non-pemerintah)</option>
+                <option value="04">04 — DPP Nilai Lain (Pasal 8A ayat 1 UU PPN)</option>
+                <option value="05">05 — PPN dengan besaran tertentu (Pasal 9A ayat 1 UU PPN)</option>
+                <option value="06">06 — Penyerahan ke turis asing (VAT Refund)</option>
+                <option value="07">07 — Fasilitas PPN Tidak Dipungut / DTP</option>
+                <option value="08">08 — Fasilitas Dibebaskan dari PPN</option>
+                <option value="09">09 — Penyerahan aktiva tetap (Pasal 16D UU PPN)</option>
+                <option value="10">10 — Penyerahan lainnya yang PPN-nya dipungut oleh PKP penjual</option>
+              </select>
+              <span class="hint" id="fk-kode-desc"></span>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label>Status Faktur</label>
+                <select id="fk-status">
+                  <option value="normal">Normal</option>
+                  <option value="pengganti">Pengganti</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Format Nomor Seri</label>
+                <select id="fk-format-nsfp">
+                  <option value="baru">Format Coretax 17 digit (PER-11/PJ/2025, berlaku sejak 2025)</option>
+                  <option value="lama">Format lama 16 digit (PER-03/PJ/2022, s.d. 2024)</option>
+                </select>
+              </div>
+            </div>
+
+            <h3>4. Rincian Barang / Jasa Kena Pajak</h3>
+            <table class="items" id="fk-items-table">
+              <thead>
+                <tr><th style="width:40%">Nama Barang/Jasa</th><th style="width:15%">Kuantitas</th><th style="width:25%">Harga Satuan (Rp)</th><th style="width:15%">Subtotal</th><th></th></tr>
+              </thead>
+              <tbody id="fk-items-body"></tbody>
+            </table>
+            <button class="btn btn-outline btn-sm" id="fk-add-item">+ Tambah baris</button>
+
+            <h3>5. Potongan &amp; Uang Muka</h3>
+            <div class="row">
+              <div class="field">
+                <label>Potongan Harga (Rp)</label>
+                <input type="number" id="fk-potongan" value="0" min="0">
+              </div>
+              <div class="field">
+                <label>Uang Muka Diterima (Rp)</label>
+                <input type="number" id="fk-uangmuka" value="0" min="0">
+              </div>
+            </div>
+
+            <h3>6. Skema PPN</h3>
+            <label class="checkline"><input type="checkbox" id="fk-barang-mewah"> Barang/Jasa Mewah (kena PPnBM, tarif PPN penuh 12%)</label>
+            <div class="field" style="margin-top:8px" id="fk-ppnbm-wrap">
+              <label>Tarif PPnBM (%)</label>
+              <input type="number" id="fk-ppnbm-rate" value="0" min="0" max="200" step="0.5">
+              <span class="hint">Berlaku 10%–200% menurut kelompok barang mewah, Pasal 8 UU PPN &amp; PPnBM.</span>
+            </div>
+            <label class="checkline" style="margin-top:8px"><input type="checkbox" id="fk-ekspor"> Ekspor BKP/JKP (tarif PPN 0%)</label>
+
+            <div class="law-box" style="margin-top:16px">
+              <strong>Dasar hukum &amp; tarif berlaku:</strong>
+              <ul>
+                <li>UU No. 42 Tahun 2009 jo. UU No. 7 Tahun 2021 (UU HPP) tentang PPN</li>
+                <li>PMK 131/2024 — DPP Nilai Lain 11/12 × 12% (tarif efektif PPN 11%) untuk BKP/JKP nonmewah</li>
+                <li>PER-11/PJ/2025 — kode transaksi &amp; format NSFP 17 digit di sistem Coretax</li>
+                <li>PER-03/PJ/2022 — ketentuan Faktur Pajak (format sebelum Coretax)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="doc-wrap">
+          <h2>Pratinjau Faktur Pajak</h2>
+          <div id="fk-preview"></div>
+          <div class="actions no-print">
+            <button class="btn" id="fk-btn-print">🖨️ Cetak / Simpan PDF</button>
+            <button class="btn btn-ghost" id="fk-btn-save">💾 Simpan ke Riwayat</button>
+            <button class="btn btn-outline" id="fk-btn-reset">↺ Reset Form</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card history">
+        <h2>Riwayat Faktur Tersimpan</h2>
+        <div id="fk-history-list"></div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW: BUKTI POTONG ================= -->
+    <section id="view-bupot" class="view">
+      <div class="grid2">
+        <div>
+          <div class="card">
+            <h2>Data Pemotongan / Pemungutan</h2>
+
+            <div class="field">
+              <label>Jenis Bukti Potong / Pungut</label>
+              <select id="bp-jenis">
+                <option value="pph21-tetap">PPh 21 — Pegawai Tetap (bulanan, skema TER)</option>
+                <option value="pph21-bukan-pegawai">PPh 21 — Bukan Pegawai (tenaga ahli/jasa perorangan)</option>
+                <option value="pph2326">PPh 23 / 26 — Unifikasi (Formulir BPBS / BPNR)</option>
+                <option value="pph22">PPh 22 — Unifikasi</option>
+                <option value="pph4ayat2">PPh 4 ayat (2) — Final, Unifikasi</option>
+                <option value="pph15">PPh 15 — Unifikasi</option>
+              </select>
+              <span class="hint" id="bp-jenis-desc"></span>
+            </div>
+
+            <h3>1. Identitas Pemotong / Pemungut</h3>
+            <div class="field">
+              <label>Nama Pemotong/Pemungut</label>
+              <input type="text" id="bp-pemotong-nama" placeholder="PT Sumber Makmur Sejahtera">
+            </div>
+            <div class="field">
+              <label>NPWP Pemotong/Pemungut</label>
+              <input type="text" id="bp-pemotong-npwp" placeholder="16 digit NPWP">
+                <small class="npwp-hint" id="bp-pemotong-npwp-hint"></small>
+            </div>
+
+            <h3>2. Identitas Pihak yang Dipotong</h3>
+            <div class="field">
+              <label>Nama Wajib Pajak Dipotong</label>
+              <input type="text" id="bp-terima-nama" placeholder="Nama penerima penghasilan">
+            </div>
+            <div class="row">
+              <div class="field">
+                <label>NPWP / NIK</label>
+                <input type="text" id="bp-terima-npwp" placeholder="16 digit NPWP/NIK">
+                <small class="npwp-hint" id="bp-terima-npwp-hint"></small>
+              </div>
+              <div class="field">
+                <label>Tanggal Pemotongan</label>
+                <input type="date" id="bp-tanggal">
+              </div>
+            </div>
+            <label class="checkline" id="bp-nonpwp-wrap"><input type="checkbox" id="bp-tanpa-npwp"> Penerima penghasilan belum ber-NPWP (tarif lebih tinggi)</label>
+
+            <div id="bp-fields-dynamic"></div>
+
+            <div class="law-box" style="margin-top:16px" id="bp-law-box"></div>
+          </div>
+        </div>
+
+        <div class="doc-wrap">
+          <h2>Pratinjau Bukti Potong</h2>
+          <div id="bp-preview"></div>
+          <div class="actions no-print">
+            <button class="btn" id="bp-btn-print">🖨️ Cetak / Simpan PDF</button>
+            <button class="btn btn-ghost" id="bp-btn-save">💾 Simpan ke Riwayat</button>
+            <button class="btn btn-outline" id="bp-btn-reset">↺ Reset Form</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card history">
+        <h2>Riwayat Bukti Potong Tersimpan</h2>
+        <div id="bp-history-list"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <small>Referensi utama: UU PPN &amp; PPnBM, UU PPh (UU HPP), PMK 81/2024 &amp; PER-11/PJ/2025 (Coretax), PER-03/PJ/2022 (Faktur Pajak), PER-24/PJ/2021 (Bukti Pemotongan/Pemungutan Unifikasi), PP 58/2023 &amp; PMK 168/2023 (TER PPh 21). Bukan Aplikasi Resmi DJP untuk Edukasi.</small>
+  </footer>
+
+  <script src="../js/shared/tax-engine.js"></script>
+  <script src="../js/shared/npwp-utils.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

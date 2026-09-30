@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Excel Formula Practice Generator</title>
+<meta name="description" content="Generator workbook latihan rumus Microsoft Excel (.xlsx) dari dataset realistis — Beginner/Profesional/Expert, langsung diunduh dan dikerjakan di Excel." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css" />
+<link rel="stylesheet" href="./css/responsive.css" />
+<link rel="stylesheet" href="../../css/responsive-foundation.css" />
+<link rel="stylesheet" href="../../css/knowledge-base.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ======================= HEADER ======================= -->
+  <header class="app-header">
+    <div class="app-header__brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="28" height="28" rx="6" fill="var(--efpg-green-700)"/>
+          <path d="M9 9h14M9 15.5h14M9 22h14M13.5 9v13M18.5 9v13" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <span class="brand-title">Excel Formula Practice Generator</span>
+        <span class="brand-subtitle">Generator workbook latihan Excel (.xlsx) dari dataset nyata</span>
+      </div>
+    </div>
+    <div class="app-header__meta">
+      <button class="btn btn--ghost btn--small" id="btnOpenKnowledgeExcel" type="button">📘 Modul Pengetahuan</button>
+      <a class="badge-pill" href="pivot-dashboard/index.html" style="text-decoration:none;">🧮 Latihan Baru: Pivot &amp; Dashboard</a>
+    </div>
+  </header>
+
+  <div class="app-body app-body--single">
+
+    <!-- ======================= MAIN CONTENT ======================= -->
+    <main class="main-content main-content--single">
+
+      <!-- ---------- Panel Generator Workbook Latihan (.xlsx) — satu-satunya alur latihan ---------- -->
+      <section class="panel setup-panel" id="twoEnginePanel" aria-labelledby="twoEnginePanelTitle">
+        <h2 id="twoEnginePanelTitle">Generator Workbook Latihan (.xlsx)</h2>
+        <p class="panel-description">Pilih Level &amp; Materi, lalu Generate — workbook latihan 4-sheet lengkap (Lembar latihan / dataset / kunci jawaban / Penjelasan Rumus) langsung dibuat dan diunduh, mengikuti layout file contoh. Kerjakan kolom jawaban yang kosong di sheet <strong>Lembar latihan</strong> langsung di Excel; bandingkan dengan <strong>kunci jawaban</strong> dan <strong>Penjelasan Rumus</strong> kalau butuh bantuan.</p>
+
+        <div class="setup-grid">
+          <div class="setup-field">
+            <label for="egLevel">Level</label>
+            <select id="egLevel">
+              <option value="beginner">Beginner</option>
+              <option value="professional">Profesional</option>
+              <option value="expert">Expert</option>
+            </select>
+          </div>
+          <div class="setup-field">
+            <label for="egMateri">Materi</label>
+            <select id="egMateri">
+              <option value="sales">Sales</option>
+              <option value="inventori">Inventori</option>
+              <option value="karyawan">Karyawan</option>
+              <option value="akuntansi">Akuntansi &amp; Pajak Korporat</option>
+              <option value="admin-pajak">Administrasi Perpajakan</option>
+              <option value="financial-modeling">Financial Modeling &amp; Proyeksi Bisnis</option>
+            </select>
+          </div>
+        </div>
+        <div class="setup-actions">
+          <button class="btn btn--primary" id="btnGenerateExerciseXlsx" type="button">Generate Workbook Latihan (.xlsx)</button>
+          <button class="btn btn--ghost" id="btnGenerateDatasetXlsx" type="button">Unduh Dataset Mentah Saja (.xlsx)</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="app-footer">
+    <span>Excel Formula Practice Generator · Berjalan sepenuhnya di browser, tanpa server</span>
+  </footer>
+</div>
+
+<script src="../../js/shared/paper-config.js"></script>
+<script src="../../js/knowledge-base.js"></script>
+<script src="./vendor/exceljs/exceljs.min.js"></script>
+<script src="./js/export/exercise-workbook-writer.js"></script>
+<script type="module" src="./js/generator-ui.js"></script>
+<script src="./data/knowledge-excel.js"></script>
+<script>
+  document.getElementById('btnOpenKnowledgeExcel')?.addEventListener('click', function() {
+    if (window.KnowledgeBase && window.KNOWLEDGE_CONTENT_EXCEL) window.KnowledgeBase.open(window.KNOWLEDGE_CONTENT_EXCEL);
+    else console.warn('KnowledgeBase belum siap');
+  });
+</script>
+  <script src="../../js/back-to-portal.js"></script>
+
+  <!-- PWA: daftarkan service worker (gratis, agar modul bisa dibuka offline) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').catch(function(err) {
+                console.warn('Service worker gagal didaftarkan (app tetap jalan normal seperti web biasa):', err);
+            });
+        });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Portal Belajar — SPT Pajak · Akuntansi · Excel · SQL &amp; Power Query</title>
+  <meta name="description" content="Satu portal untuk latihan SPT Pajak, Akuntansi, Rumus Excel, dan SQL &amp; Power Query." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/portal.css" />
+  <link rel="stylesheet" href="./css/responsive-foundation.css" />
+  <link rel="icon" href="./apps/spt/icons/favicon-32.png" />
+</head>
+<body>
+  <!-- Boot -->
+  <section id="screen-boot" class="screen active">
+    <div class="boot">
+      <div class="spinner" aria-hidden="true"></div>
+      <div>Memuat portal…</div>
+    </div>
+  </section>
+
+  <!-- Hub -->
+  <section id="screen-hub" class="screen">
+    <header class="hub-header">
+      <div class="brand" style="margin:0">
+        <div class="brand-mark" style="width:40px;height:40px;font-size:15px;border-radius:12px">PB</div>
+        <div>
+          <h1 style="font-size:1.05rem">Portal Belajar</h1>
+          <p style="margin:0;font-size:0.78rem;color:var(--muted)">Pilih modul latihan</p>
+        </div>
+      </div>
+      <div class="hub-user">
+        <button type="button" class="btn btn-ghost" id="portalThemeBtn" aria-label="Ganti tema" style="padding:8px 10px;margin-right:8px">🌙</button>
+        <div class="avatar" id="hub-user-avatar" aria-label="Profil Pengguna">?</div>
+        <div class="meta">
+          <div class="name" id="hub-user-name">—</div>
+          <div class="email" id="hub-user-email">—</div>
+        </div>
+        <button type="button" class="btn btn-ghost" id="btn-login" style="padding:8px 12px;margin-left:8px">Masuk</button>
+        <button type="button" class="btn btn-ghost" id="btn-logout" style="padding:8px 12px;margin-left:8px;display:none">Keluar</button>
+        <div class="portal-data-actions" aria-label="Data portal">
+          <button type="button" class="btn btn-ghost" id="btn-portal-backup" title="Unduh backup semua progres modul">Backup</button>
+          <button type="button" class="btn btn-ghost" id="btn-portal-restore" title="Pulihkan backup semua progres modul">Pulihkan</button>
+          <button type="button" class="btn btn-ghost" id="btn-portal-reset" title="Hapus semua progres modul di perangkat ini">Reset data</button>
+          <input type="file" id="portal-restore-file" accept="application/json,.json" hidden>
+        </div>
+      </div>
+    </header>
+
+    <!-- Inline login modal -->
+    <div class="login-modal" id="loginModal">
+      <div class="login-modal__backdrop" id="loginBackdrop"></div>
+      <div class="login-modal__card">
+        <h3>Masuk dengan Email</h3>
+        <p>Kami akan mengirimkan link login ke email Anda — tidak perlu password.</p>
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="nama@contoh.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="login-name">Nama Tampilan <span style="color:var(--muted);font-weight:400">(opsional)</span></label>
+          <input type="text" id="login-name" placeholder="Nama Anda" autocomplete="name">
+        </div>
+        <div class="feedback" id="login-feedback"></div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button type="button" class="btn btn-primary" id="btn-send-link" style="flex:1">Kirim Link Login</button>
+          <button type="button" class="btn btn-ghost" id="btn-cancel-login">Batal</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="hub-main">
+      <div class="hub-hero">
+        <h2>Belajar Lebih Siap untuk Dunia Profesional</h2>
+        <p class="lead justified">
+          Kembangkan kompetensi pajak, akuntansi, Excel, serta SQL dan Power Query melalui simulasi yang praktis dan relevan. Setiap modul dirancang untuk membantu Anda membangun pemahaman, mengasah ketelitian, dan meningkatkan kesiapan kerja secara bertahap. Pilih modul yang ingin dikuasai, lalu mulai perjalanan belajar Anda hari ini.
+        </p>
+      </div>
+
+      <div class="resume-banner" id="resumeBanner">
+        <div class="resume-banner__text">Lanjutkan sesi terakhir: <strong id="resumeBannerLabel">—</strong></div>
+        <button type="button" class="btn btn-primary" id="resumeBannerBtn" style="padding:8px 16px">Lanjutkan →</button>
+      </div>
+
+      <div class="module-grid">
+        <button type="button" class="module-card mod-spt" data-module="./apps/spt/index.html" tabindex="0">
+          <div class="icon">🧾</div>
+          <h3>Simulator SPT Pajak</h3>
+          <p>
+            Latihan isi SPT Tahunan Badan (Formulir 1771 + lampiran), modul ringkasan pajak,
+            kuis, dan kasus berbasis aturan perpajakan Indonesia.
+          </p>
+          <div class="tags">
+            <span class="tag">PPh Badan</span>
+            <span class="tag">Formulir 1771</span>
+            <span class="tag">Kuis Pajak</span>
+          </div>
+          <div class="cta">Buka Simulator SPT →</div>
+        </button>
+
+        <button type="button" class="module-card mod-accounting" data-module="./apps/accounting/index.html" tabindex="0">
+          <div class="icon">📊</div>
+          <h3>Accounting Simulator</h3>
+          <p>
+            Siklus akuntansi lengkap: jurnal, buku besar, neraca saldo, penyesuaian, worksheet,
+            laporan keuangan, penutupan, plus modul invoice &amp; rekonsiliasi PPN.
+          </p>
+          <div class="tags">
+            <span class="tag">Jurnal</span>
+            <span class="tag">Laporan Keuangan</span>
+            <span class="tag">PPN &amp; Invoice</span>
+          </div>
+          <div class="cta">Buka Accounting →</div>
+        </button>
+
+        <button type="button" class="module-card mod-excel" data-module="./apps/excel/index.html" tabindex="0">
+          <div class="icon">📈</div>
+          <h3>Excel Formula Practice</h3>
+          <p>
+            Latihan rumus Excel di atas dataset penjualan realistis: SUM, IF, COUNTIF, SUMIF,
+            fungsi teks &amp; tanggal — dengan validasi hasil, XP, dan badge.
+          </p>
+          <div class="tags">
+            <span class="tag">Level 1–2</span>
+            <span class="tag">Dataset Penjualan</span>
+            <span class="tag">XP &amp; Badge</span>
+          </div>
+          <div class="cta">Buka Excel Practice →</div>
+        </button>
+
+
+        <button type="button" class="module-card mod-sqlpq" data-module="./apps/sql-pq/index.html" tabindex="0">
+          <div class="icon">🗄️</div>
+          <h3>SQL &amp; Power Query Simulator</h3>
+          <p>
+            Belajar SQL &amp; Power Query dari dasar sampai mahir: dataset realistis, SQL editor
+            sungguhan di browser (SQLite/WASM), penilaian otomatis, dan simulasi transformasi Power Query.
+          </p>
+          <div class="tags">
+            <span class="tag">SQL Editor Nyata</span>
+            <span class="tag">Dataset Generator</span>
+            <span class="tag">Power Query M-Code</span>
+          </div>
+          <div class="cta">Buka SQL &amp; Power Query →</div>
+        </button>
+      </div>
+
+      <p class="hub-footer">
+        Portal Belajar · Berjalan di browser · Data modul lokal per aplikasi
+      </p>
+    </main>
+  </section>
+
+  <!-- Firebase SDK (compat, sama seperti Simulator SPT) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="./js/shared/firebase-config.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/portal.js"></script>
+
+  <!-- PWA: daftarkan service worker (gratis, agar hub bisa dibuka offline) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').catch(function(err) {
+                console.warn('Service worker gagal didaftarkan (portal tetap jalan normal seperti web biasa):', err);
+            });
+        });
+    }
+  </script>
+</body>
+</html>

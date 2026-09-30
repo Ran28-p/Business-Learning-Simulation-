@@ -1,0 +1,14 @@
+{
+  "name": "sim-spt",
+  "version": "1.0.0",
+  "description": "Simulator SPT Pajak (SIM-SPT) — aplikasi HTML/CSS/JavaScript murni, tanpa backend, tanpa build step. File ini HANYA dipakai untuk menjalankan pengujian otomatis (tests/); aplikasinya sendiri cukup dibuka lewat server statis.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/test-tax-engine.mjs && node tests/test-npwp-utils.mjs && node tests/test-backup-utils.mjs && node tests/test-formulir-utils.mjs",
+    "test:tax-engine": "node tests/test-tax-engine.mjs",
+    "test:npwp-utils": "node tests/test-npwp-utils.mjs",
+    "test:backup-utils": "node tests/test-backup-utils.mjs",
+    "test:formulir-utils": "node tests/test-formulir-utils.mjs"
+  }
+}

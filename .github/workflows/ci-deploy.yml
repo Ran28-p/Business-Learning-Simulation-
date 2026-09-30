@@ -1,0 +1,116 @@
+# CI/CD gratis untuk repo publik GitHub — tidak ada biaya, tidak butuh
+# kartu kredit (GitHub Actions gratis untuk repo publik; minutes gratis
+# juga tersedia untuk repo privat sampai kuota bulanan, lalu berhenti,
+# bukan menagih otomatis).
+#
+# CI  : empat job paralel di setiap push & pull request —
+#       - "test-excel" menjalankan test suite otomatis apps/excel.
+#       - "test-spt" menjalankan test suite otomatis apps/spt (js/shared/tax-engine.js
+#         & js/shared/npwp-utils.js — tanpa dependency luar, jadi tidak perlu npm install).
+#       - "test-accounting" menjalankan test suite otomatis apps/accounting (siklus
+#         akuntansi + mesin PPN/pajak di js/tax/) — tanpa dependency luar juga.
+#       - "lint" mengecek SEMUA modul (apps/spt, apps/accounting,
+#         apps/excel, apps/sql-pq, + root): syntax .js/.mjs, validitas
+#         .json, dan link src=/href= statis di HTML yang patah. Tidak
+#         perlu npm install, cuma Node bawaan → cepat.
+# CD  : auto-deploy seluruh isi repo (situs statis) ke GitHub Pages saat
+#       push ke branch main. Tidak menyentuh apapun kalau salah satu job test
+#       ATAU "lint" gagal — jadi update modul manapun tetap divalidasi dulu
+#       sebelum live.
+
+name: CI & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  test-excel:
+    name: Test (apps/excel)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
+      - name: Install test deps (apps/excel)
+        working-directory: apps/excel
+        run: npm install --no-save jsdom exceljs
+
+      - name: Run test suite
+        working-directory: apps/excel
+        run: npm test
+
+  test-spt:
+    name: Test (apps/spt)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
+      - name: Run test suite (tanpa dependency luar)
+        working-directory: apps/spt
+        run: npm test
+
+  test-accounting:
+    name: Test (apps/accounting)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
+      - name: Run test suite (tanpa dependency luar)
+        working-directory: apps/accounting
+        run: npm test
+
+  lint:
+    name: Lint (semua apps)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
+      - name: Cek syntax, JSON, dan link patah di semua modul
+        run: node scripts/ci-lint.mjs
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: [test-excel, test-spt, test-accounting, lint]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Upload site sebagai artifact Pages
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: '.'
+
+      - name: Deploy ke GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

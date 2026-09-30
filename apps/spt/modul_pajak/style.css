@@ -1,0 +1,49 @@
+/* Nilai warna berasal dari ../css/tokens.css (sumber kebenaran tunggal) — jangan tulis ulang hex di sini. */
+:root{--primary:var(--sp-primary);--muted:var(--sp-muted);--card:var(--sp-card);--border:var(--sp-border);--accent:var(--sp-primary-soft);--bg:var(--sp-bg);--text:var(--sp-text)}
+*{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,sans-serif}
+body{margin:0;background:var(--bg);color:var(--text)}
+header{padding:18px 24px;background:var(--accent);border-bottom:1px solid var(--border)}
+header h1{margin:0;font-size:1.3rem}
+.container{display:flex;gap:18px;padding:20px}
+.topics{width:260px}
+.topics ul{list-style:none;padding:0}
+.topics li{background:var(--card);padding:10px;border-radius:8px;margin-bottom:8px;cursor:pointer;border:1px solid var(--border);transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}
+.topics li:hover{transform:translateY(-1px);border-color:var(--primary)}
+.topics li.active{border-color:var(--primary);box-shadow:0 6px 18px rgba(0,75,135,0.06)}
+.content{flex:1}
+.card{background:var(--card);padding:18px;border-radius:12px;border:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,.03)}
+.btn{background:var(--primary);color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;transition:opacity .15s ease}
+.btn:hover{opacity:.92}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+label{display:block;margin-bottom:6px;font-weight:600}
+input[type="text"],input[type="number"],select{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text)}
+input[type="radio"]{margin-right:6px}
+.question{margin-bottom:14px;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--card)}
+.result{margin-top:12px;padding:12px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3)}
+footer{padding:12px 24px;color:var(--muted);font-size:0.9rem}
+/* Responsiveness untuk layar kecil (Mobile & Tablet) */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Mengubah susunan menjadi atas-bawah */
+        padding: 15px; /* Mengurangi padding agar tidak terlalu sempit di HP */
+    }
+    
+    .topics {
+        width: 100%; /* Membuat menu kiri mengambil lebar penuh */
+    }
+}
+
+
+/* 2026 module polish */
+body { line-height: 1.55; }
+header { padding: 28px max(24px, calc((100vw - 1120px) / 2)); background: linear-gradient(135deg, var(--accent), var(--bg)); }
+header p { color: var(--muted); max-width: 62ch; }
+.card-modul { max-width: 1120px; margin: 20px auto 0; padding: 20px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); box-shadow: 0 8px 24px rgba(15,23,42,.04); }
+.container { max-width: 1160px; margin: 0 auto; padding-top: 24px; }
+.topics li { padding: 12px; border-radius: 10px; }
+.card { border-radius: 14px; padding: 24px; }
+.btn, .btn-primary { border-radius: 9px; padding: 10px 14px; font-weight: 700; }
+input[type="text"]:focus,input[type="number"]:focus,select:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 14%,transparent); }
+@media (max-width:768px) { header { padding: 22px 16px; } .card-modul { margin: 16px; } }
+
