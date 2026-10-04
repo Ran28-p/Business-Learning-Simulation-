@@ -1,0 +1,575 @@
+{
+  "_petunjuk": "Daftar regulasi yang dirujuk materi. Tambahkan entri SEBELUM memakai regulasi baru di materi; perbarui terakhirDicek setelah memverifikasi ulang. Lihat docs/PEMELIHARAAN-MATERI.md.",
+  "regulasi": [
+    {
+      "id": "UU 7/1983",
+      "judul": "Pajak Penghasilan (PPh), sebagaimana diubah terakhir dengan UU 7/2021",
+      "status": "diubah",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT",
+        "Accounting"
+      ],
+      "catatan": "Pasal 4, 6, 7, 9, 11, 14, 17, 18, 21, 23, 24, 25, 26, 31E dirujuk; nomor pasal tertentu dari pengetahuan umum."
+    },
+    {
+      "id": "UU 6/1983",
+      "judul": "Ketentuan Umum dan Tata Cara Perpajakan (KUP), diubah UU 7/2021",
+      "status": "diubah",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Pasal 3, 7, 8, 9, 12, 13–15, 19, 25–27, 28, 29 dirujuk."
+    },
+    {
+      "id": "UU 8/1983",
+      "judul": "Pajak Pertambahan Nilai dan PPnBM, diubah UU 7/2021",
+      "status": "diubah",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Pasal 5, 7, 8A, 9, 13 dirujuk; daftar Pajak Masukan tak dapat dikreditkan (Pasal 9 ayat (8)) tidak lengkap."
+    },
+    {
+      "id": "UU 7/2021",
+      "judul": "Harmonisasi Peraturan Perpajakan (HPP)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT",
+        "Accounting"
+      ],
+      "catatan": "Mengubah UU PPh, KUP, PPN; tarif PPh OP 5% s.d. Rp60 juta, PPh Badan 22%, PPN 11%→12%."
+    },
+    {
+      "id": "UU 1/2022",
+      "judul": "Hubungan Keuangan antara Pusat dan Daerah (HKPD)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "PBJT, PBB-P2, BPHTB, reklame, PKB; tarif ditetapkan Perda (batas atas di UU)."
+    },
+    {
+      "id": "UU 10/2020",
+      "judul": "Bea Meterai",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Tarif tunggal Rp10.000; dokumen nilai uang > Rp5 juta; dokumen tanpa meterai tetap sah perdata."
+    },
+    {
+      "id": "UU 12/1985",
+      "judul": "Pajak Bumi dan Bangunan",
+      "status": "diubah",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Diubah UU 12/1994; PBB-P3 tetap pajak pusat."
+    },
+    {
+      "id": "UU 12/1994",
+      "judul": "Perubahan UU PBB",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ]
+    },
+    {
+      "id": "UU 10/1995",
+      "judul": "Kepabeanan (UU Kepabeanan), diubah UU 17/2006",
+      "status": "diubah",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Diubah UU 17/2006; belum diverifikasi sesi ini."
+    },
+    {
+      "id": "UU 17/2006",
+      "judul": "Perubahan UU Kepabeanan",
+      "status": "berlaku",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Belum diverifikasi sesi ini."
+    },
+    {
+      "id": "UU 11/1995",
+      "judul": "Cukai (UU Cukai), diubah UU 39/2007",
+      "status": "diubah",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Diubah UU 39/2007; belum diverifikasi sesi ini."
+    },
+    {
+      "id": "UU 39/2007",
+      "judul": "Perubahan UU Cukai",
+      "status": "berlaku",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Belum diverifikasi sesi ini."
+    },
+    {
+      "id": "PP 20/2026",
+      "judul": "Perubahan atas PP 55/2022 (PPh final UMKM)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "PENTING: ditetapkan 22 April 2026. Teks resmi belum dibuka (situs PDF menolak akses otomatis). Cocokkan batas waktu OP/PT Perorangan dan Pasal II peralihan dengan teks resmi.",
+      "url": "https://peraturan.bpk.go.id/Details/349415/pp-no-20-tahun-2026"
+    },
+    {
+      "id": "PP 55/2022",
+      "judul": "Penyesuaian Pengaturan di Bidang PPh",
+      "status": "diubah",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Diubah PP 20/2026."
+    },
+    {
+      "id": "PP 23/2018",
+      "judul": "PPh atas penghasilan dari usaha UMKM (0,5%)",
+      "status": "historis",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "digantiOleh": "PP 55/2022",
+      "catatan": "Digantikan PP 55/2022; hanya dirujuk sebagai sejarah (batas 7/4/3 tahun)."
+    },
+    {
+      "id": "PP 46/2013",
+      "judul": "PPh atas usaha dengan peredaran tertentu (1%)",
+      "status": "historis",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "digantiOleh": "PP 23/2018",
+      "catatan": "Digantikan PP 23/2018; hanya dirujuk sebagai sejarah."
+    },
+    {
+      "id": "PP 34/2017",
+      "judul": "PPh final atas pengalihan dan sewa tanah/bangunan (10%)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ]
+    },
+    {
+      "id": "PP 58/2023",
+      "judul": "Tarif PPh Pasal 21 (TER)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ]
+    },
+    {
+      "id": "PP 60/2010",
+      "judul": "Zakat/sumbangan keagamaan wajib sebagai pengurang penghasilan bruto",
+      "status": "berlaku",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Belum diverifikasi sesi ini."
+    },
+    {
+      "id": "PP 131/2000",
+      "judul": "PPh atas bunga deposito dan tabungan (20%)",
+      "status": "diubah",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Tarif umum 20% dikonfirmasi rujukan sekunder lama; tarif lebih rendah untuk kondisi tertentu (mis. devisa hasil ekspor) tidak dirinci. Tinjau ulang dengan teks resmi."
+    },
+    {
+      "id": "PP 132/2000",
+      "judul": "PPh atas hadiah undian (25%)",
+      "status": "berlaku",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Belum diverifikasi sesi ini."
+    },
+    {
+      "id": "PP 19/2009",
+      "judul": "PPh atas dividen WP OP dalam negeri (10% final)",
+      "status": "historis",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Dividen WP OP dalam negeri: 10% final (Pasal 17 ayat (2c) UU PPh) kecuali diinvestasikan di dalam negeri (PMK 18/2021). Materi tidak lagi merujuk PP 19/2009 sebagai ketentuan berlaku.",
+      "digantiOleh": "PMK 18/PMK.03/2021"
+    },
+    {
+      "id": "PP 9/2022",
+      "judul": "PPh final jasa konstruksi (perubahan kedua PP 51/2008)",
+      "status": "berlaku",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Belum diverifikasi sesi ini; rentang tarif 1,75%–6% perlu dicek."
+    },
+    {
+      "id": "PMK 131/2024",
+      "judul": "Perhitungan PPN dengan DPP nilai lain (11/12)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Pasal 2, 3, 5 dirujuk; berlaku 1 Januari 2025.",
+      "url": "https://jdih.kemenkeu.go.id/api/download/ad276b82-94bd-4197-b409-af33e2842cd6/2024pmkeuangan131.pdf"
+    },
+    {
+      "id": "PMK 168/2023",
+      "judul": "Pelaksanaan PP 58/2023 (PPh 21 TER, biaya jabatan)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ]
+    },
+    {
+      "id": "PMK 111/2025",
+      "judul": "Pengawasan Kepatuhan Wajib Pajak (SP2DK), efektif 1 Januari 2026",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Tenggat tanggapan 14+7 hari dari pemberitaan, bukan teks PMK."
+    },
+    {
+      "id": "PMK 81/2024",
+      "judul": "Ketentuan perpajakan Coretax (pengganti banyak PMK pelaksana KUP/PPN)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Pasal 179, 373, 375–376 dirujuk dari artikel."
+    },
+    {
+      "id": "PMK 18/PMK.03/2021",
+      "judul": "Pelaksanaan UU Cipta Kerja bidang PPh, PPN, KUP",
+      "status": "diubah",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "alias": [
+        "PMK 18/2021"
+      ],
+      "catatan": "Sebagian dicabut/diganti PMK 81/2024."
+    },
+    {
+      "id": "PMK 101/PMK.010/2016",
+      "judul": "Penyesuaian PTKP (TK/0 Rp54 juta)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Belum ditemukan PMK pengganti untuk Tahun Pajak 2026 (rujukan sekunder)."
+    },
+    {
+      "id": "PMK 141/PMK.03/2015",
+      "judul": "Jenis jasa lain objek PPh Pasal 23",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ]
+    },
+    {
+      "id": "PMK 250/PMK.03/2008",
+      "judul": "Biaya jabatan dan biaya pensiun",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "url": "https://jdih.kemenkeu.go.id/api/download/fulltext/2008/250~PMK.03~2008Per.htm"
+    },
+    {
+      "id": "PMK 96/PMK.03/2009",
+      "judul": "Pengelompokan harta berwujud bukan bangunan untuk penyusutan",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Diperbarui PMK 72/2023 (nomor dari pengetahuan umum)."
+    },
+    {
+      "id": "PMK 72/2023",
+      "judul": "Pembaruan pengelompokan harta penyusutan fiskal",
+      "status": "berlaku",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Belum diverifikasi sesi ini."
+    },
+    {
+      "id": "PMK 242/PMK.03/2014",
+      "judul": "Tata cara pembayaran dan penyetoran pajak (setor tgl 10, lapor tgl 20)",
+      "status": "berlaku",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "catatan": "Mungkin sudah dipindah ke PMK 81/2024; verifikasi."
+    },
+    {
+      "id": "PMK 02/PMK.03/2010",
+      "judul": "Biaya entertainment, representasi, jamuan tamu (daftar nominatif)",
+      "status": "berlaku",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "alias": [
+        "PMK-02/PMK.03/2010"
+      ],
+      "catatan": "Belum diverifikasi sesi ini."
+    },
+    {
+      "id": "PMK 105/PMK.03/2009",
+      "judul": "Piutang tak tertagih yang dapat dikurangkan",
+      "status": "berlaku",
+      "verifikasi": "pengetahuan-umum",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "catatan": "Belum diverifikasi sesi ini."
+    },
+    {
+      "id": "SE-02/PJ/2024",
+      "judul": "Petunjuk teknis pemotongan PPh 21 metode TER",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ]
+    },
+    {
+      "id": "SE-05/PJ/2022",
+      "judul": "Landasan SP2DK sebelum PMK 111/2025",
+      "status": "historis",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "SPT"
+      ],
+      "digantiOleh": "PMK 111/2025",
+      "catatan": "Digantikan PMK 111/2025."
+    },
+    {
+      "id": "PSAK 201",
+      "judul": "Penyajian Laporan Keuangan (dahulu PSAK 1)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "catatan": "Penomoran baru efektif 1 Januari 2024 (dokumen komparasi IAI). Isi paragraf dari pengetahuan umum (IAS).",
+      "url": "https://web.iaiglobal.or.id/assets/files/file_publikasi/Komparasi%20Perubahan%20Penomoran%20PSAK%20ISAK%20SAK%20Indonesia_FINAL.pdf"
+    },
+    {
+      "id": "PSAK 207",
+      "judul": "Laporan Arus Kas (dahulu PSAK 2)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "catatan": "Penomoran baru efektif 1 Januari 2024 (dokumen komparasi IAI). Isi paragraf dari pengetahuan umum (IAS).",
+      "url": "https://web.iaiglobal.or.id/assets/files/file_publikasi/Komparasi%20Perubahan%20Penomoran%20PSAK%20ISAK%20SAK%20Indonesia_FINAL.pdf"
+    },
+    {
+      "id": "PSAK 212",
+      "judul": "Pajak Penghasilan (dahulu PSAK 46)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "catatan": "Penomoran baru efektif 1 Januari 2024 (dokumen komparasi IAI). Isi paragraf dari pengetahuan umum (IAS).",
+      "url": "https://web.iaiglobal.or.id/assets/files/file_publikasi/Komparasi%20Perubahan%20Penomoran%20PSAK%20ISAK%20SAK%20Indonesia_FINAL.pdf"
+    },
+    {
+      "id": "PSAK 216",
+      "judul": "Aset Tetap (dahulu PSAK 16)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "catatan": "Penomoran baru efektif 1 Januari 2024 (dokumen komparasi IAI). Isi paragraf dari pengetahuan umum (IAS).",
+      "url": "https://web.iaiglobal.or.id/assets/files/file_publikasi/Komparasi%20Perubahan%20Penomoran%20PSAK%20ISAK%20SAK%20Indonesia_FINAL.pdf"
+    },
+    {
+      "id": "PSAK 115",
+      "judul": "Pendapatan dari Kontrak dengan Pelanggan (dahulu PSAK 72)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "catatan": "Penomoran baru efektif 1 Januari 2024 (dokumen komparasi IAI). Isi paragraf dari pengetahuan umum (IAS).",
+      "url": "https://web.iaiglobal.or.id/assets/files/file_publikasi/Komparasi%20Perubahan%20Penomoran%20PSAK%20ISAK%20SAK%20Indonesia_FINAL.pdf"
+    },
+    {
+      "id": "PSAK 109",
+      "judul": "Instrumen Keuangan (dahulu PSAK 71)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "catatan": "Penomoran baru efektif 1 Januari 2024 (dokumen komparasi IAI). Isi paragraf dari pengetahuan umum (IAS).",
+      "url": "https://web.iaiglobal.or.id/assets/files/file_publikasi/Komparasi%20Perubahan%20Penomoran%20PSAK%20ISAK%20SAK%20Indonesia_FINAL.pdf"
+    },
+    {
+      "id": "PSAK 1",
+      "judul": "Penyajian Laporan Keuangan — penomoran lama",
+      "status": "historis",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "digantiOleh": "PSAK 201",
+      "catatan": "Hanya dirujuk dalam bentuk \"dahulu PSAK 1\"."
+    },
+    {
+      "id": "PSAK 2",
+      "judul": "Laporan Arus Kas — penomoran lama",
+      "status": "historis",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "digantiOleh": "PSAK 207",
+      "catatan": "Hanya dirujuk dalam bentuk \"dahulu PSAK 2\"."
+    },
+    {
+      "id": "PSAK 46",
+      "judul": "Pajak Penghasilan — penomoran lama",
+      "status": "historis",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "digantiOleh": "PSAK 212",
+      "catatan": "Hanya dirujuk dalam bentuk \"dahulu PSAK 46\"."
+    },
+    {
+      "id": "PSAK 16",
+      "judul": "Aset Tetap — penomoran lama",
+      "status": "historis",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "digantiOleh": "PSAK 216",
+      "catatan": "Hanya dirujuk dalam bentuk \"dahulu PSAK 16\"."
+    },
+    {
+      "id": "PSAK 72",
+      "judul": "Pendapatan dari Kontrak dengan Pelanggan — penomoran lama",
+      "status": "historis",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "digantiOleh": "PSAK 115",
+      "catatan": "Hanya dirujuk dalam bentuk \"dahulu PSAK 72\"."
+    },
+    {
+      "id": "PSAK 71",
+      "judul": "Instrumen Keuangan — penomoran lama",
+      "status": "historis",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Accounting"
+      ],
+      "digantiOleh": "PSAK 109",
+      "catatan": "Hanya dirujuk dalam bentuk \"dahulu PSAK 71\"."
+    }
+  ]
+}

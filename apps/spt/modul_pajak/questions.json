@@ -16,28 +16,71 @@
           ],
           "answer": "Dipotong atas penghasilan dari pemberi kerja kepada pegawai",
           "explanation": "PPh Pasal 21 merupakan pemotongan pajak atas penghasilan pegawai, penerima honorarium, dan sejenisnya dari pemberi kerja.",
-          "ref": "PPh Pasal 21"
+          "ref": "PPh Pasal 21",
+          "pembahasan": {
+            "konsep": "PPh Pasal 21 adalah pemotongan oleh pemberi kerja/pembayar atas penghasilan sehubungan dengan pekerjaan, jasa, atau kegiatan: gaji, upah, honorarium, tunjangan, dan sejenisnya. Pemotong menyetorkannya atas nama penerima.",
+            "dasar": "UU 7/1983 (PPh) Pasal 21; PP 58/2023 dan PMK 168/2023 (tarif TER)",
+            "jebakan": "Mengira PPh 21 hanya untuk pegawai tetap. Penerima honorarium, bonus, dan pesangon juga termasuk.",
+            "ingat": "PPh 21 = pajak atas \"penghasilan dari kerja\", dipotong oleh yang membayar.",
+            "salah": {
+              "Hanya berlaku untuk perusahaan besar": "Tidak dibatasi besar perusahaan: pemberi kerja mana pun (badan maupun orang pribadi tertentu) yang membayar gaji wajib memotong.",
+              "Hanya dikenakan pada penjualan barang mewah": "Itu ciri PPnBM, bukan PPh 21. PPh 21 berkaitan dengan penghasilan pegawai.",
+              "Tidak berkaitan dengan pembayaran gaji": "Justru gaji adalah objek utama PPh 21."
+            }
+          }
         },
         {
-          "q": "Jika penghasilan kena pajak seseorang Rp 80.000.000 dan tarifnya 5%, berapa PPh terutang? (Rp)",
+          "q": "Anggap seluruh penghasilan kena pajak Rp 80.000.000 dikenai tarif tunggal 5% (penyederhanaan untuk latihan hitung). Berapa PPh terutang? (Rp)",
           "type": "number",
           "answer": 4000000,
-          "explanation": "PPh terutang dihitung dari dasar pengenaan dikalikan tarif yang berlaku. Pada contoh ini, 5% x Rp 80.000.000 = Rp 4.000.000.",
-          "ref": "Tarif progresif PPh"
+          "explanation": "Dengan tarif tunggal 5%: 5% x Rp 80.000.000 = Rp 4.000.000. Pada tarif progresif yang sebenarnya, PKP Rp 80 juta dihitung berlapis sehingga PPh-nya Rp 6.000.000 (lihat pembahasan).",
+          "ref": "UU PPh Pasal 17 ayat (1) huruf a",
+          "pembahasan": {
+            "konsep": "Soal ini sengaja memakai satu tarif (5%) agar latihan hitungnya sederhana: PPh = dasar pengenaan × tarif.",
+            "dasar": "UU 7/1983 (PPh) Pasal 17 ayat (1) huruf a s.t.d.t.d. UU 7/2021 (HPP)",
+            "langkah": [
+              "Dasar pengenaan = Rp80.000.000",
+              "PPh = 5% × 80.000.000 = Rp4.000.000"
+            ],
+            "jebakan": "Pada tarif progresif yang sebenarnya, PKP Rp80 juta dihitung berlapis: 5% × 60.000.000 + 15% × 20.000.000 = 3.000.000 + 3.000.000 = Rp6.000.000. Jangan menerapkan tarif lapis pertama ke seluruh PKP.",
+            "ingat": "Progresif = berlapis. Lapis 1 (s.d. Rp60 juta) 5%, lapis 2 (s.d. Rp250 juta) 15%."
+          }
         },
         {
           "q": "Apa tujuan utama PPh final UMKM menurut PP 55/2022?",
           "type": "text",
           "answer": "simpel dan pasti",
           "explanation": "PP 55/2022 menerapkan skema PPh final yang lebih sederhana untuk UMKM, sehingga perhitungan dan pelaporan menjadi lebih praktis.",
-          "ref": "PP 55/2022"
+          "ref": "PP 55/2022",
+          "accept": [
+            "sederhana",
+            "simpel",
+            "praktis",
+            "kepastian",
+            "mudah"
+          ],
+          "pembahasan": {
+            "konsep": "PPh final UMKM menyederhanakan kewajiban: pajak dihitung langsung dari peredaran bruto dengan tarif tetap, tanpa perlu menghitung laba dan koreksi fiskal. Hasilnya lebih sederhana dan pasti bagi pelaku usaha kecil.",
+            "dasar": "PP 55/2022 s.t.d.d. PP 20/2026",
+            "jebakan": "Sederhana tidak berarti selalu lebih murah: dasarnya omzet, jadi usaha yang rugi tetap membayar.",
+            "ingat": "Final UMKM = sederhana + pasti, dihitung dari omzet."
+          }
         },
         {
-          "q": "Tarif PPh final UMKM badan menurut PP 55/2022 adalah ... %",
+          "q": "Tarif PPh final UMKM menurut PP 55/2022 (sebagaimana diubah PP 20/2026) adalah ... %",
           "type": "number",
           "answer": 0.5,
-          "explanation": "Tarif final untuk UMKM badan yang ditetapkan dalam PP 55/2022 adalah 0,5% dari peredaran bruto.",
-          "ref": "PP 55/2022"
+          "explanation": "Tarif PPh final UMKM adalah 0,5% dari peredaran bruto. PP 20/2026 (22 April 2026) tidak mengubah tarif, tetapi mempersempit subjeknya: Orang Pribadi, PT Perorangan, dan Koperasi (maks. 4 Tahun Pajak). PT/CV biasa kembali ke tarif umum setelah masa peralihan s.d. Tahun Pajak 2026.",
+          "ref": "PP 55/2022 s.t.d.d. PP 20/2026",
+          "pembahasan": {
+            "konsep": "Tarif PPh final UMKM adalah 0,5% dari peredaran bruto. PP 20/2026 tidak mengubah tarif; yang berubah adalah siapa yang boleh memakainya (OP, PT Perorangan, Koperasi).",
+            "dasar": "PP 55/2022 s.t.d.d. PP 20/2026",
+            "langkah": [
+              "Tarif = 0,5% dari peredaran bruto (setengah persen)"
+            ],
+            "jebakan": "Tarif lama 1% adalah PP 46/2013. Sejak PP 23/2018 tarifnya 0,5% dan tetap 0,5% setelah PP 55/2022.",
+            "ingat": "0,5% = setengah persen dari omzet, bukan dari laba."
+          }
         }
       ]
     },
@@ -57,21 +100,52 @@
           ],
           "answer": "Pajak Progresif",
           "explanation": "Pajak progresif menggunakan persentase yang semakin naik. Semakin besar dasar pengenaannya, semakin besar persentase pajaknya.",
-          "ref": "Konsep Dasar Pajak"
+          "ref": "Konsep Dasar Pajak",
+          "pembahasan": {
+            "konsep": "Pada pajak progresif, persentase tarif naik seiring naiknya dasar pengenaan. PPh orang pribadi (5%–35%) adalah contoh utamanya.",
+            "dasar": "UU 7/1983 (PPh) Pasal 17 ayat (1) huruf a",
+            "jebakan": "Progresif bukan berarti seluruh penghasilan dikenai tarif tertinggi; tarif berlaku per lapisan.",
+            "ingat": "Progresif = makin besar, makin tinggi persentasenya.",
+            "salah": {
+              "Pajak Proporsional": "Proporsional: tarif tetap berapa pun dasarnya (mis. PPN).",
+              "Pajak Degresif": "Degresif: tarif justru turun saat dasar naik.",
+              "Pajak Regresif": "Regresif: beban relatif lebih berat bagi yang berpenghasilan rendah."
+            }
+          }
         },
         {
           "q": "Sesuai ketentuan UU HPP, tarif PPh progresif lapis pertama (penghasilan sampai dengan Rp60 juta) dikenakan sebesar ... %",
           "type": "number",
           "answer": 5,
           "explanation": "Pada UU HPP, lapisan tarif terendah (penghasilan 0 - Rp60 juta) dikenakan tarif 5%.",
-          "ref": "UU HPP PPh Pasal 21"
+          "ref": "UU PPh Pasal 17 ayat (1) huruf a s.t.d.t.d. UU HPP",
+          "pembahasan": {
+            "konsep": "Lapisan pertama tarif PPh orang pribadi adalah penghasilan kena pajak sampai Rp60 juta, dengan tarif 5%.",
+            "dasar": "UU 7/1983 (PPh) Pasal 17 ayat (1) huruf a s.t.d.t.d. UU 7/2021 (HPP)",
+            "langkah": [
+              "Lapisan: 5% (s.d. Rp60 jt), 15% (>60–250 jt), 25% (>250–500 jt), 30% (>500 jt–5 M), 35% (>5 M)"
+            ],
+            "jebakan": "Mengira lapisan pertama 10% atau 15%. Itu tarif lama sebelum UU HPP (tarif 5% s.d. Rp50 juta berubah menjadi 5% s.d. Rp60 juta).",
+            "ingat": "5–15–25–30–35."
+          }
         },
         {
           "q": "Di tingkat daerah, pajak progresif biasanya diterapkan pada kepemilikan aset apa? (Jawab dengan huruf kecil, 2 kata)",
           "type": "text",
           "answer": "kendaraan bermotor",
           "explanation": "Pajak Kendaraan Bermotor (PKB) dikenakan secara progresif untuk kepemilikan kendaraan kedua, ketiga, dan seterusnya dalam satu alamat keluarga.",
-          "ref": "Pajak Daerah"
+          "ref": "Pajak Daerah",
+          "accept": [
+            "kendaraan bermotor",
+            "kendaraan",
+            "pkb"
+          ],
+          "pembahasan": {
+            "konsep": "Di daerah, pajak progresif umumnya diterapkan pada Pajak Kendaraan Bermotor (PKB): kepemilikan kendaraan kedua dan seterusnya dikenai tarif lebih tinggi.",
+            "dasar": "UU 1/2022 (HKPD) — PKB; tarif kendaraan pertama paling tinggi 1,2% dan kendaraan berikutnya progresif sampai 6%",
+            "jebakan": "Besaran tarif progresif ditetapkan Perda masing-masing daerah, sehingga bisa berbeda antar provinsi.",
+            "ingat": "Aset yang \"dikoleksi\" di daerah: kendaraan."
+          }
         }
       ]
     },
@@ -91,28 +165,71 @@
           ],
           "answer": "PPN keluaran",
           "explanation": "PPN keluaran adalah pajak yang dipungut ketika PKP menjual barang atau jasa kena pajak.",
-          "ref": "UU PPN"
+          "ref": "UU PPN",
+          "pembahasan": {
+            "konsep": "PPN keluaran adalah PPN yang dipungut PKP saat menyerahkan BKP/JKP. PPN yang dibayar saat membeli disebut PPN masukan.",
+            "dasar": "UU 8/1983 (PPN) s.t.d.t.d. UU 7/2021",
+            "jebakan": "Tertukar arah: keluaran = menjual (dipungut), masukan = membeli (dibayar).",
+            "ingat": "Keluar = jual, Masuk = beli.",
+            "salah": {
+              "PPN masukan": "PPN masukan dibayar saat membeli, bukan saat menjual.",
+              "PPN final": "PPN tidak bersifat final; selisih keluaran dan masukan dihitung tiap masa.",
+              "PPN tambahan": "\"PPN tambahan\" bukan istilah resmi."
+            }
+          }
         },
         {
           "q": "Jika PPN Keluaran Rp 55.000.000 dan PPN Masukan Rp 33.000.000, berapa PPN yang harus disetor? (Rp)",
           "type": "number",
           "answer": 22000000,
           "explanation": "PPN terutang dihitung dari selisih PPN keluaran dan PPN masukan. Jadi Rp 55.000.000 - Rp 33.000.000 = Rp 22.000.000.",
-          "ref": "UU PPN"
+          "ref": "UU PPN",
+          "pembahasan": {
+            "konsep": "PPN yang disetor adalah selisih PPN keluaran dikurangi PPN masukan yang dapat dikreditkan.",
+            "dasar": "UU PPN Pasal 9 ayat (1)",
+            "langkah": [
+              "PPN keluaran − PPN masukan",
+              "55.000.000 − 33.000.000 = Rp22.000.000 (kurang bayar)"
+            ],
+            "jebakan": "Bila PPN masukan lebih besar dari keluaran, hasilnya lebih bayar, yang dikompensasikan ke masa berikutnya atau direstitusi, bukan disetor.",
+            "ingat": "Setor = Keluaran − Masukan."
+          }
         },
         {
           "q": "Apa bukti yang digunakan untuk mengkreditkan PPN masukan?",
           "type": "text",
           "answer": "faktur pajak",
           "explanation": "PPN masukan dikreditkan dengan menggunakan faktur pajak sebagai bukti transaksi pembelian barang atau jasa kena pajak.",
-          "ref": "UU PPN"
+          "ref": "UU PPN",
+          "accept": [
+            "faktur pajak",
+            "faktur",
+            "e-faktur",
+            "efaktur"
+          ],
+          "pembahasan": {
+            "konsep": "Pajak Masukan dikreditkan berdasarkan Faktur Pajak yang memenuhi syarat formal dan material.",
+            "dasar": "UU PPN Pasal 9 ayat (2), (8), (9); PMK 81/2024",
+            "jebakan": "Kuitansi atau nota biasa tidak dapat dipakai mengkreditkan; faktur pajak yang cacat juga tidak dapat dikreditkan.",
+            "ingat": "Tanpa faktur pajak sah, tidak ada kredit."
+          }
         },
         {
           "q": "Untuk penyerahan barang/jasa NONMEWAH, tarif PPN EFEKTIF yang dipungut PKP saat ini adalah ... % (bukan tarif menurut undang-undang, tapi tarif yang benar-benar dibebankan ke konsumen)",
           "type": "number",
           "answer": 11,
           "explanation": "Tarif PPN menurut UU HPP sebenarnya sudah 12% sejak 1 Januari 2025. Namun PMK 131/2024 menetapkan Dasar Pengenaan Pajak (DPP) Nilai Lain sebesar 11/12 dari harga jual/nilai impor khusus untuk barang/jasa NONMEWAH, sehingga PPN yang efektif dipungut tetap setara 11%. Barang/jasa tergolong mewah (kena PPnBM) dikenakan tarif 12% penuh tanpa mekanisme ini.",
-          "ref": "UU HPP No. 7/2021 Pasal 7 jo. PMK 131/2024"
+          "ref": "UU HPP No. 7/2021 Pasal 7 jo. PMK 131/2024",
+          "pembahasan": {
+            "konsep": "Tarif menurut UU adalah 12%, tetapi untuk barang/jasa non-mewah DPP-nya 11/12 dari harga jual (DPP nilai lain), sehingga yang efektif dipungut 12% × 11/12 = 11%.",
+            "dasar": "UU 8/1983 (PPN) Pasal 7 ayat (1); PMK 131/2024 Pasal 3",
+            "langkah": [
+              "DPP nilai lain = 11/12 × harga jual",
+              "PPN = 12% × DPP = 12% × 11/12 × harga = 11% × harga"
+            ],
+            "jebakan": "Barang mewah (objek PPnBM) memakai harga jual penuh dengan tarif 12%, sehingga efektif 12%.",
+            "ingat": "12% × 11/12 = 11%."
+          }
         }
       ]
     },
@@ -132,76 +249,167 @@
           ],
           "answer": "Barang mewah",
           "explanation": "PPnBM dikenakan pada barang mewah tertentu yang masuk kategori barang yang dipilih untuk dibebani pajak tambahan.",
-          "ref": "PPnBM"
+          "ref": "PPnBM",
+          "pembahasan": {
+            "konsep": "PPnBM dikenakan atas penyerahan atau impor barang kena pajak yang tergolong mewah, sebagai tambahan PPN.",
+            "dasar": "UU PPN Pasal 5",
+            "jebakan": "PPnBM dikenakan tambahan, bukan pengganti PPN.",
+            "ingat": "PPnBM = \"PPN-nya orang mewah\".",
+            "salah": {
+              "Bahan pokok": "Bahan pokok umumnya tidak dikenai PPN, apalagi PPnBM.",
+              "Jasa kesehatan": "Jasa medis tidak dikenai PPN dan bukan barang mewah.",
+              "Kertas kantor": "Kertas kantor barang biasa; dikenai PPN biasa, bukan PPnBM."
+            }
+          }
         },
         {
           "q": "Sebutkan satu contoh barang yang sering dikenai PPnBM.",
           "type": "text",
           "answer": "mobil mewah",
           "explanation": "Contoh barang mewah yang umum dikenai PPnBM adalah kendaraan mewah dan barang elektronik premium.",
-          "ref": "PPnBM"
+          "ref": "PPnBM",
+          "accept": [
+            "mobil",
+            "kendaraan",
+            "kapal pesiar",
+            "pesawat",
+            "yacht",
+            "hunian mewah",
+            "apartemen mewah",
+            "rumah mewah"
+          ],
+          "pembahasan": {
+            "konsep": "Objek PPnBM antara lain kendaraan bermotor mewah, hunian mewah, kapal pesiar, dan pesawat udara tertentu.",
+            "dasar": "UU PPN Pasal 5 dan peraturan pelaksananya",
+            "jebakan": "Tidak semua barang elektronik premium termasuk objek PPnBM; hanya yang ditetapkan peraturan.",
+            "ingat": "Mobil mewah, hunian mewah, kapal pesiar."
+          }
         },
         {
           "q": "Apakah PPnBM merupakan pajak final atas penghasilan?",
           "type": "text",
           "answer": "tidak",
           "explanation": "PPnBM adalah pajak atas penjualan barang mewah, bukan pajak penghasilan yang bersifat final dalam arti yang sama.",
-          "ref": "PPnBM"
+          "ref": "PPnBM",
+          "accept": [
+            "bukan"
+          ],
+          "pembahasan": {
+            "konsep": "PPnBM adalah pajak atas penjualan atau impor barang mewah (pajak konsumsi), bukan pajak atas penghasilan.",
+            "dasar": "UU PPN Pasal 5",
+            "jebakan": "Karena namanya \"pajak penjualan\", tidak ada kaitannya dengan PPh final.",
+            "ingat": "PPnBM ≠ PPh."
+          }
         },
         {
           "q": "Tujuan utama pemberlakuan PPnBM adalah ...",
           "type": "text",
           "answer": "mengendalikan konsumsi barang mewah",
           "explanation": "PPnBM bertujuan untuk mengendalikan konsumsi barang mewah dan menambah penerimaan negara dari golongan yang mampu.",
-          "ref": "PPnBM"
+          "ref": "PPnBM",
+          "accept": [
+            "mengendalikan konsumsi",
+            "pengendalian konsumsi",
+            "membatasi konsumsi",
+            "keseimbangan",
+            "keadilan",
+            "penerimaan negara"
+          ],
+          "pembahasan": {
+            "konsep": "PPnBM bertujuan menyeimbangkan pembebanan pajak antara konsumen berpenghasilan rendah dan tinggi dan mengendalikan pola konsumsi barang mewah.",
+            "dasar": "UU PPN Pasal 5 dan penjelasannya",
+            "jebakan": "Menyebut hanya \"penerimaan negara\"; tujuan utamanya pengendalian dan keadilan pembebanan.",
+            "ingat": "Kendalikan konsumsi mewah."
+          }
         }
       ]
     },
     {
       "key": "pbb_p3",
-      "title": "PBB P3 (Pajak Bumi dan Bangunan Perdesaan dan Perkotaan)",
-      "summary": "PBB adalah pajak atas tanah dan/atau bangunan yang dipungut oleh pemerintah daerah berdasarkan NJOP. Tarif yang berlaku saat ini: paling tinggi 0,5% dari NJOP setelah dikurangi NJOPTKP, sesuai UU HKPD; besaran final ditetapkan oleh Perda masing-masing kabupaten/kota.",
+      "title": "PBB-P3 (Perkebunan, Perhutanan, Pertambangan)",
+      "summary": "PBB-P3 adalah Pajak Bumi dan Bangunan atas kawasan yang digunakan untuk kegiatan usaha perkebunan, perhutanan, dan pertambangan (serta sektor lainnya di perairan). Berbeda dengan PBB-P2 yang kini menjadi pajak kabupaten/kota, PBB-P3 tetap menjadi pajak pusat yang dikelola DJP. Dasar pengenaannya NJOP.",
       "questions": [
         {
-          "q": "Dasar pengenaan PBB adalah apa?",
           "type": "mcq",
+          "q": "PBB-P3 adalah PBB atas sektor apa?",
           "options": [
-            "NJOP",
-            "Harga pasar global",
-            "Biaya produksi",
-            "Pendapatan bersih"
+            "Perkebunan, perhutanan, dan pertambangan",
+            "Perdesaan dan perkotaan",
+            "Perdagangan dan perindustrian",
+            "Pariwisata dan perhotelan"
           ],
-          "answer": "NJOP",
-          "explanation": "PBB dikenakan berdasarkan Nilai Jual Objek Pajak atau NJOP yang ditetapkan oleh pemerintah daerah.",
-          "ref": "PBB"
+          "answer": "Perkebunan, perhutanan, dan pertambangan",
+          "explanation": "PBB-P3 adalah PBB atas bumi/bangunan yang dipakai untuk kegiatan usaha perkebunan, perhutanan, dan pertambangan (serta sektor lainnya di perairan).",
+          "ref": "UU 12/1994 (PBB); UU 1/2022 (HKPD)",
+          "pembahasan": {
+            "konsep": "PBB-P3 adalah PBB atas bumi/bangunan yang dipakai untuk kegiatan usaha perkebunan, perhutanan, dan pertambangan (serta sektor lainnya di perairan).",
+            "dasar": "UU 12/1985 jo. UU 12/1994 (PBB); UU 1/2022 (HKPD) Pasal 38",
+            "jebakan": "Mengira \"P3\" berarti pajak bangunan perusahaan biasa. P3 = perkebunan, perhutanan, pertambangan.",
+            "ingat": "P3 = 3 sektor: kebun, hutan, tambang.",
+            "salah": {
+              "Perdesaan dan perkotaan": "Itu PBB-P2 (perdesaan dan perkotaan) yang dikelola daerah.",
+              "Perdagangan dan perindustrian": "Perdagangan dan perindustrian bukan sektor PBB-P3.",
+              "Pariwisata dan perhotelan": "Pariwisata dan perhotelan bukan sektor PBB-P3."
+            }
+          }
         },
         {
-          "q": "PBB dibayar ke tingkat pemerintahan mana?",
           "type": "text",
-          "answer": "daerah",
-          "explanation": "PBB adalah pajak daerah sehingga pemungutannya dilakukan oleh pemerintah daerah.",
-          "ref": "PBB"
+          "q": "PBB-P3 dipungut oleh pemerintah tingkat apa? (pusat/daerah)",
+          "answer": "pusat",
+          "explanation": "PBB-P3 tetap menjadi kewenangan pemerintah pusat (DJP), berbeda dengan PBB-P2 yang dialihkan ke kabupaten/kota.",
+          "ref": "UU 12/1994 (PBB); UU 1/2022 (HKPD)",
+          "accept": [
+            "pusat",
+            "pemerintah pusat",
+            "djp",
+            "dirjen pajak"
+          ],
+          "pembahasan": {
+            "konsep": "PBB-P3 tetap menjadi kewenangan pemerintah pusat (DJP), berbeda dengan PBB-P2 yang dialihkan ke kabupaten/kota.",
+            "dasar": "UU 12/1994 (PBB); UU 1/2022 (HKPD)",
+            "jebakan": "Menyamakan semua PBB sebagai pajak daerah.",
+            "ingat": "P3 pusat, P2 daerah."
+          }
         },
         {
-          "q": "Objek PBB adalah ...",
           "type": "text",
-          "answer": "tanah dan bangunan",
-          "explanation": "PBB dikenakan atas tanah dan/atau bangunan yang menjadi objek pajak.",
-          "ref": "PBB"
+          "q": "Dasar pengenaan PBB (P2 maupun P3) adalah ...",
+          "answer": "njop",
+          "explanation": "Dasar pengenaan PBB adalah Nilai Jual Objek Pajak (NJOP).",
+          "ref": "UU 12/1994; UU 1/2022 (HKPD)",
+          "accept": [
+            "nilai jual objek pajak"
+          ],
+          "pembahasan": {
+            "konsep": "Dasar pengenaan PBB (P2 maupun P3) adalah Nilai Jual Objek Pajak (NJOP).",
+            "dasar": "UU 12/1985 jo. UU 12/1994; UU 1/2022 (HKPD) Pasal 41",
+            "jebakan": "Memakai harga transaksi atau biaya perolehan; dasar PBB adalah NJOP yang ditetapkan.",
+            "ingat": "PBB berdasar NJOP."
+          }
         },
         {
-          "q": "PBB termasuk jenis pajak apa?",
           "type": "text",
-          "answer": "pajak daerah",
-          "explanation": "PBB merupakan pajak daerah karena pemungutannya dilakukan oleh pemerintah daerah sesuai aturan setempat.",
-          "ref": "PBB"
+          "q": "Apakah PBB atas rumah tinggal di perkotaan termasuk PBB-P3? (ya/tidak)",
+          "answer": "tidak",
+          "explanation": "PBB rumah tinggal di perkotaan termasuk PBB-P2 (pajak daerah), bukan PBB-P3.",
+          "ref": "UU 1/2022 (HKPD) Pasal 38",
+          "accept": [
+            "bukan"
+          ],
+          "pembahasan": {
+            "konsep": "PBB rumah tinggal di perkotaan termasuk PBB-P2 (pajak daerah), bukan PBB-P3.",
+            "dasar": "UU 1/2022 (HKPD) Pasal 38",
+            "jebakan": "Mengira semua PBB yang berstatus perusahaan masuk P3. Yang menentukan adalah sektor kawasan, bukan jenis pemilik.",
+            "ingat": "Rumah/ruko/gedung = P2."
+          }
         }
       ]
     },
     {
       "key": "bea_materai",
       "title": "Bea Materai",
-      "summary": "Pajak atas dokumen tertentu yang berfungsi sebagai bukti legalitas dan keabsahan dokumen. Tarif yang berlaku saat ini: tarif tunggal Rp10.000 untuk semua dokumen yang terutang Bea Meterai, sesuai UU No. 10 Tahun 2020.",
+      "summary": "Bea meterai adalah pajak atas dokumen tertentu, dikenakan satu kali per dokumen dengan tarif tunggal Rp10.000 (UU 10/2020), antara lain atas dokumen yang menyebut jumlah uang lebih dari Rp5.000.000. Meterai bukan syarat keabsahan perjanjian: dokumen tanpa meterai tetap sah secara perdata, tetapi belum dapat langsung dijadikan alat bukti di pengadilan sebelum dilunasi lewat pemeteraian kemudian.",
       "questions": [
         {
           "q": "Bea materai dikenakan pada apa?",
@@ -213,29 +421,74 @@
             "Pajak penghasilan"
           ],
           "answer": "Dokumen tertentu",
-          "explanation": "Bea materai dikenakan pada dokumen tertentu yang ditentukan peraturan, seperti surat perjanjian atau kuitansi.",
-          "ref": "Bea Materai"
+          "explanation": "Bea meterai dikenakan pada dokumen tertentu, seperti surat perjanjian atau kuitansi yang menyebut uang lebih dari Rp5 juta.",
+          "ref": "Bea Materai",
+          "pembahasan": {
+            "konsep": "Bea meterai adalah pajak atas dokumen, dikenakan sekali untuk setiap dokumen tertentu: dokumen perdata dan dokumen yang dipakai sebagai alat bukti di pengadilan.",
+            "dasar": "UU 10/2020 Pasal 1 dan 3",
+            "jebakan": "Mengira semua dokumen wajib bermeterai. Hanya dokumen tertentu, antara lain yang menyebut jumlah uang lebih dari Rp5 juta.",
+            "ingat": "Meterai = pajak atas dokumen.",
+            "salah": {
+              "Barang konsumsi": "Barang konsumsi dikenai PPN/cukai, bukan bea meterai.",
+              "Layanan transportasi": "Layanan transportasi dikenai PPN/pajak lain, bukan bea meterai.",
+              "Pajak penghasilan": "Bea meterai bukan pajak atas penghasilan."
+            }
+          }
         },
         {
           "q": "Sebutkan satu contoh dokumen yang sering memerlukan materai.",
           "type": "text",
           "answer": "surat perjanjian",
           "explanation": "Surat perjanjian adalah contoh dokumen yang sering dikenakan bea materai.",
-          "ref": "Bea Materai"
+          "ref": "Bea Materai",
+          "accept": [
+            "perjanjian",
+            "kuitansi",
+            "kwitansi",
+            "akta",
+            "surat kuasa",
+            "surat pernyataan",
+            "surat utang"
+          ],
+          "pembahasan": {
+            "konsep": "Dokumen yang menyatakan penerimaan uang atau pengakuan utang dengan nilai lebih dari Rp5.000.000 adalah objek meterai. Surat perjanjian, surat kuasa, dan akta notaris juga objek meterai.",
+            "dasar": "UU 10/2020 Pasal 3 dan 5 (tarif Rp10.000)",
+            "jebakan": "Slip gaji, ijazah, dan tanda terima gaji dikecualikan dari bea meterai.",
+            "ingat": "Perjanjian, kuitansi > Rp5 juta, akta."
+          }
         },
         {
-          "q": "Apa fungsi utama bea materai?",
           "type": "text",
-          "answer": "menjamin keabsahan dokumen",
-          "explanation": "Bea materai memberikan tanda atau bukti bahwa dokumen memiliki status resmi dan sah secara hukum.",
-          "ref": "Bea Materai"
+          "q": "Apakah dokumen yang belum dibubuhi meterai otomatis tidak sah secara perdata? (ya/tidak)",
+          "answer": "tidak",
+          "explanation": "Dokumen tanpa meterai tetap sah secara perdata antar pihak. Meterai adalah pajak atas dokumen, bukan syarat keabsahan; hanya saja dokumen itu belum dapat langsung dipakai sebagai alat bukti di pengadilan sebelum bea meterainya dilunasi (pemeteraian kemudian).",
+          "ref": "UU 10/2020",
+          "accept": [
+            "tetap sah",
+            "bukan"
+          ],
+          "pembahasan": {
+            "konsep": "Dokumen tanpa meterai tetap sah secara perdata antar pihak. Meterai adalah pajak atas dokumen, bukan syarat keabsahan. Akibatnya, dokumen itu belum dapat langsung dijadikan alat bukti di pengadilan sebelum bea meterainya dilunasi lewat pemeteraian kemudian.",
+            "dasar": "UU 10/2020 (pemeteraian kemudian dikenai sanksi 100% dari bea terutang)",
+            "jebakan": "Anggapan umum bahwa meterai menentukan sah-tidaknya perjanjian adalah keliru.",
+            "ingat": "Meterai = pajak, bukan stempel keabsahan."
+          }
         },
         {
           "q": "Bea materai termasuk jenis pajak atas apa?",
           "type": "text",
           "answer": "dokumen",
           "explanation": "Bea materai adalah pajak yang dikenakan atas dokumen tertentu, bukan atas barang atau jasa.",
-          "ref": "Bea Materai"
+          "ref": "Bea Materai",
+          "accept": [
+            "dokumen"
+          ],
+          "pembahasan": {
+            "konsep": "Bea meterai adalah pajak atas dokumen, bukan atas barang atau jasa.",
+            "dasar": "UU 10/2020 Pasal 1 ayat (1)",
+            "jebakan": "Menyamakan dengan PPN atas barang/jasa.",
+            "ingat": "Objek: dokumen. Tarif tunggal Rp10.000."
+          }
         }
       ]
     },
@@ -255,28 +508,76 @@
           ],
           "answer": "Rokok dan minuman beralkohol",
           "explanation": "Cukai umumnya dikenakan pada barang-barang tertentu seperti rokok, minuman beralkohol, dan produk lain yang dikendalikan.",
-          "ref": "Bea Cukai"
+          "ref": "Bea Cukai",
+          "pembahasan": {
+            "konsep": "Cukai dikenakan atas barang tertentu yang konsumsinya perlu dikendalikan, antara lain hasil tembakau (rokok), etil alkohol, dan minuman beralkohol.",
+            "dasar": "UU 11/1995 jo. UU 39/2007 (Cukai)",
+            "jebakan": "Mengira cukai = pajak untuk semua barang konsumsi; hanya barang tertentu.",
+            "ingat": "Cukai: rokok, alkohol, dan barang yang dikendalikan.",
+            "salah": {
+              "Buku pelajaran": "Buku pelajaran bukan barang kena cukai.",
+              "Pakaian kerja": "Pakaian kerja bukan barang kena cukai.",
+              "Alat tulis": "Alat tulis bukan barang kena cukai."
+            }
+          }
         },
         {
           "q": "Apa yang dimaksud dengan bea masuk?",
           "type": "text",
           "answer": "pajak atas barang impor",
           "explanation": "Bea masuk adalah pungutan atas barang yang masuk ke wilayah pabean Indonesia.",
-          "ref": "Bea Cukai"
+          "ref": "Bea Cukai",
+          "accept": [
+            "barang impor",
+            "impor",
+            "pungutan atas barang impor"
+          ],
+          "pembahasan": {
+            "konsep": "Bea masuk adalah pungutan negara atas barang yang diimpor, yaitu masuk ke daerah pabean.",
+            "dasar": "UU 10/1995 jo. UU 17/2006 (Kepabeanan)",
+            "jebakan": "Menyamakan bea masuk dengan PPN impor. Keduanya dipungut terpisah.",
+            "ingat": "Bea masuk = pajak barang impor."
+          }
         },
         {
           "q": "Tujuan utama penerapan cukai adalah ...",
           "type": "text",
           "answer": "mengendalikan konsumsi dan melindungi kesehatan",
           "explanation": "Cukai diterapkan untuk mengendalikan konsumsi barang tertentu dan menjaga dampak sosial serta kesehatan masyarakat.",
-          "ref": "Bea Cukai"
+          "ref": "Bea Cukai",
+          "accept": [
+            "mengendalikan konsumsi",
+            "pengendalian konsumsi",
+            "membatasi konsumsi",
+            "melindungi kesehatan"
+          ],
+          "pembahasan": {
+            "konsep": "Cukai diterapkan untuk mengendalikan konsumsi dan peredaran barang yang berdampak sosial atau kesehatan.",
+            "dasar": "UU 11/1995 jo. UU 39/2007 (Cukai)",
+            "jebakan": "Menganggap tujuan utamanya sekadar menambah penerimaan.",
+            "ingat": "Cukai = rem konsumsi."
+          }
         },
         {
           "q": "Bea cukai dikelola oleh lembaga apa?",
           "type": "text",
           "answer": "dirjen bea cukai",
           "explanation": "Bea cukai dikelola oleh Direktorat Jenderal Bea dan Cukai sebagai bagian dari otoritas kepabeanan.",
-          "ref": "Bea Cukai"
+          "ref": "Bea Cukai",
+          "accept": [
+            "dirjen bea cukai",
+            "direktorat jenderal bea dan cukai",
+            "djbc",
+            "bea dan cukai",
+            "kementerian keuangan",
+            "kemenkeu"
+          ],
+          "pembahasan": {
+            "konsep": "Bea dan cukai dikelola Direktorat Jenderal Bea dan Cukai (DJBC) di bawah Kementerian Keuangan.",
+            "dasar": "UU Kepabeanan dan UU Cukai",
+            "jebakan": "Tertukar dengan DJP, yang mengelola pajak (PPh, PPN).",
+            "ingat": "DJBC ≠ DJP."
+          }
         }
       ]
     },
@@ -296,69 +597,163 @@
           ],
           "answer": "Saat terjadi perolehan hak atas tanah dan bangunan",
           "explanation": "BPHTB timbul ketika terjadi perolehan hak atas tanah dan/atau bangunan melalui transaksi tertentu.",
-          "ref": "BPHTB"
+          "ref": "BPHTB",
+          "pembahasan": {
+            "konsep": "BPHTB terutang saat terjadi perolehan hak atas tanah dan/atau bangunan, misalnya karena jual beli, hibah, atau waris.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Mengira BPHTB dibayar penjual. Pihak yang memperoleh hak (pembeli/penerima) yang membayar.",
+            "ingat": "BPHTB = pajak pihak yang memperoleh hak.",
+            "salah": {
+              "Saat menerima gaji bulanan": "Gaji bulanan dikenai PPh 21.",
+              "Saat memproduksi barang": "Memproduksi barang tidak menimbulkan BPHTB.",
+              "Saat membayar PPN": "PPN dibayar atas barang/jasa, bukan perolehan hak tanah."
+            }
+          }
         },
         {
           "q": "Sebutkan satu contoh transaksi yang memicu BPHTB.",
           "type": "text",
           "answer": "jual beli tanah",
           "explanation": "Transaksi jual beli tanah atau bangunan merupakan contoh perolehan hak yang menimbulkan BPHTB.",
-          "ref": "BPHTB"
+          "ref": "BPHTB",
+          "accept": [
+            "jual beli",
+            "hibah",
+            "waris",
+            "tukar menukar",
+            "pemberian hak",
+            "lelang"
+          ],
+          "pembahasan": {
+            "konsep": "Transaksi yang memicu BPHTB: jual beli, tukar-menukar, hibah, waris, pemberian hak baru, dan lelang.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Pengalihan oleh penjual dikenai PPh final, bukan BPHTB. Dua pajak berbeda atas satu transaksi.",
+            "ingat": "Jual beli, hibah, waris."
+          }
         },
         {
           "q": "Objek BPHTB adalah ...",
           "type": "text",
           "answer": "hak atas tanah dan bangunan",
           "explanation": "Objek BPHTB adalah perolehan hak atas tanah dan/atau bangunan yang ditetapkan oleh aturan.",
-          "ref": "BPHTB"
+          "ref": "BPHTB",
+          "accept": [
+            "perolehan hak atas tanah",
+            "perolehan hak atas tanah dan bangunan",
+            "perolehan hak",
+            "hak atas tanah"
+          ],
+          "pembahasan": {
+            "konsep": "Objek BPHTB adalah perolehan hak atas tanah dan/atau bangunan.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Objeknya bukan tanah/bangunan itu sendiri (itu PBB), melainkan perolehan haknya.",
+            "ingat": "BPHTB = perolehan hak, PBB = kepemilikan."
+          }
         },
         {
           "q": "BPHTB biasanya dipungut oleh ...",
           "type": "text",
           "answer": "pemda",
           "explanation": "BPHTB merupakan pajak daerah yang dipungut berdasarkan ketentuan pemerintah daerah.",
-          "ref": "BPHTB"
+          "ref": "BPHTB",
+          "accept": [
+            "pemerintah daerah",
+            "pemda",
+            "pemkab",
+            "kabupaten",
+            "kota"
+          ],
+          "pembahasan": {
+            "konsep": "BPHTB adalah pajak kabupaten/kota yang dipungut pemerintah daerah. Tarif paling tinggi 5% dari NPOP setelah dikurangi NPOPTKP.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Dulu BPHTB dipungut pusat; sejak 2011 menjadi pajak daerah.",
+            "ingat": "BPHTB = daerah."
+          }
         }
       ]
     },
     {
       "key": "pbb_p2",
-      "title": "PBB-P2 (Pajak Bumi dan Bangunan Perdesaan & Perkotaan untuk Perusahaan)",
-      "summary": "PBB-P2 adalah bentuk PBB yang terkait dengan objek pajak yang dipakai untuk kegiatan usaha atau badan. Tarif yang berlaku saat ini: sama seperti PBB Perdesaan dan Perkotaan pada umumnya, paling tinggi 0,5% dari NJOP setelah dikurangi NJOPTKP, sesuai UU HKPD; besaran final ditetapkan oleh Perda masing-masing daerah.",
+      "title": "PBB-P2 (Perdesaan & Perkotaan)",
+      "summary": "PBB-P2 adalah pajak kabupaten/kota atas bumi dan/atau bangunan yang dimiliki, dikuasai, dan/atau dimanfaatkan orang pribadi atau badan, kecuali kawasan usaha perkebunan, perhutanan, dan pertambangan (itu PBB-P3). Dasar pengenaannya NJOP setelah dikurangi NJOPTKP (paling sedikit Rp10 juta). Tarif paling tinggi 0,5% (Pasal 41 UU HKPD); besar finalnya ditetapkan Perda.",
       "questions": [
         {
-          "q": "PBB-P2 biasanya terkait dengan siapa?",
           "type": "mcq",
+          "q": "Siapa subjek PBB-P2?",
           "options": [
-            "Badan atau perusahaan",
-            "Pekerja harian",
-            "Pengusaha kecil tanpa bangunan",
-            "Pelanggan rumah tangga"
+            "Orang pribadi maupun badan yang memiliki, menguasai, atau memanfaatkan bumi/bangunan",
+            "Hanya badan atau perusahaan",
+            "Hanya pemilik tanah bersertifikat",
+            "Hanya pengusaha besar"
           ],
-          "answer": "Badan atau perusahaan",
-          "explanation": "PBB-P2 dikenal sebagai PBB yang terkait dengan subjek pajak badan atau perusahaan dalam kegiatan usaha.",
-          "ref": "PBB-P2"
+          "answer": "Orang pribadi maupun badan yang memiliki, menguasai, atau memanfaatkan bumi/bangunan",
+          "explanation": "Subjek PBB-P2 adalah orang pribadi atau badan yang memiliki, menguasai, atau memanfaatkan bumi dan/atau bangunan.",
+          "ref": "UU 1/2022 (HKPD) Pasal 38",
+          "pembahasan": {
+            "konsep": "Subjek PBB-P2 adalah orang pribadi maupun badan yang memiliki, menguasai, atau memanfaatkan bumi dan/atau bangunan, kecuali kawasan usaha perkebunan, perhutanan, dan pertambangan.",
+            "dasar": "UU 1/2022 (HKPD) Pasal 38 ayat (1)",
+            "jebakan": "Mengira PBB-P2 hanya untuk perusahaan.",
+            "ingat": "Siapa pun yang memiliki/menguasai/memanfaatkan.",
+            "salah": {
+              "Hanya badan atau perusahaan": "PBB-P2 tidak hanya untuk badan; rumah tinggal orang pribadi juga objeknya.",
+              "Hanya pemilik tanah bersertifikat": "Sertifikat bukan syarat; yang menentukan adalah pemilikan, penguasaan, atau pemanfaatan.",
+              "Hanya pengusaha besar": "Tidak ada syarat \"pengusaha besar\"."
+            }
+          }
         },
         {
+          "type": "text",
           "q": "Dasar pengenaan PBB-P2 adalah apa?",
-          "type": "text",
           "answer": "njop",
-          "explanation": "Seperti PBB pada umumnya, dasar pengenaan PBB-P2 adalah NJOP objek pajak.",
-          "ref": "PBB-P2"
+          "explanation": "Dasar pengenaan PBB-P2 adalah NJOP setelah dikurangi NJOPTKP.",
+          "ref": "UU 1/2022 (HKPD) Pasal 41",
+          "accept": [
+            "nilai jual objek pajak"
+          ],
+          "pembahasan": {
+            "konsep": "Dasar pengenaan PBB-P2 adalah NJOP (setelah dikurangi NJOPTKP).",
+            "dasar": "UU 1/2022 (HKPD) Pasal 41; NJOPTKP paling sedikit Rp10 juta",
+            "jebakan": "Tarif paling tinggi 0,5% dan besar finalnya ditetapkan Perda masing-masing daerah.",
+            "ingat": "NJOP − NJOPTKP."
+          }
         },
         {
-          "q": "PBB-P2 merupakan bagian dari pajak apa?",
           "type": "text",
+          "q": "PBB-P2 merupakan bagian dari pajak apa? (pusat/daerah)",
           "answer": "pajak daerah",
-          "explanation": "PBB-P2 merupakan bagian dari pajak daerah yang dipungut berdasarkan ketentuan daerah.",
-          "ref": "PBB-P2"
+          "explanation": "PBB-P2 adalah pajak kabupaten/kota yang dikelola dan hasilnya masuk kas daerah.",
+          "ref": "UU 1/2022 (HKPD)",
+          "accept": [
+            "daerah",
+            "kabupaten",
+            "pemda"
+          ],
+          "pembahasan": {
+            "konsep": "PBB-P2 adalah pajak kabupaten/kota yang dikelola dan hasilnya masuk kas daerah.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Pada masa lalu PBB dipungut pusat; kini PBB-P2 dialihkan ke daerah.",
+            "ingat": "P2 = pajak daerah."
+          }
         },
         {
-          "q": "Objek PBB-P2 biasanya berupa ...",
           "type": "text",
-          "answer": "tanah dan bangunan usaha",
-          "explanation": "Objek pajak dalam PBB-P2 biasanya terkait dengan tanah dan bangunan yang dipakai untuk kegiatan usaha.",
-          "ref": "PBB-P2"
+          "q": "Objek PBB-P2 biasanya berupa ...",
+          "answer": "tanah dan bangunan",
+          "explanation": "Objek PBB-P2 adalah bumi dan/atau bangunan, termasuk rumah tinggal, ruko, apartemen, dan gedung perkantoran.",
+          "ref": "UU 1/2022 (HKPD) Pasal 38",
+          "accept": [
+            "tanah dan bangunan",
+            "bumi dan bangunan",
+            "bumi dan/atau bangunan",
+            "tanah",
+            "bangunan"
+          ],
+          "pembahasan": {
+            "konsep": "Objek PBB-P2 adalah bumi dan/atau bangunan yang dimiliki, dikuasai, atau dimanfaatkan, mencakup rumah tinggal, ruko, apartemen, dan gedung perkantoran.",
+            "dasar": "UU 1/2022 (HKPD) Pasal 38",
+            "jebakan": "Menganggap objeknya hanya \"tanah dan bangunan usaha\". Hunian pribadi pun termasuk.",
+            "ingat": "Bumi dan/atau bangunan."
+          }
         }
       ]
     },
@@ -378,28 +773,75 @@
           ],
           "answer": "Pelayanan makanan dan minuman",
           "explanation": "Pajak restoran dikenakan pada pelayanan penyediaan makanan dan minuman di restoran atau sejenisnya.",
-          "ref": "Pajak Restoran"
+          "ref": "Pajak Restoran",
+          "pembahasan": {
+            "konsep": "Pajak restoran kini menjadi bagian dari PBJT atas makanan dan/atau minuman, yang dikenakan atas penjualan makanan dan minuman di restoran dan sejenisnya.",
+            "dasar": "UU 1/2022 (HKPD) — PBJT",
+            "jebakan": "Menyebut \"pajak restoran\" tanpa tahu istilah barunya PBJT atas makanan dan minuman.",
+            "ingat": "Restoran = PBJT makanan/minuman.",
+            "salah": {
+              "Penjualan kendaraan": "Penjualan kendaraan dikenai pajak kendaraan/PPN.",
+              "Pengiriman barang ekspor": "Ekspor umumnya dikenai PPN 0%.",
+              "Sewa gedung kantor": "Sewa gedung kantor bukan objek pajak restoran."
+            }
+          }
         },
         {
           "q": "Pajak restoran dipungut oleh siapa?",
           "type": "text",
           "answer": "pemda",
           "explanation": "Pajak restoran adalah pajak daerah yang dipungut oleh pemerintah daerah.",
-          "ref": "Pajak Restoran"
+          "ref": "Pajak Restoran",
+          "accept": [
+            "pemerintah daerah",
+            "pemda",
+            "kabupaten",
+            "kota"
+          ],
+          "pembahasan": {
+            "konsep": "PBJT/pajak restoran dipungut pemerintah daerah (kabupaten/kota).",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Pajak ini dibayar konsumen dan disetor oleh pengusaha restoran.",
+            "ingat": "Pajak daerah."
+          }
         },
         {
           "q": "Sebutkan satu contoh tempat yang biasanya dikenai pajak restoran.",
           "type": "text",
           "answer": "restoran",
           "explanation": "Restoran, rumah makan, dan kafe termasuk objek pajak restoran.",
-          "ref": "Pajak Restoran"
+          "ref": "Pajak Restoran",
+          "accept": [
+            "restoran",
+            "rumah makan",
+            "kafe",
+            "cafe",
+            "warung",
+            "katering",
+            "kantin"
+          ],
+          "pembahasan": {
+            "konsep": "Restoran, rumah makan, kafe, warung, dan katering termasuk penyedia makanan/minuman yang menjadi objek PBJT.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Tarif paling tinggi 10% dari nilai transaksi dan ditetapkan Perda.",
+            "ingat": "Restoran, kafe, katering."
+          }
         },
         {
           "q": "Pajak restoran termasuk jenis pajak apa?",
           "type": "text",
           "answer": "pajak daerah",
           "explanation": "Pajak restoran merupakan salah satu jenis pajak daerah yang pendapatannya masuk ke kas daerah.",
-          "ref": "Pajak Restoran"
+          "ref": "Pajak Restoran",
+          "accept": [
+            "daerah"
+          ],
+          "pembahasan": {
+            "konsep": "Pajak restoran adalah pajak daerah yang hasilnya masuk kas daerah.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Tidak masuk kas pusat.",
+            "ingat": "Daerah."
+          }
         }
       ]
     },
@@ -419,28 +861,71 @@
           ],
           "answer": "Luas, lokasi, dan lama pemasangan",
           "explanation": "Besaran pajak reklame biasanya dipengaruhi oleh ukuran reklame, zona lokasi, dan masa pemasangannya.",
-          "ref": "Pajak Reklame"
+          "ref": "Pajak Reklame",
+          "pembahasan": {
+            "konsep": "Nilai sewa dan pajak reklame dipengaruhi luas, lokasi (zona), dan jangka waktu pemasangan.",
+            "dasar": "UU 1/2022 (HKPD) — Pajak Reklame; tarif paling tinggi 25% dari nilai sewa",
+            "jebakan": "Menyangka pajak ditentukan isi pesan reklame.",
+            "ingat": "Luas, lokasi, lama.",
+            "salah": {
+              "Warna logo perusahaan": "Warna logo tidak memengaruhi nilai sewa reklame.",
+              "Jumlah karyawan": "Jumlah karyawan pemasang tidak relevan.",
+              "Jenis printer yang dipakai": "Jenis printer tidak relevan."
+            }
+          }
         },
         {
           "q": "Sebutkan satu contoh objek reklame.",
           "type": "text",
           "answer": "baliho",
           "explanation": "Baliho, billboard, dan spanduk adalah contoh reklame yang sering dikenai pajak reklame.",
-          "ref": "Pajak Reklame"
+          "ref": "Pajak Reklame",
+          "accept": [
+            "baliho",
+            "billboard",
+            "spanduk",
+            "videotron",
+            "papan reklame",
+            "neon box"
+          ],
+          "pembahasan": {
+            "konsep": "Baliho, billboard, spanduk, videotron, dan papan reklame adalah contoh objek pajak reklame.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Reklame di dalam gedung untuk keperluan sendiri biasanya dikecualikan.",
+            "ingat": "Baliho dan sejenisnya."
+          }
         },
         {
           "q": "Pajak reklame termasuk jenis pajak apa?",
           "type": "text",
           "answer": "pajak daerah",
           "explanation": "Pajak reklame adalah pajak daerah yang dipungut oleh pemerintah daerah.",
-          "ref": "Pajak Reklame"
+          "ref": "Pajak Reklame",
+          "accept": [
+            "daerah"
+          ],
+          "pembahasan": {
+            "konsep": "Pajak reklame adalah pajak kabupaten/kota: pemungutannya oleh pemerintah daerah, hasilnya masuk kas daerah, dan tarifnya ditetapkan melalui Perda (paling tinggi 25% dari nilai sewa reklame).",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Tidak dipungut pusat.",
+            "ingat": "Daerah."
+          }
         },
         {
           "q": "Apakah pajak reklame dipungut oleh pemerintah pusat?",
           "type": "text",
           "answer": "tidak",
           "explanation": "Pajak reklame bukan pajak pusat, melainkan pajak daerah yang dikelola pemerintah daerah.",
-          "ref": "Pajak Reklame"
+          "ref": "Pajak Reklame",
+          "accept": [
+            "bukan"
+          ],
+          "pembahasan": {
+            "konsep": "Pajak reklame bukan pajak pusat; ia dikelola pemerintah daerah.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Mengira semua pajak atas iklan dipungut pusat.",
+            "ingat": "Reklame = daerah."
+          }
         }
       ]
     },
@@ -460,28 +945,77 @@
           ],
           "answer": "Penyelenggaraan hiburan",
           "explanation": "Pajak hiburan dikenakan pada berbagai kegiatan yang bersifat hiburan seperti konser, bioskop, dan pertunjukan.",
-          "ref": "Pajak Hiburan"
+          "ref": "Pajak Hiburan",
+          "pembahasan": {
+            "konsep": "Pajak hiburan kini bagian dari PBJT atas jasa kesenian dan hiburan, dikenakan atas penyelenggaraan hiburan seperti konser, bioskop, dan pertunjukan.",
+            "dasar": "UU 1/2022 (HKPD) — PBJT; tarif umum paling tinggi 10%, hiburan tertentu 40%–75%",
+            "jebakan": "Tarif 40%–75% hanya untuk hiburan tertentu (diskotek, karaoke, kelab malam, bar, spa), bukan semua hiburan.",
+            "ingat": "Hiburan = PBJT jasa kesenian dan hiburan.",
+            "salah": {
+              "Penjualan alat tulis": "Penjualan alat tulis bukan jasa hiburan.",
+              "Pembelian rumah": "Pembelian rumah dikenai BPHTB/PPN, bukan PBJT hiburan.",
+              "Pendidikan formal": "Pendidikan formal tidak termasuk objek."
+            }
+          }
         },
         {
           "q": "Sebutkan satu contoh objek pajak hiburan.",
           "type": "text",
           "answer": "bioskop",
           "explanation": "Bioskop adalah contoh objek pajak hiburan yang umum diketahui.",
-          "ref": "Pajak Hiburan"
+          "ref": "Pajak Hiburan",
+          "accept": [
+            "bioskop",
+            "konser",
+            "pertunjukan",
+            "karaoke",
+            "diskotek",
+            "pameran",
+            "pacuan",
+            "sirkus",
+            "permainan ketangkasan"
+          ],
+          "pembahasan": {
+            "konsep": "Bioskop, konser, pertunjukan, karaoke, dan diskotek adalah contoh penyelenggaraan hiburan yang menjadi objek.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Tidak semua pertunjukan dikenai; sebagian dikecualikan (mis. untuk kegiatan sosial).",
+            "ingat": "Bioskop, konser."
+          }
         },
         {
           "q": "Dasar pengenaan pajak hiburan bisa berupa apa?",
           "type": "text",
           "answer": "harga tiket",
           "explanation": "Pajak hiburan sering kali dihitung berdasarkan harga tiket atau penerimaan dari penyelenggaraan kegiatan hiburan.",
-          "ref": "Pajak Hiburan"
+          "ref": "Pajak Hiburan",
+          "accept": [
+            "tiket",
+            "penerimaan",
+            "tanda masuk",
+            "jumlah uang yang diterima"
+          ],
+          "pembahasan": {
+            "konsep": "Dasar pengenaan pajak hiburan adalah jumlah uang yang diterima atau seharusnya diterima penyelenggara, umumnya berupa penjualan tiket atau tanda masuk.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Pajak dihitung dari nilai transaksi, bukan dari laba penyelenggara.",
+            "ingat": "Harga tiket × tarif."
+          }
         },
         {
           "q": "Pajak hiburan termasuk jenis pajak apa?",
           "type": "text",
           "answer": "pajak daerah",
           "explanation": "Pajak hiburan adalah pajak daerah yang diatur oleh wilayah setempat.",
-          "ref": "Pajak Hiburan"
+          "ref": "Pajak Hiburan",
+          "accept": [
+            "daerah"
+          ],
+          "pembahasan": {
+            "konsep": "Pajak hiburan (kini PBJT atas jasa kesenian dan hiburan) adalah pajak kabupaten/kota: dipungut pemerintah daerah dan hasilnya masuk kas daerah.",
+            "dasar": "UU 1/2022 (HKPD)",
+            "jebakan": "Tidak dipungut pusat.",
+            "ingat": "Daerah."
+          }
         }
       ]
     },
@@ -501,28 +1035,79 @@
           ],
           "answer": "Mengurangi emisi karbon",
           "explanation": "Pajak karbon bertujuan untuk menekan emisi gas rumah kaca dan mendorong pengurangan dampak lingkungan.",
-          "ref": "Pajak Karbon"
+          "ref": "Pajak Karbon",
+          "pembahasan": {
+            "konsep": "Tujuan utama pajak karbon adalah menekan emisi gas rumah kaca dengan memberi sinyal harga pada emisi karbon.",
+            "dasar": "UU 7/2021 (HPP) Bab VI (Pajak Karbon)",
+            "jebakan": "Menyamakan pajak karbon dengan pajak penghasilan.",
+            "ingat": "Pajak karbon = harga untuk emisi.",
+            "salah": {
+              "Meningkatkan konsumsi listrik": "Pajak karbon justru mendorong efisiensi energi, bukan menaikkan konsumsi listrik.",
+              "Menghapus pajak daerah": "Tidak menghapus pajak daerah.",
+              "Mempermudah ekspor tanpa aturan": "Bukan soal kemudahan ekspor."
+            }
+          }
         },
         {
           "q": "Pajak karbon biasanya dikenakan pada apa?",
           "type": "text",
           "answer": "emisi",
           "explanation": "Pajak karbon berfokus pada emisi karbon yang dihasilkan oleh aktivitas ekonomi dan industri.",
-          "ref": "Pajak Karbon"
+          "ref": "Pajak Karbon",
+          "accept": [
+            "emisi",
+            "karbon",
+            "co2",
+            "gas rumah kaca"
+          ],
+          "pembahasan": {
+            "konsep": "Pajak karbon dikenakan atas emisi karbon (CO2 ekuivalen) yang memberikan dampak negatif bagi lingkungan.",
+            "dasar": "UU 7/2021 (HPP) Bab VI",
+            "jebakan": "Dikenakan atas emisi, bukan atas penggunaan listrik itu sendiri.",
+            "ingat": "Objek: emisi karbon."
+          }
         },
         {
           "q": "Pajak karbon memiliki sisi apa?",
           "type": "text",
           "answer": "fiskal dan lingkungan",
           "explanation": "Pajak karbon tidak hanya berkaitan dengan penerimaan negara, tetapi juga dengan tujuan lingkungan dan pengurangan emisi.",
-          "ref": "Pajak Karbon"
+          "ref": "Pajak Karbon",
+          "accept": [
+            "fiskal dan lingkungan",
+            "lingkungan dan fiskal",
+            "fiskal",
+            "lingkungan"
+          ],
+          "pembahasan": {
+            "konsep": "Pajak karbon punya dua sisi: fiskal (penerimaan negara) dan lingkungan (pengurangan emisi).",
+            "dasar": "UU 7/2021 (HPP) Bab VI",
+            "jebakan": "Menyebut hanya sisi penerimaan.",
+            "ingat": "Fiskal + lingkungan."
+          }
         },
         {
           "q": "Sebutkan satu sektor yang dapat dikenai pajak karbon.",
           "type": "text",
           "answer": "energi",
           "explanation": "Sektor energi, industri, dan transportasi adalah contoh bidang yang sering dikaitkan dengan emisi karbon.",
-          "ref": "Pajak Karbon"
+          "ref": "Pajak Karbon",
+          "accept": [
+            "energi",
+            "industri",
+            "transportasi",
+            "pltu",
+            "listrik",
+            "batu bara",
+            "batubara",
+            "pembangkit"
+          ],
+          "pembahasan": {
+            "konsep": "Sektor energi (terutama pembangkit listrik batu bara), industri, dan transportasi adalah sumber emisi besar yang dikaitkan dengan pajak karbon.",
+            "dasar": "UU 7/2021 (HPP) Bab VI",
+            "jebakan": "Penerapan di lapangan bertahap dan dimulai dari PLTU batu bara; status terbarunya perlu dicek.",
+            "ingat": "Energi, industri, transportasi."
+          }
         }
       ]
     },
@@ -542,21 +1127,52 @@
           ],
           "answer": "Pihak yang membayarkan penghasilan (mis. perusahaan pemberi jasa/penyewa)",
           "explanation": "Berbeda dengan pajak yang dibayar sendiri, PPh 23 dipotong oleh pihak PEMBERI penghasilan pada saat pembayaran dilakukan, lalu disetorkan ke kas negara atas nama pihak yang menerima penghasilan.",
-          "ref": "UU PPh Pasal 23"
+          "ref": "UU PPh Pasal 23",
+          "pembahasan": {
+            "konsep": "PPh 23 dipotong oleh pihak yang membayar (pemberi penghasilan) pada saat pembayaran, lalu disetor atas nama penerima.",
+            "dasar": "UU 7/1983 (PPh) Pasal 23",
+            "jebakan": "Mengira penerima yang harus membayar sendiri.",
+            "ingat": "Yang membayar yang memotong.",
+            "salah": {
+              "Pihak yang menerima penghasilan": "Penerima menerima penghasilan setelah dipotong; potongan menjadi kredit pajaknya.",
+              "Kantor pajak setempat": "Kantor pajak menerima setoran dan mengawasi, bukan pemotong.",
+              "Bank tempat transaksi dilakukan": "Bank hanya tempat setor, bukan pemotong."
+            }
+          }
         },
         {
           "q": "PT Sejahtera membayar royalti sebesar Rp 60.000.000 kepada PT Kreasi (badan, ber-NPWP). Berapa PPh 23 yang harus dipotong? (Rp)",
           "type": "number",
           "answer": 9000000,
           "explanation": "Royalti dikenakan tarif 15% dari jumlah bruto: 15% x Rp 60.000.000 = Rp 9.000.000.",
-          "ref": "UU HPP Pasal 23"
+          "ref": "UU PPh Pasal 23",
+          "pembahasan": {
+            "konsep": "Royalti termasuk kelompok tarif 15% dari jumlah bruto (tidak termasuk PPN).",
+            "dasar": "UU PPh Pasal 23 ayat (1) huruf a",
+            "langkah": [
+              "Dasar = jumlah bruto Rp60.000.000",
+              "PPh 23 = 15% × 60.000.000 = Rp9.000.000"
+            ],
+            "jebakan": "Memakai tarif 2% (kelompok jasa/sewa) untuk royalti.",
+            "ingat": "15%: dividen, bunga, royalti, hadiah. 2%: sewa harta dan jasa."
+          }
         },
         {
           "q": "Sebuah kantor membayar jasa konsultan sebesar Rp 10.000.000 kepada penyedia jasa yang TIDAK memiliki NPWP. Berapa PPh 23 yang harus dipotong? (Rp)",
           "type": "number",
           "answer": 400000,
           "explanation": "Jasa konsultan termasuk kelompok tarif 2%, tetapi karena penerima tidak ber-NPWP, tarifnya menjadi 2 kali lipat (4%): 4% x Rp 10.000.000 = Rp 400.000.",
-          "ref": "UU PPh Pasal 23 jo. Pasal 21 ayat (5a)"
+          "ref": "UU PPh Pasal 23 (tarif 100% lebih tinggi tanpa NPWP)",
+          "pembahasan": {
+            "konsep": "Jasa konsultan termasuk tarif 2%. Penerima tanpa NPWP dikenai tarif 100% lebih tinggi, sehingga menjadi 4%.",
+            "dasar": "UU PPh Pasal 23 (tarif 100% lebih tinggi tanpa NPWP); PMK 141/PMK.03/2015",
+            "langkah": [
+              "Tarif normal 2% → tanpa NPWP 4%",
+              "4% × 10.000.000 = Rp400.000"
+            ],
+            "jebakan": "Lupa melipatduakan tarif sehingga menjawab Rp200.000. Tarif tinggi hanya ketika penerima tidak ber-NPWP.",
+            "ingat": "Tanpa NPWP: tarif ×2."
+          }
         },
         {
           "q": "Manakah dari berikut ini yang DIKECUALIKAN dari pemotongan PPh Pasal 23?",
@@ -569,21 +1185,45 @@
           ],
           "answer": "Bunga yang dibayarkan kepada bank",
           "explanation": "Pembayaran bunga kepada bank dikecualikan dari objek PPh Pasal 23 karena bank sudah dikenai skema perpajakan tersendiri atas penghasilan bunganya.",
-          "ref": "UU PPh Pasal 23 ayat (4)"
+          "ref": "UU PPh Pasal 23 ayat (4)",
+          "pembahasan": {
+            "konsep": "Bunga yang dibayarkan kepada bank dikecualikan dari pemotongan PPh 23 (tercantum dalam daftar pengecualian).",
+            "dasar": "UU PPh Pasal 23 ayat (4)",
+            "jebakan": "Mengira semua bunga bebas PPh 23: yang dikecualikan adalah bunga kepada bank.",
+            "ingat": "Bank = dikecualikan.",
+            "salah": {
+              "Royalti kepada pencipta lagu": "Royalti adalah objek PPh 23 (15%).",
+              "Sewa alat berat kepada perusahaan penyewaan": "Sewa alat berat adalah sewa harta selain tanah/bangunan, objek PPh 23 (2%).",
+              "Jasa konsultan manajemen": "Jasa konsultan manajemen adalah jasa objek PPh 23 (2%)."
+            }
+          }
         },
         {
           "q": "Sewa tanah dan/atau bangunan dikenakan pajak final berdasarkan pasal berapa, BUKAN PPh Pasal 23?",
           "type": "text",
           "answer": "pasal 4 ayat 2",
           "explanation": "Sewa tanah dan/atau bangunan secara khusus dikeluarkan dari objek PPh Pasal 23 dan masuk ke PPh Final Pasal 4 ayat (2) dengan tarif 10% dari nilai bruto persewaan.",
-          "ref": "PP 34/2017"
+          "ref": "PP 34/2017",
+          "accept": [
+            "pasal 4 ayat 2",
+            "pasal 4 ayat (2)",
+            "4 ayat 2",
+            "4(2)",
+            "pasal 4(2)"
+          ],
+          "pembahasan": {
+            "konsep": "Sewa tanah dan/atau bangunan dikeluarkan dari PPh 23 dan dikenai PPh final Pasal 4 ayat (2) sebesar 10% dari jumlah bruto sewa.",
+            "dasar": "UU PPh Pasal 4 ayat (2); PP 34/2017",
+            "jebakan": "Menyewa mesin atau alat berat tetap PPh 23 (2%), hanya tanah/bangunan yang final.",
+            "ingat": "Tanah/bangunan = 4(2) final 10%."
+          }
         }
       ]
     },
     {
       "key": "pph-final",
       "title": "PPh Final Pasal 4 Ayat (2)",
-      "summary": "Pajak penghasilan yang bersifat FINAL atas jenis penghasilan tertentu — artinya dipotong/disetor sekali saat transaksi terjadi dan TIDAK diperhitungkan lagi (tidak jadi kredit pajak) dalam SPT Tahunan. Beberapa tarif utama: sewa tanah/bangunan 10% dari nilai bruto sewa (PP 34/2017); UMKM (peredaran bruto tidak lebih dari Rp4,8 miliar setahun) 0,5% dari peredaran bruto (PP 23/2018, berlaku maksimal 7 tahun untuk WP orang pribadi sejak terdaftar); bunga deposito dan tabungan 20% (PP 131/2000); dividen kepada WP orang pribadi dalam negeri 10% (PP 19/2009); hadiah undian 25% (PP 132/2000); jasa konstruksi bertarif final bervariasi (sekitar 1,75%-6%) tergantung kualifikasi usaha (PP 9/2022).",
+      "summary": "Pajak penghasilan yang bersifat FINAL atas jenis penghasilan tertentu — artinya dipotong/disetor sekali saat transaksi terjadi dan TIDAK diperhitungkan lagi (tidak jadi kredit pajak) dalam SPT Tahunan. Beberapa tarif utama: sewa tanah/bangunan 10% dari nilai bruto sewa (PP 34/2017); UMKM (peredaran bruto tidak lebih dari Rp4,8 miliar setahun) 0,5% dari peredaran bruto (PP 55/2022 sebagaimana diubah PP 20/2026; subjeknya Orang Pribadi, PT Perorangan, dan Koperasi, sedangkan PT/CV biasa hanya lewat ketentuan peralihan sampai akhir Tahun Pajak 2026); bunga deposito dan tabungan umumnya 20% (PP 131/2000; ada tarif lebih rendah untuk kondisi tertentu, mis. deposito dari devisa hasil ekspor); dividen kepada WP orang pribadi dalam negeri 10% final (Pasal 17 ayat (2c) UU PPh), tetapi dikecualikan dari objek PPh bila diinvestasikan di dalam negeri sesuai PMK 18/2021; hadiah undian 25% (PP 132/2000); jasa konstruksi bertarif final bervariasi (sekitar 1,75%-6%) tergantung kualifikasi usaha (PP 9/2022).",
       "questions": [
         {
           "q": "Apa arti \"final\" pada PPh Final Pasal 4 ayat (2)?",
@@ -596,41 +1236,90 @@
           ],
           "answer": "Pajak yang dipotong sudah menyelesaikan kewajiban pajak atas penghasilan itu, tidak dihitung ulang di SPT Tahunan",
           "explanation": "Sifat final berarti PPh yang sudah dipotong/disetor atas penghasilan tersebut dianggap SELESAI kewajibannya -- tidak digabung ke penghasilan lain dan tidak menjadi kredit pajak di SPT Tahunan.",
-          "ref": "UU PPh Pasal 4 ayat (2)"
+          "ref": "UU PPh Pasal 4 ayat (2)",
+          "pembahasan": {
+            "konsep": "Final berarti PPh yang sudah dipotong/disetor atas penghasilan itu menyelesaikan kewajiban pajaknya: tidak digabung ke penghasilan lain dan tidak menjadi kredit pajak di SPT Tahunan.",
+            "dasar": "UU PPh Pasal 4 ayat (2)",
+            "jebakan": "Mengkreditkan PPh final di SPT Tahunan; PPh final tidak dapat dikreditkan.",
+            "ingat": "Final = selesai, tidak dihitung lagi.",
+            "salah": {
+              "Pajak yang hanya dibayar satu kali seumur hidup Wajib Pajak": "Final tidak berarti sekali seumur hidup; berlaku pada tiap transaksi/masa.",
+              "Pajak yang jumlahnya sudah pasti sama setiap tahun": "Final tidak berarti jumlah tetap sama tiap tahun.",
+              "Pajak yang hanya berlaku untuk transaksi terakhir dalam setahun": "Final tidak terkait urutan transaksi."
+            }
+          }
         },
         {
           "q": "Pak Rudi menyewakan ruko miliknya seharga Rp 40.000.000 setahun. Berapa PPh Final yang harus dipotong penyewa? (Rp)",
           "type": "number",
           "answer": 4000000,
           "explanation": "Sewa tanah/bangunan dikenakan PPh Final 10% dari nilai bruto sewa: 10% x Rp 40.000.000 = Rp 4.000.000.",
-          "ref": "PP 34/2017"
+          "ref": "PP 34/2017",
+          "pembahasan": {
+            "konsep": "Sewa tanah/bangunan dikenai PPh final 10% dari nilai bruto sewa.",
+            "dasar": "PP 34/2017",
+            "langkah": [
+              "10% × 40.000.000 = Rp4.000.000"
+            ],
+            "jebakan": "Memakai PPh 23 (2%) sehingga menjawab Rp800.000.",
+            "ingat": "Sewa tanah/bangunan = 10% final."
+          }
         },
         {
-          "q": "Sebuah usaha UMKM (peredaran bruto di bawah Rp4,8 miliar/tahun) mencatat omzet Rp 20.000.000 pada suatu bulan. Berapa PPh Final terutang? (Rp)",
+          "q": "Sebuah usaha UMKM yang berhak memakai skema final (peredaran bruto di bawah Rp4,8 miliar/tahun; asumsikan batas bebas Rp500 juta khusus WP OP sudah terlampaui) mencatat omzet Rp 20.000.000 pada suatu bulan. Berapa PPh Final terutang? (Rp)",
           "type": "number",
           "answer": 100000,
-          "explanation": "PPh Final UMKM dihitung dari PEREDARAN BRUTO (omzet), bukan laba: 0,5% x Rp 20.000.000 = Rp 100.000.",
-          "ref": "PP 23/2018"
+          "explanation": "PPh Final UMKM dihitung dari PEREDARAN BRUTO (omzet), bukan laba: 0,5% x Rp 20.000.000 = Rp 100.000. Catatan: bagi WP Orang Pribadi, peredaran kumulatif s.d. Rp500 juta setahun tidak dikenai PPh final; soal ini mengasumsikan batas itu sudah terlampaui.",
+          "ref": "PP 55/2022 s.t.d.d. PP 20/2026",
+          "pembahasan": {
+            "konsep": "PPh final UMKM dihitung 0,5% dari peredaran bruto (omzet), bukan dari laba.",
+            "dasar": "PP 55/2022 s.t.d.d. PP 20/2026",
+            "langkah": [
+              "0,5% × 20.000.000 = Rp100.000"
+            ],
+            "jebakan": "Menghitung dari laba, atau lupa bahwa bagi WP OP peredaran kumulatif s.d. Rp500 juta setahun tidak dikenai (soal mengasumsikan batas itu sudah terlampaui).",
+            "ingat": "0,5% × omzet."
+          }
         },
         {
-          "q": "Berapa lama jangka waktu maksimal WP orang pribadi boleh memakai skema PPh Final UMKM 0,5% sejak terdaftar?",
+          "q": "Sebelum berlakunya PP 20/2026, berapa tahun pajak jangka waktu maksimal WP orang pribadi boleh memakai skema PPh Final UMKM 0,5% sejak terdaftar?",
           "type": "number",
           "answer": 7,
-          "explanation": "PP 23/2018 membatasi penggunaan tarif final 0,5% untuk WP orang pribadi maksimal 7 tahun pajak sejak terdaftar (lebih pendek untuk WP badan berbentuk CV/firma: 4 tahun, dan PT: 3 tahun).",
-          "ref": "PP 23/2018"
+          "explanation": "PP 23/2018 (dipertahankan PP 55/2022) membatasi final 0,5% untuk WP orang pribadi maksimal 7 tahun pajak sejak terdaftar (CV/firma/koperasi: 4 tahun, PT: 3 tahun). Catatan terbaru: menurut penjelasan DJP atas PP 20/2026, OP dan PT Perorangan dapat memakai skema ini tanpa batas jangka waktu selama syarat terpenuhi, koperasi maks. 4 tahun, sedangkan PT/CV biasa dikeluarkan setelah masa peralihan.",
+          "ref": "PP 23/2018; PP 55/2022 s.t.d.d. PP 20/2026",
+          "pembahasan": {
+            "konsep": "Sebelum PP 20/2026, WP orang pribadi boleh memakai final 0,5% paling lama 7 tahun pajak sejak terdaftar.",
+            "dasar": "PP 23/2018; PP 55/2022",
+            "langkah": [
+              "OP 7 tahun; CV/firma/koperasi 4 tahun; PT 3 tahun"
+            ],
+            "jebakan": "Tertukar dengan batas CV/koperasi (4 tahun) atau PT (3 tahun). Setelah PP 20/2026, OP dan PT Perorangan menurut penjelasan DJP tanpa batas waktu.",
+            "ingat": "7–4–3: OP–CV/koperasi–PT."
+          }
         },
         {
           "q": "Mengapa PPh Final UMKM (0,5% dari omzet) TIDAK selalu lebih menguntungkan dibanding tarif normal (PPh Pasal 17 dari laba)?",
           "type": "mcq",
           "answer": "Karena dasarnya peredaran bruto (omzet), bukan laba -- usaha rugi tetap kena pajak",
           "explanation": "Karena dasar pengenaannya adalah PEREDARAN BRUTO (omzet), bukan laba, usaha yang sedang rugi atau bermargin tipis tetap harus membayar PPh Final -- berbeda dengan tarif normal yang dihitung dari penghasilan neto (laba), sehingga usaha rugi bisa nihil pajak.",
-          "ref": "PP 23/2018",
+          "ref": "PP 55/2022 s.t.d.d. PP 20/2026",
           "options": [
             "Karena dasarnya peredaran bruto (omzet), bukan laba -- usaha rugi tetap kena pajak",
             "Karena tarifnya lebih tinggi dari tarif normal",
             "Karena hanya berlaku untuk usaha yang sudah untung besar",
             "Karena harus dibayar dua kali dalam setahun"
-          ]
+          ],
+          "pembahasan": {
+            "konsep": "Dasar PPh final UMKM adalah peredaran bruto, bukan laba. Usaha yang rugi atau bermargin tipis tetap membayar, sedangkan tarif normal dihitung dari laba sehingga dapat nihil.",
+            "dasar": "PP 55/2022 s.t.d.d. PP 20/2026",
+            "jebakan": "Mengira final selalu lebih hemat. Pada margin tipis atau rugi, tarif normal bisa lebih murah.",
+            "ingat": "Final = omzet, normal = laba.",
+            "salah": {
+              "Karena tarifnya lebih tinggi dari tarif normal": "Tarif 0,5% justru jauh lebih rendah daripada tarif normal.",
+              "Karena hanya berlaku untuk usaha yang sudah untung besar": "Tidak ada syarat harus untung besar; syaratnya peredaran bruto ≤ Rp4,8 M dan subjek yang berhak.",
+              "Karena harus dibayar dua kali dalam setahun": "Pembayaran bulanan, bukan dua kali setahun."
+            }
+          }
         }
       ]
     }

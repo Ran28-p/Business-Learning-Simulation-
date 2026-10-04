@@ -38,6 +38,17 @@ export function loadAppState() {
 }
 
 /**
+ * Theme preference helpers
+ */
+export function saveTheme(theme) {
+  localStorage.setItem(STORAGE_KEYS.THEME, theme);
+}
+
+export function loadTheme() {
+  return localStorage.getItem(STORAGE_KEYS.THEME);
+}
+
+/**
  * Onboarding flag helpers
  */
 export function hasCompletedOnboarding() {

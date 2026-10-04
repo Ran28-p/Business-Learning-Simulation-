@@ -131,7 +131,7 @@ const PSAK_REFS = {
     text: 'Beban adalah penurunan manfaat ekonomi selama periode pelaporan yang mengakibatkan penurunan ekuitas (selain distribusi ke pemilik).'
   },
   revenue: {
-    code: 'PSAK 72',
+    code: 'PSAK 115 (dahulu PSAK 72)',
     title: 'Pendapatan dari Kontrak dengan Pelanggan',
     text: 'Pendapatan diakui saat (atau selama) entitas memenuhi kewajiban pelaksanaan dengan mengalihkan barang/jasa yang dijanjikan.'
   },
@@ -146,17 +146,17 @@ const PSAK_REFS = {
     text: 'Kewajiban adalah kewajiban saat ini untuk menyerahkan sumber daya ekonomi sebagai akibat peristiwa masa lalu.'
   },
   accrual: {
-    code: 'PSAK 1',
+    code: 'PSAK 201 (dahulu PSAK 1)',
     title: 'Dasar Akrual',
     text: 'Entitas menyusun laporan keuangan atas dasar akrual (kecuali arus kas). Transaksi diakui saat terjadi, bukan saat kas diterima/dibayar.'
   },
   prepaid: {
-    code: 'Kerangka Konseptual SAK & PSAK 1',
+    code: 'Kerangka Konseptual SAK & PSAK 201 (dahulu PSAK 1)',
     title: 'Deferral (Beban/Pendapatan Ditangguhkan)',
     text: 'Pembayaran di muka dicatat sebagai aset; pengakuan beban dilakukan secara proporsional seiring berlalunya waktu/manfaat.'
   },
   depreciation: {
-    code: 'PSAK 16',
+    code: 'PSAK 216 (dahulu PSAK 16)',
     title: 'Aset Tetap – Penyusutan',
     text: 'Penyusutan adalah alokasi sistematis jumlah tersusutkan suatu aset selama umur manfaatnya.'
   },
@@ -166,7 +166,7 @@ const PSAK_REFS = {
     text: 'Akun nominal ditutup ke ekuitas di akhir periode agar saldo kembali nol di awal periode berikutnya.'
   },
   measurement: {
-    code: 'PSAK 1 & Kerangka Konseptual',
+    code: 'PSAK 201 (dahulu PSAK 1) & Kerangka Konseptual',
     title: 'Pengukuran',
     text: 'Unsur laporan keuangan diukur pada biaya historis, nilai wajar, atau dasar pengukuran lain yang relevan.'
   }
@@ -190,7 +190,7 @@ export function generateTutorLessons(validationResult, userEntries = []) {
   const seen = new Set(); // dedupe by title+account key
 
   // Classic mistake patterns (rule-based teaching, independent of full answer key)
-  _detectClassicMistakes(userEntries, transactions).forEach(l => {
+  _detectClassicMistakes(userEntries, transactions, expected).forEach(l => {
     if (!l) return;
     const key = l.type + '|' + l.title;
     if (!seen.has(key)) { seen.add(key); lessons.push(l); }
@@ -271,7 +271,9 @@ export function generateTutorLessons(validationResult, userEntries = []) {
    ═══════════════════════════════════════════════════════════ */
 
 
-function _detectClassicMistakes(userEntries, transactions) {
+export const detectClassicMistakes = (userEntries, transactions, expected) => _detectClassicMistakes(userEntries, transactions, expected);
+
+function _detectClassicMistakes(userEntries, transactions, expected = []) {
   const lessons = [];
   if (!userEntries || !userEntries.length) return lessons;
 
@@ -346,6 +348,88 @@ function _detectClassicMistakes(userEntries, transactions) {
         psak: { code: PSAK_REFS.expense.code, title: PSAK_REFS.expense.title }
       });
     }
+  }
+
+
+  // ── Kesalahan klasik tambahan (Fase 3): pembahasan sadar-konteks. Dipicu hanya bila answer key
+  // memuat akun tertentu DAN jawaban siswa memakai akun "tetangga" yang keliru — supaya tidak salah tuduh.
+  const exp = Array.isArray(expected) ? expected : [];
+  const expHas = (name, side) => exp.some(e => e && e.account === name &&
+    (side === 'D' ? (Number(e.debit) || 0) > 0 : side === 'K' ? (Number(e.credit) || 0) > 0 : true));
+  const expHasLike = (re, side) => exp.some(e => e && re.test(e.account || '') &&
+    (side === 'D' ? (Number(e.debit) || 0) > 0 : (Number(e.credit) || 0) > 0));
+  const userSide = (re, side) => userEntries.some(e => e && re.test(e.account || '') &&
+    (side === 'D' ? (Number(e.debit) || 0) > 0 : (Number(e.credit) || 0) > 0));
+  const userUses = (re) => userEntries.some(e => e && re.test(e.account || ''));
+  const push = (type, title, explanation, concept, tip, ref) => lessons.push({
+    type, title, explanation, concept, correctExample: null, tip, psak: { code: ref.code, title: ref.title }
+  });
+
+  // 1. Prive bukan beban
+  if (expHas('Prive') && !userUses(/^Prive$/) && userUses(/^(Beban|Utang)/)) {
+    push('account', 'Prive bukan Beban',
+      `Pengambilan kas atau barang oleh pemilik untuk keperluan pribadi dicatat di akun <strong>Prive</strong>, bukan sebagai beban. ` +
+      `Beban adalah pengorbanan untuk menghasilkan pendapatan; prive adalah <em>distribusi kepada pemilik</em> yang mengurangi ekuitas langsung, tanpa melewati laporan laba rugi.`,
+      PSAK_REFS.expense.text,
+      'Uang keluar untuk usaha → Beban. Uang keluar untuk pemilik → Prive (Debit), mengurangi Modal.',
+      PSAK_REFS.expense);
+  }
+
+  // 2. Penyusutan: kredit akumulasi, bukan aset langsung
+  if (expHasLike(/^Akumulasi Penyusutan/, 'K') && userSide(/^(Peralatan|Kendaraan|Gedung)$/, 'K')) {
+    push('account', 'Penyusutan: Kredit ke Akumulasi, Bukan ke Aset',
+      `Penyusutan dicatat Debit <strong>Beban Penyusutan</strong> dan Kredit <strong>Akumulasi Penyusutan</strong> (akun pengurang aset). ` +
+      `Harga perolehan aset tetap dibiarkan utuh; nilai tercatat di neraca = harga perolehan − akumulasi penyusutan.`,
+      PSAK_REFS.depreciation.text,
+      'Penyusutan tidak pernah mengubah akun aset itu sendiri. Kredit selalu ke Akumulasi Penyusutan.',
+      PSAK_REFS.depreciation);
+  }
+
+  // 3. Pendapatan diterima dimuka adalah kewajiban
+  if (expHas('Pendapatan Diterima Dimuka', 'K') && userSide(/^(Pendapatan Jasa|Penjualan)$/, 'K')) {
+    push('account', 'Uang Muka Pelanggan = Kewajiban, Belum Pendapatan',
+      `Kas yang diterima sebelum jasa/barang diserahkan belum boleh diakui sebagai pendapatan. Kredit ke <strong>Pendapatan Diterima Dimuka</strong> (kewajiban), ` +
+      `lalu dipindahkan ke pendapatan saat jasa diberikan pada jurnal penyesuaian.`,
+      PSAK_REFS.revenue.text,
+      'Tanya: "Sudah ada jasa yang kuserahkan?" Belum → kewajiban. Sudah → pendapatan.',
+      PSAK_REFS.revenue);
+  }
+
+  // 4. Biaya dibayar di muka adalah aset
+  if (expHas('Sewa Dibayar Dimuka', 'D') && userSide(/^Beban Sewa$/, 'D')) {
+    push('account', 'Sewa Dibayar Dimuka (Aset) vs Beban Sewa',
+      `Sewa untuk beberapa bulan ke depan dibayar sekaligus dicatat sebagai <strong>Sewa Dibayar Dimuka</strong> (aset), karena manfaatnya masih akan diterima. ` +
+      `Beban Sewa baru diakui seiring berjalannya waktu melalui jurnal penyesuaian.`,
+      PSAK_REFS.prepaid.text,
+      'Bayar di depan = aset. Terpakai = beban. Dua langkah: bayar (aset), lalu sesuaikan (beban).',
+      PSAK_REFS.prepaid);
+  }
+
+  // 5. Beban yang masih harus dibayar → utang, bukan kas
+  if (expHas('Utang Gaji', 'K') && userSide(/^Kas$/, 'K') && !userUses(/^Utang Gaji$/)) {
+    push('account', 'Beban yang Masih Harus Dibayar → Utang Gaji',
+      `Gaji yang sudah menjadi beban periode ini tetapi belum dibayar dicatat Kredit <strong>Utang Gaji</strong>, bukan Kredit Kas — kasnya belum keluar. ` +
+      `Beban diakui saat terjadi (dasar akrual), kas mengikuti saat dibayar.`,
+      PSAK_REFS.accrual.text,
+      'Kas belum bergerak? Jangan kredit Kas. Pakai akun utang untuk kewajiban yang tertunda.',
+      PSAK_REFS.accrual);
+  }
+
+  // 6. PPN dicatat terpisah (bukan bagian harga perolehan/pendapatan)
+  if (expHas('PPN Masukan', 'D') && !userUses(/^PPN Masukan$/) && userUses(/^(Pembelian|Perlengkapan|Peralatan|Beban)/)) {
+    push('account', 'PPN Masukan Dicatat Terpisah',
+      `PPN yang dibayar atas pembelian dari PKP dicatat di akun <strong>PPN Masukan</strong> (Debit), bukan digabung ke harga perolehan atau beban. ` +
+      `PPN Masukan nanti dikreditkan terhadap PPN Keluaran, sehingga yang disetor hanya selisihnya.`,
+      PSAK_REFS.asset.text,
+      'Harga beli = DPP; PPN dicatat sendiri. Setor PPN = Keluaran − Masukan.',
+      PSAK_REFS.asset);
+  }
+  if (expHas('PPN Keluaran', 'K') && !userUses(/^PPN Keluaran$/) && userUses(/^(Penjualan|Pendapatan)/)) {
+    push('account', 'PPN Keluaran Dicatat Terpisah',
+      `PPN yang dipungut dari pembeli bukan pendapatan perusahaan, melainkan titipan untuk negara. Catat Kredit <strong>PPN Keluaran</strong> (kewajiban) terpisah dari Penjualan/Pendapatan sebesar DPP.`,
+      PSAK_REFS.liability.text,
+      'Pendapatan = DPP. PPN Keluaran = titipan pajak, kewajiban kepada negara.',
+      PSAK_REFS.liability);
   }
 
   // Mistake: both sides on same row already handled by validation

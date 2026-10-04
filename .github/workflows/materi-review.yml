@@ -1,0 +1,25 @@
+# Pengingat tinjau materi (Fase 5).
+# Tiap tanggal 1 pukul 02:00 UTC menjalankan pemeriksa kedaluwarsa. Bila ada regulasi atau subbab
+# yang terakhir diverifikasi > 6 bulan lalu, job GAGAL sehingga GitHub mengirim notifikasi ke pemilik repo.
+# Tidak ada biaya: repo publik gratis; repo privat memakai kuota menit bulanan (job ini < 1 menit).
+# Bisa dijalankan manual dari tab Actions (workflow_dispatch).
+name: Tinjau Materi Berkala
+
+on:
+  schedule:
+    - cron: '0 2 1 * *'
+  workflow_dispatch:
+
+jobs:
+  cek-kedaluwarsa:
+    name: Cek umur verifikasi materi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
+      - name: Cek regulasi & materi kedaluwarsa
+        run: node scripts/check-staleness.mjs --fail-on-stale

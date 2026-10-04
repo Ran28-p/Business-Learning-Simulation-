@@ -26,7 +26,10 @@ window.KNOWLEDGE_CONTENT_SQLPQ = {
 <tr><td><strong>Query</strong></td><td>Satu perintah SQL yang dijalankan untuk mengambil atau mengubah data.</td></tr>
 </tbody>
 </table></div>
-<div class="kb-tip"><span class="kb-callout-title">💡 Kenapa Dipecah Jadi Banyak Tabel?</span>Kalau data pelanggan (nama, alamat) ditulis ulang di setiap baris pesanan, satu perubahan alamat pelanggan berarti harus mengubah ratusan baris pesanan. Dengan tabel terpisah yang saling terhubung lewat key, data pelanggan cukup disimpan sekali — inilah prinsip dasar <em>normalisasi</em> database.</div>`
+<div class="kb-tip"><span class="kb-callout-title">💡 Kenapa Dipecah Jadi Banyak Tabel?</span>Kalau data pelanggan (nama, alamat) ditulis ulang di setiap baris pesanan, satu perubahan alamat pelanggan berarti harus mengubah ratusan baris pesanan. Dengan tabel terpisah yang saling terhubung lewat key, data pelanggan cukup disimpan sekali — inilah prinsip dasar <em>normalisasi</em> database.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'SQLite Documentation (sqlite.org/docs.html)', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
+          ]
         },
         {
           id: 'urutan-eksekusi',
@@ -45,7 +48,7 @@ window.KNOWLEDGE_CONTENT_SQLPQ = {
 <tr><td>6. ORDER BY</td><td>Mengurutkan hasil akhir.</td></tr>
 </tbody>
 </table></div>
-<div class="kb-warning"><span class="kb-callout-title">⚠️ Ini Sebabnya WHERE Tidak Bisa Memakai Alias SELECT</span>Karena WHERE dieksekusi <strong>sebelum</strong> SELECT, kamu tidak bisa menulis <code>WHERE total_harga > 100</code> jika <code>total_harga</code> adalah alias yang baru didefinisikan di klausa SELECT (mis. <code>SELECT qty*harga AS total_harga</code>) — database belum "mengenal" alias itu di tahap WHERE. Solusinya: ulangi ekspresinya di WHERE, atau gunakan HAVING jika sudah melalui GROUP BY, atau bungkus dengan subquery.</div>
+<div class="kb-warning"><span class="kb-callout-title">⚠️ Alias SELECT di WHERE: aturan standar vs SQLite</span>Menurut urutan eksekusi, WHERE berjalan <strong>sebelum</strong> SELECT, sehingga pada standar SQL (dan banyak database lain) alias seperti <code>total_harga</code> dari <code>SELECT qty*harga AS total_harga</code> belum dikenal di WHERE. Solusi portabel: ulangi ekspresinya di WHERE, atau bungkus dengan subquery/CTE.<br><br><strong>Namun SQLite lebih longgar</strong>: ia tetap menerima alias di WHERE, GROUP BY, dan HAVING. Jadi di Simulator ini query tersebut akan berjalan, tetapi kebiasaan itu bisa gagal bila query dipindah ke database lain. Biasakan menulis versi portabel.</div>
 <div class="kb-example"><span class="kb-callout-title">Contoh</span>
 <code>SELECT wilayah, SUM(total) AS total_penjualan<br>
 FROM penjualan<br>
@@ -53,7 +56,11 @@ WHERE tahun = 2025<br>
 GROUP BY wilayah<br>
 HAVING SUM(total) > 50000000<br>
 ORDER BY total_penjualan DESC;</code><br><br>
-Urutan berpikir database: ambil tabel <code>penjualan</code> → sisakan baris tahun 2025 saja → kelompokkan per wilayah → hitung SUM per kelompok → buang kelompok dengan total ≤ 50 juta → baru susun kolom hasil akhir → urutkan dari terbesar.</div>`
+Urutan berpikir database: ambil tabel <code>penjualan</code> → sisakan baris tahun 2025 saja → kelompokkan per wilayah → hitung SUM per kelompok → buang kelompok dengan total ≤ 50 juta → baru susun kolom hasil akhir → urutkan dari terbesar.</div>`,
+          sources: [
+            { type: 'lain', ref: 'Uji langsung pada sql.js 1.14.1 (SQLite 3.49.1) — mesin yang dipakai Simulator SQL aplikasi ini', note: 'hasil dapat direproduksi di Simulator; perilaku database lain tidak diuji' }
+          ],
+          reviewed: '2026-10'
         },
         {
           id: 'join-types',
@@ -70,7 +77,13 @@ Urutan berpikir database: ambil tabel <code>penjualan</code> → sisakan baris t
 <tr><td><strong>CROSS JOIN</strong></td><td>Setiap baris tabel pertama dipasangkan dengan SETIAP baris tabel kedua (perkalian kartesian) — tanpa syarat kecocokan.</td><td>Jarang untuk laporan biasa; dipakai untuk menghasilkan semua kombinasi yang mungkin, mis. kombinasi semua produk × semua ukuran.</td></tr>
 </tbody>
 </table></div>
-<div class="kb-tip"><span class="kb-callout-title">💡 Cara Cepat Mengingat</span>Bayangkan dua lingkaran diagram Venn. INNER = irisan tengah saja. LEFT = seluruh lingkaran kiri (termasuk irisan). RIGHT = seluruh lingkaran kanan. FULL = gabungan kedua lingkaran seluruhnya.</div>`
+<div class="kb-tip"><span class="kb-callout-title">💡 Cara Cepat Mengingat</span>Bayangkan dua lingkaran diagram Venn. INNER = irisan tengah saja. LEFT = seluruh lingkaran kiri (termasuk irisan). RIGHT = seluruh lingkaran kanan. FULL = gabungan kedua lingkaran seluruhnya.</div>
+<div class="kb-warning"><span class="kb-callout-title">⚠️ Versi SQLite</span>RIGHT JOIN dan FULL OUTER JOIN baru didukung SQLite sejak versi <strong>3.39.0</strong> (Juni 2022). Simulator ini memakai SQLite 3.49.1 sehingga keduanya berjalan, tetapi pada SQLite yang lebih lama RIGHT JOIN ditulis sebagai LEFT JOIN dengan tabel dibalik, dan FULL JOIN sebagai dua LEFT JOIN yang digabung UNION ALL.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'SQLite Release 3.39.0 (25 Jun 2022) — dukungan RIGHT dan FULL OUTER JOIN', url: 'https://sqlite.org/releaselog/3_39_0.html' },
+            { type: 'lain', ref: 'Uji langsung pada sql.js 1.14.1 (SQLite 3.49.1) — mesin yang dipakai Simulator SQL aplikasi ini', note: 'hasil dapat direproduksi di Simulator; perilaku database lain tidak diuji' }
+          ],
+          reviewed: '2026-10'
         },
         {
           id: 'window-functions',
@@ -92,11 +105,15 @@ Urutan berpikir database: ambil tabel <code>penjualan</code> → sisakan baris t
 &nbsp;&nbsp;RANK() OVER (PARTITION BY wilayah ORDER BY total DESC) AS peringkat<br>
 FROM penjualan;</code><br><br>
 Query ini memberi peringkat sales rep <em>di dalam masing-masing wilayah</em> (bukan peringkat global) — <code>PARTITION BY wilayah</code> me-reset peringkat setiap kali wilayahnya berganti.</div>
-<div class="kb-warning"><span class="kb-callout-title">⚠️ Beda dengan GROUP BY</span>GROUP BY meringkas banyak baris menjadi satu baris per grup (jumlah baris hasil berkurang). Window function TIDAK meringkas — jumlah baris hasil tetap sama seperti data aslinya, hanya menambah kolom hasil perhitungan.</div>`
+<div class="kb-warning"><span class="kb-callout-title">⚠️ Beda dengan GROUP BY</span>GROUP BY meringkas banyak baris menjadi satu baris per grup (jumlah baris hasil berkurang). Window function TIDAK meringkas — jumlah baris hasil tetap sama seperti data aslinya, hanya menambah kolom hasil perhitungan.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'SQLite — Window Functions (sqlite.org/windowfunctions.html)', note: 'rujukan dokumentasi resmi; dukungan window function di mesin Simulator teruji (ROW_NUMBER)' }
+          ]
         },
         {
           id: 'best-practices',
           heading: '1.5 Best Practices Menulis Query yang Efisien',
+          noSourceNeeded: 'Saran praktik penulisan query; bukan ketentuan baku',
           body: `
 <ul>
 <li><strong>Hindari <code>SELECT *</code></strong> di query produksi — sebutkan kolom yang benar-benar dibutuhkan agar lebih cepat dan hasilnya jelas maksudnya.</li>
@@ -107,6 +124,50 @@ Query ini memberi peringkat sales rep <em>di dalam masing-masing wilayah</em> (b
 <li><strong>Uji dengan LIMIT saat eksplorasi</strong> — sebelum menjalankan query ke jutaan baris, uji dulu dengan <code>LIMIT 10-100</code> untuk memastikan logikanya benar.</li>
 <li><strong>Manfaatkan index pada kolom yang sering dipakai di WHERE/JOIN</strong> (di database produksi sungguhan) — di luar cakupan simulator ini, tapi penting diketahui untuk performa query di dunia nyata.</li>
 </ul>`
+        },
+        {
+          id: 'null-logika',
+          heading: '1.6 NULL & Logika Tiga Nilai',
+          body: `
+<p class="kb-lead"><strong>NULL berarti "tidak diketahui"</strong>, bukan 0 dan bukan teks kosong. Karena itu perbandingan dengan NULL tidak bernilai benar atau salah, melainkan <em>tidak diketahui</em> (NULL), dan baris itu tersaring oleh WHERE.</p>
+<p>Tabel contoh <code>pesanan</code>: (id=1, qty=2), (id=2, qty=5), (id=3, qty=<strong>NULL</strong>).</p>
+<div class="kb-table-wrap"><table class="kb-table">
+<thead><tr><th>Ekspresi</th><th>Hasil</th><th>Penjelasan</th></tr></thead>
+<tbody>
+<tr><td><code>NULL = NULL</code></td><td>NULL</td><td>Dua yang tidak diketahui tidak bisa dipastikan sama. Pakai <code>IS NULL</code>.</td></tr>
+<tr><td><code>WHERE qty != 2</code></td><td>hanya id 2</td><td>Baris id 3 (NULL) ikut tersaring.</td></tr>
+<tr><td><code>COUNT(*)</code> vs <code>COUNT(qty)</code></td><td>3 vs 2</td><td>COUNT(kolom) tidak menghitung NULL.</td></tr>
+<tr><td><code>AVG(qty)</code></td><td>3,5</td><td>NULL diabaikan: (2+5)÷2, bukan (2+5+0)÷3.</td></tr>
+<tr><td><code>COALESCE(qty, 0)</code></td><td>2, 5, 0</td><td>Mengganti NULL dengan nilai pengganti.</td></tr>
+<tr><td><code>id NOT IN (SELECT qty FROM pesanan)</code></td><td>kosong</td><td>Bila daftar berisi NULL, NOT IN tidak pernah bernilai benar.</td></tr>
+</tbody></table></div>
+<div class="kb-warning"><span class="kb-callout-title">⚠️ Jebakan NOT IN</span>Bila subquery bisa menghasilkan NULL, gunakan <code>NOT EXISTS</code> atau tambahkan <code>WHERE kolom IS NOT NULL</code> di subquery.</div>
+<div class="kb-tip"><span class="kb-callout-title">💡 LEFT JOIN</span>Baris tanpa pasangan terisi NULL. Untuk mencari "yang belum punya pasangan", filter <code>WHERE kolom_kanan IS NULL</code>, bukan <code>= NULL</code>.</div>`,
+          sources: [
+            { type: 'lain', ref: 'Uji langsung pada sql.js 1.14.1 (SQLite 3.49.1) — mesin yang dipakai Simulator SQL aplikasi ini', note: 'hasil dapat direproduksi di Simulator; perilaku database lain tidak diuji' }
+          ],
+          reviewed: '2026-10'
+        },
+        {
+          id: 'portabilitas-sqlite',
+          heading: '1.7 Catatan Dialek: SQLite di Simulator',
+          body: `
+<p class="kb-lead">Simulator menjalankan query pada <strong>SQLite sungguhan</strong> (sql.js 1.14.1, SQLite 3.49.1). Beberapa perilakunya perlu diketahui agar kebiasaan yang dipelajari tetap berlaku di database lain.</p>
+<div class="kb-table-wrap"><table class="kb-table">
+<thead><tr><th>Topik</th><th>Perilaku di SQLite (Simulator)</th><th>Saran portabel</th></tr></thead>
+<tbody>
+<tr><td>Alias di WHERE/GROUP BY/HAVING</td><td>Diterima</td><td>Ulangi ekspresi atau pakai subquery/CTE</td></tr>
+<tr><td>RIGHT / FULL OUTER JOIN</td><td>Didukung sejak 3.39.0</td><td>Tulis LEFT JOIN dengan tabel dibalik bila perlu</td></tr>
+<tr><td>Pembagian bilangan bulat</td><td><code>7/2</code> = 3, sedangkan <code>7/2.0</code> = 3,5</td><td>Jadikan salah satu operand desimal bila ingin hasil pecahan</td></tr>
+<tr><td>CTE (<code>WITH</code>) dan window function</td><td>Didukung</td><td>Gunakan untuk query bertahap yang mudah dibaca</td></tr>
+<tr><td>Tipe tanggal</td><td>Disimpan sebagai teks (format ISO <code>YYYY-MM-DD</code> mudah diurutkan dan dibandingkan)</td><td>Konsisten memakai format ISO</td></tr>
+</tbody></table></div>
+<div class="kb-tip"><span class="kb-callout-title">💡</span>Perilaku di tabel diuji langsung pada mesin Simulator; perilaku database lain (PostgreSQL, SQL Server, MySQL) tidak diuji di sini, jadi cek dokumentasi masing-masing sebelum memindahkan query.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'SQLite Release 3.39.0 (25 Jun 2022) — dukungan RIGHT dan FULL OUTER JOIN', url: 'https://sqlite.org/releaselog/3_39_0.html' },
+            { type: 'lain', ref: 'Uji langsung pada sql.js 1.14.1 (SQLite 3.49.1) — mesin yang dipakai Simulator SQL aplikasi ini', note: 'hasil dapat direproduksi di Simulator; perilaku database lain tidak diuji' }
+          ],
+          reviewed: '2026-10'
         }
       ]
     },
@@ -127,7 +188,10 @@ Query ini memberi peringkat sales rep <em>di dalam masing-masing wilayah</em> (b
 <tr><td><strong>L</strong></td><td>Load (Muat)</td><td>Memasukkan hasil akhir ke worksheet, atau ke Data Model untuk dipakai PivotTable/dashboard.</td></tr>
 </tbody>
 </table></div>
-<div class="kb-tip"><span class="kb-callout-title">💡 Kenapa Ini Penting Dipasangkan dengan Pivot Table</span>Pivot Table meringkas data, tapi kualitas ringkasannya bergantung sepenuhnya pada kerapian data mentahnya. Power Query mengurus tahap "membersihkan data mentah" ini secara berulang dan otomatis — begitu ada data baru, cukup klik Refresh, tanpa mengulang proses cleaning secara manual dari awal.</div>`
+<div class="kb-tip"><span class="kb-callout-title">💡 Kenapa Ini Penting Dipasangkan dengan Pivot Table</span>Pivot Table meringkas data, tapi kualitas ringkasannya bergantung sepenuhnya pada kerapian data mentahnya. Power Query mengurus tahap "membersihkan data mentah" ini secara berulang dan otomatis — begitu ada data baru, cukup klik Refresh, tanpa mengulang proses cleaning secara manual dari awal.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — Power Query documentation', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
+          ]
         },
         {
           id: 'langkah-transformasi',
@@ -145,7 +209,10 @@ Query ini memberi peringkat sales rep <em>di dalam masing-masing wilayah</em> (b
 <li><strong>Split Column</strong> — memecah satu kolom teks menjadi beberapa kolom (mis. berdasarkan delimiter seperti spasi atau koma).</li>
 <li><strong>Add Custom Column</strong> — menambah kolom hasil perhitungan/formula M (lihat 2.3), setara kolom formula di Excel biasa.</li>
 </ul>
-<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Coba pikirkan dataset penjualan yang datanya disusun dengan kolom terpisah per bulan (Jan, Feb, Mar, ...) — transformasi apa yang paling tepat untuk merapikannya menjadi satu kolom "Bulan" dan satu kolom "Nilai" supaya siap dipakai Pivot Table? (Jawaban: <strong>Unpivot Column</strong>.)</div>`
+<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Coba pikirkan dataset penjualan yang datanya disusun dengan kolom terpisah per bulan (Jan, Feb, Mar, ...) — transformasi apa yang paling tepat untuk merapikannya menjadi satu kolom "Bulan" dan satu kolom "Nilai" supaya siap dipakai Pivot Table? (Jawaban: <strong>Unpivot Column</strong>.)</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — Power Query documentation', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
+          ]
         },
         {
           id: 'm-language',
@@ -164,7 +231,10 @@ Query ini memberi peringkat sales rep <em>di dalam masing-masing wilayah</em> (b
 <tr><td><code>Table.Sort</code></td><td>Sort/urutkan (mirip ORDER BY di SQL)</td></tr>
 </tbody>
 </table></div>
-<div class="kb-tip"><span class="kb-callout-title">💡 Tidak Wajib Menulis M dari Nol</span>Kebanyakan pengguna Power Query tidak pernah menulis kode M langsung — cukup memakai antarmuka klik-klik di Editor, dan M dihasilkan otomatis. Memahami dasarnya tetap berguna untuk membaca/memperbaiki langkah transformasi yang sudah ada, atau menyesuaikan sedikit logika yang tidak tersedia lewat menu.</div>`
+<div class="kb-tip"><span class="kb-callout-title">💡 Tidak Wajib Menulis M dari Nol</span>Kebanyakan pengguna Power Query tidak pernah menulis kode M langsung — cukup memakai antarmuka klik-klik di Editor, dan M dihasilkan otomatis. Memahami dasarnya tetap berguna untuk membaca/memperbaiki langkah transformasi yang sudah ada, atau menyesuaikan sedikit logika yang tidak tersedia lewat menu.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — Power Query M formula language reference', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
+          ]
         },
         {
           id: 'contoh-kasus',
@@ -181,7 +251,10 @@ Tim penjualan punya dua sumber data terpisah: (1) tabel transaksi harian (hanya 
 <li><strong>Filter Rows</strong> untuk membuang baris dengan Nama Produk kosong (indikasi kode produk tidak valid) — atau justru ekspor baris ini terpisah sebagai laporan "data bermasalah" ke tim terkait.</li>
 <li>Load hasil akhir ke Data Model, siap dipakai Pivot Table &amp; dashboard.</li>
 </ol>
-Hasilnya: setiap kali ada transaksi baru, cukup klik Refresh — seluruh proses join, pembersihan tipe data, dan validasi kode produk berjalan otomatis tanpa perlu diulang manual.</div>`
+Hasilnya: setiap kali ada transaksi baru, cukup klik Refresh — seluruh proses join, pembersihan tipe data, dan validasi kode produk berjalan otomatis tanpa perlu diulang manual.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — Power Query documentation', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
+          ]
         }
       ]
     }

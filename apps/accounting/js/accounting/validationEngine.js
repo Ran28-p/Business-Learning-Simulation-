@@ -37,7 +37,7 @@ const PSAK = {
     fix: 'Pastikan jumlah seluruh kolom Debit = jumlah seluruh kolom Kredit pada jurnal yang sama.'
   },
   ACCOUNT_NAME: {
-    code: 'PSAK 1',
+    code: 'PSAK 201 (dahulu PSAK 1)',
     title: 'Penyajian Laporan Keuangan – Unsur Laporan',
     concept: 'Setiap akun harus diklasifikasikan dengan benar: Aset, Kewajiban, Ekuitas, Pendapatan, atau Beban.',
     fix: 'Periksa Chart of Accounts. Pilih nama akun yang sesuai dengan sifat transaksi.'
@@ -49,13 +49,13 @@ const PSAK = {
     fix: 'Tentukan jenis akun terlebih dahulu, lalu terapkan aturan saldo normal untuk menentukan sisi Debit atau Kredit.'
   },
   DATE: {
-    code: 'PSAK 1',
+    code: 'PSAK 201 (dahulu PSAK 1)',
     title: 'Periode Pelaporan',
     concept: 'Transaksi dicatat pada tanggal terjadinya (accrual basis), bukan pada tanggal pembayaran saja.',
     fix: 'Gunakan tanggal sesuai deskripsi transaksi yang diberikan dalam kasus.'
   },
   AMOUNT: {
-    code: 'PSAK 1 & Kerangka Konseptual',
+    code: 'PSAK 201 (dahulu PSAK 1) & Kerangka Konseptual',
     title: 'Pengukuran (Measurement)',
     concept: 'Nominal dicatat sebesar nilai wajar transaksi (historical cost untuk sebagian besar aset).',
     fix: 'Baca deskripsi transaksi dengan teliti. Ambil angka yang disebutkan secara eksplisit.'
@@ -79,13 +79,13 @@ const PSAK = {
     fix: 'Pastikan setiap nominal Debit di jurnal masuk ke sisi Debit T-Account, dan Kredit ke sisi Kredit.'
   },
   TRIAL_BALANCE: {
-    code: 'PSAK 1',
+    code: 'PSAK 201 (dahulu PSAK 1)',
     title: 'Neraca Saldo',
     concept: 'Neraca Saldo menguji persamaan Debit = Kredit setelah semua posting. Selisih menandakan kesalahan pencatatan.',
     fix: 'Periksa kembali jurnal dan posting. Cari selisih dan telusuri ke transaksi sumber.'
   },
   ADJUSTMENT: {
-    code: 'PSAK 1 & Kerangka Konseptual',
+    code: 'PSAK 201 (dahulu PSAK 1) & Kerangka Konseptual',
     title: 'Akrual dan Deferral (Jurnal Penyesuaian)',
     concept: 'Penyesuaian memastikan pendapatan dan beban diakui pada periode yang tepat (accrual basis), terlepas dari arus kas.',
     fix: 'Identifikasi: (1) beban dibayar di muka yang sudah terpakai, (2) pendapatan diterima di muka yang sudah terisi, (3) akrual beban/pendapatan belum dicatat, (4) penyusutan.'
@@ -97,13 +97,13 @@ const PSAK = {
     fix: 'Pindahkan saldo NS, tambahkan penyesuaian, hitung NS Disesuaikan, lalu alokasikan ke kolom Laba Rugi (nominal) atau Posisi Keuangan (riil).'
   },
   INCOME_STATEMENT: {
-    code: 'PSAK 1',
+    code: 'PSAK 201 (dahulu PSAK 1)',
     title: 'Laporan Laba Rugi',
     concept: 'Laporan Laba Rugi menyajikan pendapatan dan beban selama periode. Laba bersih = Pendapatan − Beban.',
     fix: 'Masukkan semua akun Pendapatan (kredit) dan Beban (debit) dari NS Disesuaikan. Jangan masukkan akun riil (Aset/Kewajiban/Ekuitas).'
   },
   FINANCIAL_POSITION: {
-    code: 'PSAK 1',
+    code: 'PSAK 201 (dahulu PSAK 1)',
     title: 'Laporan Posisi Keuangan (Neraca)',
     concept: 'Aset = Kewajiban + Ekuitas. Hanya akun permanen (riil) yang muncul. Modal akhir sudah termasuk laba bersih periode.',
     fix: 'Masukkan Aset, Kewajiban, dan Ekuitas dari NS Disesuaikan. Pastikan persamaan akuntansi terpenuhi.'
@@ -856,9 +856,9 @@ export function validateFinancialStatements() {
     severity: 'info', field: 'cash_flow',
     what: `Arus Kas: Operasi Rp ${cf.netOperating.toLocaleString('id-ID')}, Investasi Rp ${cf.netInvesting.toLocaleString('id-ID')}, Pendanaan Rp ${cf.netFinancing.toLocaleString('id-ID')}. Kas akhir Rp ${cf.endingCash.toLocaleString('id-ID')}.`,
     why: 'Laporan Arus Kas mengklasifikasikan pergerakan Kas berdasarkan aktivitas.',
-    concept: 'PSAK 2 – Laporan Arus Kas membagi aktivitas menjadi Operasi, Investasi, dan Pendanaan.',
+    concept: 'PSAK 207 (dahulu PSAK 2) – Laporan Arus Kas membagi aktivitas menjadi Operasi, Investasi, dan Pendanaan.',
     fix: 'Verifikasi bahwa Kas akhir = Kas awal + perubahan neto.',
-    psak: { code: 'PSAK 2', title: 'Laporan Arus Kas' }
+    psak: { code: 'PSAK 207 (dahulu PSAK 2)', title: 'Laporan Arus Kas' }
   }));
 
   const hasError = items.some(i => i.severity === 'error');

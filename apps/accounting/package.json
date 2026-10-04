@@ -5,6 +5,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/test-accounting-engine.mjs && node tests/test-tax-module.mjs && node tests/test-inventory-costing.mjs && node tests/test-scenario-integration.mjs"
+    "test": "node tests/test-accounting-engine.mjs && node tests/test-tax-module.mjs && node tests/test-inventory-costing.mjs && node tests/test-scenario-integration.mjs && node tests/test-aitutor-classic.mjs"
   }
 }

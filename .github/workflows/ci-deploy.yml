@@ -3,16 +3,28 @@
 # juga tersedia untuk repo privat sampai kuota bulanan, lalu berhenti,
 # bukan menagih otomatis).
 #
-# CI  : empat job paralel di setiap push & pull request —
+# CI  : enam job paralel di setiap push & pull request —
 #       - "test-excel" menjalankan test suite otomatis apps/excel.
 #       - "test-spt" menjalankan test suite otomatis apps/spt (js/shared/tax-engine.js
 #         & js/shared/npwp-utils.js — tanpa dependency luar, jadi tidak perlu npm install).
 #       - "test-accounting" menjalankan test suite otomatis apps/accounting (siklus
 #         akuntansi + mesin PPN/pajak di js/tax/) — tanpa dependency luar juga.
+#       - "test-sql-pq" menjalankan test suite otomatis apps/sql-pq (mesin penilaian SQL,
+#         Power Query, generator soal/dataset, progres) — query dieksekusi sungguhan
+#         di SQLite/WASM hasil vendor (vendor/sql-js), tanpa dependency npm.
+#       - "test-portal" menguji progres lintas modul di portal (js/shared/progress-aggregator.js):
+#         key & skema dibandingkan langsung dengan kode sumber tiap modul, ringkasan dari data
+#         engine asli, ekspor/impor (merge/replace, allowlist, atomik), dan rekap PDF.
 #       - "lint" mengecek SEMUA modul (apps/spt, apps/accounting,
 #         apps/excel, apps/sql-pq, + root): syntax .js/.mjs, validitas
 #         .json, dan link src=/href= statis di HTML yang patah. Tidak
 #         perlu npm install, cuma Node bawaan → cepat.
+#         Job yang sama juga menjalankan scripts/check-firebase-rules.mjs:
+#         memastikan database.rules.json tidak pernah membuka akses publik
+#         dan tetap sinkron dengan field yang ditulis apps/spt ke Firebase.
+#         Juga: tests/test-knowledge-schema.mjs + scripts/check-knowledge.mjs — skema materi
+#         Knowledge Base (sumber/tinjau), ratchet cakupan sumber (tidak boleh turun, subbab baru
+#         wajib bersumber), dan laporan kedalaman pembahasan soal.
 # CD  : auto-deploy seluruh isi repo (situs statis) ke GitHub Pages saat
 #       push ke branch main. Tidak menyentuh apapun kalau salah satu job test
 #       ATAU "lint" gagal — jadi update modul manapun tetap divalidasi dulu
@@ -82,6 +94,33 @@ jobs:
         working-directory: apps/accounting
         run: npm test
 
+  test-sql-pq:
+    name: Test (apps/sql-pq)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
+      - name: Run test suite (SQLite/WASM vendor, tanpa dependency npm)
+        working-directory: apps/sql-pq
+        run: npm test
+
+  test-portal:
+    name: Test (portal - progres lintas modul)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
+      - name: Run test suite (aggregator progres, ekspor/impor, rekap PDF)
+        run: node tests/test-portal-progress.mjs
+
   lint:
     name: Lint (semua apps)
     runs-on: ubuntu-latest
@@ -95,9 +134,33 @@ jobs:
       - name: Cek syntax, JSON, dan link patah di semua modul
         run: node scripts/ci-lint.mjs
 
+      - name: Cek Firebase Rules (tidak ada akses publik, skema sinkron dengan app)
+        run: node scripts/check-firebase-rules.mjs
+
+      - name: Test skema & renderer sumber materi (Knowledge Base)
+        run: node tests/test-knowledge-schema.mjs
+
+      - name: Test penilaian jawaban & pembahasan berlapis (modul_pajak)
+        run: node tests/test-modul-pajak.mjs
+
+      - name: Test pembahasan berlapis (tax_career)
+        run: node tests/test-tax-career-pembahasan.mjs
+
+      - name: Test pembahasan per titik cek mode Isi Formulir (SPT)
+        run: node tests/test-form-pembahasan.mjs
+
+      - name: Verifikasi angka contoh hitung terhadap mesin pajak (Fase 4)
+        run: node tests/test-pembahasan-angka.mjs
+
+      - name: Daftar regulasi terpantau & rujukan materi (Fase 5)
+        run: node tests/test-regulasi.mjs && node scripts/check-staleness.mjs
+
+      - name: Cek kualitas materi (skema, ratchet cakupan sumber, laporan pembahasan)
+        run: node scripts/check-knowledge.mjs
+
   deploy:
     name: Deploy to GitHub Pages
-    needs: [test-excel, test-spt, test-accounting, lint]
+    needs: [test-excel, test-spt, test-accounting, test-sql-pq, test-portal, lint]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:

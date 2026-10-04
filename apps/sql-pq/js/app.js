@@ -25,8 +25,15 @@
 
   // ============================================================ THEME ====
   function initTheme() {
-    const saved = localStorage.getItem("bls-theme") || localStorage.getItem("sqlpq_theme") || "light";
+    const saved = localStorage.getItem("sqlpq_theme") || "light";
     document.documentElement.setAttribute("data-theme", saved);
+    $("#btnThemeToggle").textContent = saved === "dark" ? "☀️" : "🌙";
+    $("#btnThemeToggle").addEventListener("click", () => {
+      const cur = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", cur);
+      localStorage.setItem("sqlpq_theme", cur);
+      $("#btnThemeToggle").textContent = cur === "dark" ? "☀️" : "🌙";
+    });
   }
 
   // ======================================================== NAVIGATION ===
@@ -577,7 +584,12 @@
     $("#hintArea").innerHTML += `<div class="hint-box"><strong>Hint ${App.hintsShown}:</strong> ${UI.escapeHtml(hint)}</div>`;
   }
 
-  function showExplanation(question) {
+  function showExplanation(question, solved) {
+    // Pembahasan berlapis (js/sql-pembahasan.js); jawaban baku hanya ditampilkan setelah soal terjawab benar.
+    if (window.SQLPQ_Pembahasan) {
+      $("#explainArea").innerHTML = window.SQLPQ_Pembahasan.html(question, { solved: !!solved });
+      return;
+    }
     $("#explainArea").innerHTML = `<div class="explain-box"><h4>Penjelasan</h4><p>${UI.escapeHtml(question.explanation)}</p><p><small>Konsep: ${UI.escapeHtml(question.conceptLabel)}</small></p></div>`;
   }
 
@@ -646,12 +658,15 @@
         const xp = Progress.recordAnswer(App.currentQuestion, true, App.hintsShown);
         renderSidebarProgress();
         UI.toast(`Benar! +${xp} XP`, "ok");
-        showExplanation(App.currentQuestion);
+        showExplanation(App.currentQuestion, true);
       } else {
         Progress.recordAnswer(App.currentQuestion, false, App.hintsShown);
         renderSidebarProgress();
         setResultStatus(verdict.error ? "err" : "wrong", verdict.error || ("Belum tepat — " + verdict.detail));
         const box = $("#explainArea");
+        const pembahasan = window.SQLPQ_Pembahasan
+          ? window.SQLPQ_Pembahasan.html(App.currentQuestion, { verdict, userSql: sql, solved: false })
+          : "";
         if ((verdict.missingExamples && verdict.missingExamples.length) || (verdict.extraExamples && verdict.extraExamples.length)) {
           let html = `<div class="explain-box"><h4>Detail Perbedaan</h4>`;
           if (verdict.missingExamples && verdict.missingExamples.length) {
@@ -667,7 +682,10 @@
         } else if (verdict.expectedResult) {
           box.innerHTML = `<div class="explain-box"><h4>Hasil yang Diharapkan (contoh)</h4><div id="expectedPreview"></div></div>`;
           UI.renderResultTable($("#expectedPreview"), verdict.expectedResult.columns, verdict.expectedResult.values, 8);
+        } else {
+          box.innerHTML = "";
         }
+        box.insertAdjacentHTML("beforeend", pembahasan);
       }
     });
 
@@ -900,6 +918,7 @@
     const dataset = window.SQLPQ_DatasetGenerator.generate({ category: task.category, rows: 60, dirty: true });
     const key = "practice_" + task.id + "_" + Date.now();
     dataset.label = task.title + " (data latihan)";
+    if (typeof task.prepare === "function") task.prepare(dataset);
     App.datasetRegistry[key] = dataset;
     refreshPqSourceOptions();
     setPqSource(key);

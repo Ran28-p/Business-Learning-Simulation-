@@ -109,11 +109,58 @@ function startQuiz(key){
 }
 
 function cleanNumber(val){
-  if(!val) return 0;
-  const raw = val.toString().replace(/[^0-9\-\.]/g,'');
-  if(!raw) return 0;
+  // Parser angka gaya Indonesia: "4.000.000", "Rp 4.000.000", "0,5", "4000000", "1,5%".
+  if (val === null || val === undefined || val === '') return 0;
+  if (typeof val === 'number') return Number.isFinite(val) ? val : 0;
+  let raw = String(val).trim().replace(/rp\.?/ig, '').replace(/%/g, '').replace(/\s+/g, '');
+  if (!raw) return 0;
+  const neg = raw.startsWith('-');
+  raw = raw.replace(/[^0-9.,]/g, '');
+  if (raw.includes('.') && raw.includes(',')) {
+    // pemisah terakhir dianggap desimal
+    if (raw.lastIndexOf(',') > raw.lastIndexOf('.')) raw = raw.replace(/\./g, '').replace(',', '.');
+    else raw = raw.replace(/,/g, '');
+  } else if (/^\d{1,3}(\.\d{3})+$/.test(raw)) {
+    raw = raw.replace(/\./g, '');            // 4.000.000 → ribuan
+  } else if (/^\d{1,3}(,\d{3})+$/.test(raw)) {
+    raw = raw.replace(/,/g, '');             // 4,000,000 → ribuan (gaya Inggris)
+  } else {
+    raw = raw.replace(',', '.');             // 0,5 → desimal
+  }
   const result = parseFloat(raw);
-  return Number.isFinite(result) ? result : 0;
+  return Number.isFinite(result) ? (neg ? -result : result) : 0;
+}
+
+// Normalisasi teks: huruf kecil, buang tanda baca & spasi ("Pasal 4 ayat (2)" == "pasal4ayat2")
+function normText(str){
+  return String(str === null || str === undefined ? '' : str).toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+// Benar bila sama dengan kunci, atau sama dengan salah satu jawaban alternatif (accept),
+// atau memuat salah satu frasa alternatif (minimal 4 karakter, agar tidak terlalu longgar).
+function isTextCorrect(val, q){
+  const u = normText(val);
+  if (!u) return false;
+  const keys = [q.answer].concat(Array.isArray(q.accept) ? q.accept : []).map(normText).filter(Boolean);
+  return keys.some(k => u === k || (k.length >= 4 && u.includes(k)));
+}
+
+// Blok "Pembahasan" berlapis; semua teks di-escape.
+function pembahasanHtml(q, ok){
+  const pb = q.pembahasan;
+  if (!pb) {
+    return (q.explanation ? `<div class="pbh"><div class="pbh-row"><span class="pbh-label">Pembahasan</span><p>${escapeHTML(q.explanation)}</p></div></div>` : '') +
+      (q.ref ? `<div class="pbh-ref">Rujukan: ${escapeHTML(q.ref)}</div>` : '');
+  }
+  const row = (label, body, cls) => body ? `<div class="pbh-row ${cls||''}"><span class="pbh-label">${label}</span>${body}</div>` : '';
+  let h = '<div class="pbh">';
+  h += row('Mengapa jawabannya begitu', `<p>${escapeHTML(pb.konsep)}</p>`);
+  if (pb.dasar) h += row('Dasar hukum', `<p>${escapeHTML(pb.dasar)}</p>`);
+  if (Array.isArray(pb.langkah) && pb.langkah.length) h += row('Langkah hitung', '<ol>' + pb.langkah.map(x => `<li>${escapeHTML(x)}</li>`).join('') + '</ol>');
+  if (pb.salah && Object.keys(pb.salah).length) h += row('Mengapa opsi lain salah', '<ul>' + Object.keys(pb.salah).map(k => `<li><strong>${escapeHTML(k)}</strong> — ${escapeHTML(pb.salah[k])}</li>`).join('') + '</ul>');
+  if (pb.jebakan) h += row('Jebakan umum', `<p>${escapeHTML(pb.jebakan)}</p>`, 'pbh-warn');
+  if (pb.ingat) h += row('Cara mengingat', `<p>${escapeHTML(pb.ingat)}</p>`, 'pbh-tip');
+  if (q.ref) h += `<div class="pbh-ref">Rujukan: ${escapeHTML(q.ref)}</div>`;
+  return h + '</div>';
 }
 
 function gradeQuiz(topic){
@@ -136,12 +183,12 @@ function gradeQuiz(topic){
         // Jika jawaban sebenarnya adalah angka, gunakan cleanNumber
         isCorrect = (cleanNumber(val) === cleanNumber(q.answer));
       } else {
-        // Jika jawaban sebenarnya adalah teks, cukup bandingkan teksnya (case-insensitive)
-        isCorrect = (val.trim().toLowerCase() === String(q.answer).toLowerCase());
+        // Jika jawaban sebenarnya adalah teks: toleran terhadap tanda baca/spasi dan jawaban alternatif (q.accept)
+        isCorrect = isTextCorrect(val, q);
       }
     }
     if(isCorrect) correct++;
-    details.push({q: q.q, user: userAns, correct: q.answer, ok: isCorrect, explanation: q.explanation || ''});
+    details.push({q: q.q, user: userAns, correct: q.answer, ok: isCorrect, item: q});
   });
 
   const score = Math.round((correct / topic.questions.length) * 100);
@@ -150,10 +197,9 @@ function gradeQuiz(topic){
   html += '<div style="margin-top:12px">';
   details.forEach((d,idx)=>{
     html += `<div style="padding:8px;border-bottom:1px solid #eef;">`;
-    html += `<div><strong>${idx+1}. ${d.q}</strong></div>`;
-    html += `<div>Jawaban Anda: <em>${escapeHTML(d.user) || '&#8212;'}</em> — Kunci: <strong>${escapeHTML(d.correct)}</strong> ${d.ok?'<span style="color:green">(Benar)</span>':'<span style="color:red">(Salah)</span>'}</div>`;
-    if(d.explanation) html += `<div style="margin-top:6px;color:#333"><small><strong>Pembahasan:</strong> ${d.explanation}</small></div>`;
-    if(d.ref) html += `<div style="margin-top:6px;color:#555"><small><strong>Referensi:</strong> ${d.ref}</small></div>`;
+    html += `<div><strong>${idx+1}. ${escapeHTML(d.q)}</strong></div>`;
+    html += `<div>Jawaban Anda: <em>${escapeHTML(d.user) || '&#8212;'}</em> — Kunci: <strong>${escapeHTML(d.correct)}</strong> ${d.ok?'<span style="color:green">(Benar)</span>':'<span style="color:#c0392b">(Salah)</span>'}</div>`;
+    html += pembahasanHtml(d.item, d.ok);
     html += `</div>`;
   });
   html += '</div>';

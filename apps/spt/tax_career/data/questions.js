@@ -66,7 +66,7 @@ window.TAX_CAREER_QUESTIONS = [
     type: "mcq",
     skill: "PPh 25",
     title: "PPh 25 — Angsuran",
-    scenario: "PT Maju memiliki SPT Tahunan tahun lalu dengan PPh kurang bayar yang menjadi dasar angsuran PPh 25 tahun berjalan.",
+    scenario: "PT Maju memiliki SPT Tahunan tahun lalu. PPh terutang setelah dikurangi kredit pajak (mis. PPh 22 dan 23) menjadi dasar angsuran PPh 25 tahun berjalan.",
     question: "Fungsi utama angsuran PPh 25 dalam kepatuhan?",
     options: [
       "Menggantikan seluruh SPT Masa PPh 21/23",
@@ -295,7 +295,7 @@ window.TAX_CAREER_QUESTIONS = [
       "Cukup sampaikan secara lisan ke Account Representative tanpa dokumen tertulis"
     ],
     answer: "Sarankan pembetulan SPT dengan kemauan sendiri sesegera mungkin — sanksi bunga keterlambatan jauh lebih ringan dibanding menunggu DJP menemukannya sendiri",
-    explanation: "Pasal 8 ayat (1) UU KUP: WP dengan kemauan sendiri boleh membetulkan SPT sepanjang DJP belum melakukan tindakan pemeriksaan (ditandai SP2 terbit). Pembetulan yang menambah utang pajak tetap kena sanksi bunga (Pasal 8 ayat 2), tapi jauh lebih ringan dibanding jika DJP menemukannya lewat pemeriksaan. Begitu SP2 terbit, hak pembetulan hilang — opsi yang tersisa hanya jalur Pengungkapan Ketidakbenaran (Pasal 8 ayat 4), dan hanya sebelum SPHP terbit."
+    explanation: "Pasal 8 ayat (1) UU KUP: WP dengan kemauan sendiri boleh membetulkan SPT sepanjang DJP belum melakukan tindakan pemeriksaan (ditandai SP2 diterima). Pembetulan yang menambah utang pajak tetap dikenai sanksi bunga, tetapi jauh lebih ringan dibanding jika DJP menemukannya lewat pemeriksaan. Begitu pemeriksaan dimulai, hak pembetulan atas kemauan sendiri hilang; jalur yang tersisa adalah pengungkapan ketidakbenaran (juga di Pasal 8) dengan syarat dan sanksi yang lebih berat."
   },
   {
     id: "TCO-006",

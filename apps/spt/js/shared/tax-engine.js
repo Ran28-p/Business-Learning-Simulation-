@@ -319,9 +319,12 @@
                 };
             },
 
-            // PPh Final UMKM sesuai PP 55/2022 (dulu PP 23/2018) — 0,5% x peredaran bruto,
-            // untuk badan dengan peredaran bruto setahun tidak melebihi Rp4,8 miliar (opsional,
-            // berlaku maks. 3 tahun pajak untuk PT sejak terdaftar/berlaku ketentuan transisi).
+            // PPh Final UMKM sesuai PP 55/2022 s.t.d.d. PP 20/2026 — 0,5% x peredaran bruto,
+            // untuk WP dengan peredaran bruto setahun tidak melebihi Rp4,8 miliar (opsional).
+            // Subjek setelah PP 20/2026: WP OP, PT Perorangan, Koperasi; PT/CV biasa hanya
+            // lewat ketentuan peralihan s.d. akhir Tahun Pajak 2026. Fungsi ini hanya menghitung
+            // 0,5% x peredaran; pengurang Rp500 juta (khusus WP OP) dan kelayakan subjek
+            // ditangani pemanggil.
             hitungPPhFinalUMKM: function(peredaranBruto) {
                 return peredaranBruto * 0.005;
             }

@@ -6,6 +6,10 @@
 > - Logika JS dipisah: `js/firebase-config.js`, `js/app-main.js`, `js/calculators.js`, `js/knowledge-init.js`, `js/sw-register.js`.
 > - `node_modules` dan `.git` tidak lagi disertakan dalam paket rilis.
 > - Accounting, Excel, dan SQL-PQ tetap modular seperti sebelumnya.
+>
+> **Update (2026-10):** CI kini punya test untuk keempat modul (termasuk `apps/sql-pq`), ada
+> `database.rules.json` + `firebase.json` + `SECURITY.md` di repo, dan rules Firebase diperiksa
+> otomatis di CI. Bagian yang sebelumnya menulis "BELUM ADA" untuk hal-hal ini sudah disesuaikan.
 
 Struktur di bawah adalah versi perbaikan dari diagram 10-layer yang diajukan,
 dicocokkan langsung dengan isi `Business-Learning-Simulation-v3.zip` (5 file
@@ -22,7 +26,7 @@ perubahan diberi alasan — tidak ada layer yang dihapus tanpa pengganti.
 | 4 | **Rate Limiting** sebagai layer generik | Tidak ada API custom untuk di-*rate-limit*. Diganti: Firebase Auth built-in abuse protection (otomatis, gratis, tidak perlu dikonfigurasi manual). |
 | 5 | **RBAC** di Identity Layer | Tidak ada sistem role/admin di aplikasi ini — semua user setara (login atau tamu). Dihapus, ditandai sebagai *future option* jika suatu saat perlu dashboard progres untuk trainer. |
 | 6 | **IndexedDB** & **Cloud Storage** di Data Layer | Dicek ke source code: **tidak dipakai sama sekali** saat ini. Ditandai "planned/optional", bukan komponen aktif — supaya diagram tidak menyatakan sesuatu yang belum ada. |
-| 7 | Observability & DevOps digambar sebagai layer "sudah ada" | Faktanya: **tidak ada** file CI/CD, tidak ada error tracking/monitoring di repo. Ditandai sebagai gap, bukan status implemented. |
+| 7 | Observability & DevOps digambar sebagai layer "sudah ada" | Saat diperiksa pertama kali: tidak ada file CI/CD maupun error tracking/monitoring di repo. **CI/CD sudah ditambahkan** (lihat bagian CI/CD di bawah); Observability tetap gap. |
 
 ## Struktur yang sudah diperbaiki
 
@@ -31,7 +35,9 @@ BUSINESS LEARNING SIMULATION
 │
 ├── 01 Presentation Layer
 │   └── Frontend — vanilla HTML/CSS/JS, tanpa framework, tanpa build step
-│       (index.html + css/portal.css + js/portal.js sebagai hub/login)
+│       (index.html + css/portal.css + js/portal.js sebagai hub/login;
+│        js/portal-progress.js + js/shared/progress-aggregator.js = dashboard "Progres Saya":
+│        ringkasan lintas modul, ekspor/impor progres, rekap PDF — hanya membaca key localStorage tiap modul)
 │
 ├── 02 Application Layer
 │   ├── Simulator Engines      → apps/spt, apps/accounting, apps/excel, apps/sql-pq
@@ -56,12 +62,12 @@ BUSINESS LEARNING SIMULATION
 │
 ├── 06 Security Layer
 │   ├── HTTPS               → otomatis dari GitHub Pages
-│   ├── Firebase Security Rules → wajib `auth != null` + scoped ke uid sendiri (lihat SECURITY.md)
+│   ├── Firebase Security Rules → [ADA] `database.rules.json` (+ `firebase.json`): default tolak semua, `users/$uid` hanya untuk pemilik uid, skema & batas nilai divalidasi; diperiksa di CI oleh `scripts/check-firebase-rules.mjs` (lihat SECURITY.md). Rules di repo BARU berlaku setelah di-deploy ke proyek Firebase
 │   ├── Authorized Domains  → whitelist domain resmi di Firebase Console
 │   └── Security Headers    → meta tags (CSP dasar) — GitHub Pages tidak bisa set header server, jadi ini scope-nya terbatas by design
 │
 ├── 07 Performance Layer
-│   ├── Cache          → Service Worker (BARU DIREKOMENDASIKAN — lihat gap di bawah)
+│   ├── Cache          → [AKTIF] Service Worker per modul (root + accounting, excel, spt, sql-pq); versi cache dinaikkan tiap ada perubahan file aplikasi
 │   ├── Compression     → gzip/brotli otomatis dari GitHub Pages
 │   └── Lazy Loading    → load modul apps/* on-demand dari hub, bukan sekaligus
 │
@@ -76,11 +82,11 @@ BUSINESS LEARNING SIMULATION
 │   ├── Backup (data)  → export/import JSON progres per modul (SUDAH ADA)
 │   └── Recovery/Rollback → git revert + import JSON backup pengguna
 │
-└── 10 DevOps Layer  [SEBAGIAN BELUM ADA]
+└── 10 DevOps Layer  [ADA]
     ├── Git    → ADA
     ├── GitHub → ADA
-    ├── CI     → BELUM ADA (rekomendasi: GitHub Actions gratis untuk repo publik, jalankan tests/ di apps/excel)
-    └── CD     → BELUM ADA (rekomendasi: GitHub Actions auto-deploy ke GitHub Pages saat push ke main)
+    ├── CI     → ADA — `.github/workflows/ci-deploy.yml`: test-excel, test-spt, test-accounting, test-sql-pq, dan lint (syntax/JSON/link + Firebase Rules)
+    └── CD     → ADA — auto-deploy ke GitHub Pages saat push ke main, hanya jika semua job CI lulus
 ```
 
 ## Gap offline vs kenyataan — SUDAH DIPERBAIKI (v4)
@@ -93,19 +99,30 @@ Firebase/CDN font) + registrasi di `index.html` untuk: root portal, dan
 tiga modul lain (`accounting`, `excel`, `sql-pq`). Lihat
 `Business-Learning-Simulation-v4.zip`.
 
-Catatan: modul `accounting` masih memuat 4 library dari CDN eksternal
-(html2pdf, canvas-confetti, intro.js) yang belum divendor lokal — service
-worker-nya sengaja tidak menyentuh host itu, jadi shell-nya tetap tampil
-offline tapi fitur yang bergantung pada library itu (mis. tur intro, export
-PDF) baru berfungsi penuh offline kalau library-nya divendor lokal seperti
-di `apps/excel` dan `apps/sql-pq`. Ini gap kecil yang tersisa, bukan blocker.
+Catatan (diperiksa ulang 2026-10): modul `accounting` masih memuat satu
+library dari CDN eksternal, yaitu `intro.js` (tur panduan) dari cdnjs —
+service worker-nya sengaja tidak menyentuh host itu, jadi shell-nya tetap
+tampil offline tetapi tur panduan baru berfungsi penuh offline kalau
+library-nya divendor lokal seperti di `apps/excel` dan `apps/sql-pq`.
+Selain itu, `manifest.json` (PWA yang bisa di-install) baru ada di `apps/spt`;
+modul lain punya service worker tapi belum punya manifest. Keduanya gap
+kecil, bukan blocker.
 
-## CI/CD — SUDAH DIPERBAIKI (v4)
+## CI/CD — SUDAH ADA
 
-Ditambahkan `.github/workflows/ci-deploy.yml`: job `test` menjalankan
-`npm test` di `apps/excel` pada tiap push/PR (gratis, GitHub Actions untuk
-repo publik), lalu job `deploy` auto-publish ke GitHub Pages saat push ke
-`main` — hanya jalan kalau `test` lolos.
+`.github/workflows/ci-deploy.yml` (gratis untuk repo publik) menjalankan lima
+job paralel di setiap push & pull request:
+
+| Job | Isi |
+|---|---|
+| `test-excel` | test suite `apps/excel` |
+| `test-spt` | test mesin pajak & utilitas NPWP (`apps/spt`) |
+| `test-accounting` | siklus akuntansi, mesin PPN/pajak, persediaan, integrasi skenario |
+| `test-sql-pq` | penilaian SQL, mesin Power Query, generator soal & dataset, latihan PQ, progres — query dijalankan sungguhan di SQLite/WASM hasil vendor |
+| `lint` | syntax `.js`/`.mjs`, validitas `.json`, link lokal HTML, konsistensi tarif PPN lintas-app, dan `scripts/check-firebase-rules.mjs` |
+
+Job `deploy` (auto-publish ke GitHub Pages saat push ke `main`) hanya jalan
+kalau kelima job di atas lulus.
 
 ## Cek kepatuhan terhadap FREE-FIRST POLICY
 
@@ -117,9 +134,11 @@ operasional yang perlu dijaga secara sadar:
   (gratis)**. Paket ini secara teknis *tidak bisa* menagih — begitu kuota
   habis, tulis/baca akan diblokir, bukan ditagih. Ini otomatis terpenuhi
   **asal tidak pernah upgrade ke paket Blaze** (pay-as-you-go). Ini
-  guardrail konkret yang layak dicatat di `SECURITY.md`, bukan cuma niat baik.
-- **Poin 14** (harus bisa jalan offline/lokal) → lihat gap service worker
-  di atas; saat ini baru terpenuhi untuk 1 dari 4 modul.
+  guardrail konkret yang dicatat di `SECURITY.md`, bukan cuma niat baik.
+- **Poin 14** (harus bisa jalan offline/lokal) → keempat modul + portal
+  sudah punya service worker, sehingga shell bisa dipakai offline setelah
+  kunjungan pertama. Sisa gap kecil dicatat di bagian "Gap offline" di atas
+  (intro.js di accounting; manifest PWA baru di SPT).
 
 Poin 1–12 sudah terpenuhi oleh pilihan yang memang sudah diambil di kode:
 static hosting, tanpa build step, tanpa dependency API berbayar, tanpa

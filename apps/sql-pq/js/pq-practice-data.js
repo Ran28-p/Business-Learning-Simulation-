@@ -35,9 +35,24 @@
   }
   function hasColumn(table, col) { return table.columns.some((c) => c.name === col); }
 
+  // Skenario nyata "angka terimpor sebagai teks" (mis. dari CSV): kolom target diubah
+  // menjadi TEXT dengan nilai string SEBELUM tugas dimulai. Tanpa ini kolomnya sudah
+  // bertipe angka sejak awal sehingga validator "bertipe Decimal/Whole Number" lulus
+  // tanpa siswa mengerjakan apa pun — langkah Change Type jadi tidak melatih apa-apa.
+  function textColumns(names) {
+    return function prepare(dataset) {
+      dataset.columns.forEach((c) => { if (names.indexOf(c.name) !== -1) c.type = "TEXT"; });
+      dataset.rows.forEach((r) => {
+        names.forEach((n) => { if (r[n] !== null && r[n] !== undefined) r[n] = String(r[n]); });
+      });
+      return dataset;
+    };
+  }
+
   const TASKS = [
     {
       id: "clean-sales",
+      prepare: textColumns(["Total_Sales"]),
       title: "Bersihkan Dataset Sales",
       category: "sales",
       instructions: [
@@ -55,6 +70,7 @@
     },
     {
       id: "clean-accounting",
+      prepare: textColumns(["Debit", "Credit"]),
       title: "Bersihkan Dataset Accounting",
       category: "accounting",
       instructions: [
@@ -73,6 +89,7 @@
     },
     {
       id: "clean-hr",
+      prepare: textColumns(["Performance_Score"]),
       title: "Bersihkan Dataset HR",
       category: "hr",
       instructions: [
@@ -90,6 +107,7 @@
     },
     {
       id: "clean-customer",
+      prepare: textColumns(["Total_Purchase"]),
       title: "Bersihkan Dataset Customer",
       category: "customers",
       instructions: [
@@ -107,6 +125,7 @@
     },
     {
       id: "clean-inventory",
+      prepare: textColumns(["Purchase_Price"]),
       title: "Bersihkan Dataset Inventory",
       category: "inventory",
       instructions: [
@@ -124,5 +143,5 @@
     }
   ];
 
-  global.SQLPQ_PQPractice = { TASKS, hasDuplicateRows, columnIsTrimmed, noNullIn, noNegativeOrZero, columnTypeIs, hasColumn };
+  global.SQLPQ_PQPractice = { TASKS, textColumns, hasDuplicateRows, columnIsTrimmed, noNullIn, noNegativeOrZero, columnTypeIs, hasColumn };
 })(window);

@@ -32,7 +32,6 @@
         </div>
       </div>
       <div class="hub-user">
-        <button type="button" class="btn btn-ghost" id="portalThemeBtn" aria-label="Ganti tema" style="padding:8px 10px;margin-right:8px">🌙</button>
         <div class="avatar" id="hub-user-avatar" aria-label="Profil Pengguna">?</div>
         <div class="meta">
           <div class="name" id="hub-user-name">—</div>
@@ -40,12 +39,6 @@
         </div>
         <button type="button" class="btn btn-ghost" id="btn-login" style="padding:8px 12px;margin-left:8px">Masuk</button>
         <button type="button" class="btn btn-ghost" id="btn-logout" style="padding:8px 12px;margin-left:8px;display:none">Keluar</button>
-        <div class="portal-data-actions" aria-label="Data portal">
-          <button type="button" class="btn btn-ghost" id="btn-portal-backup" title="Unduh backup semua progres modul">Backup</button>
-          <button type="button" class="btn btn-ghost" id="btn-portal-restore" title="Pulihkan backup semua progres modul">Pulihkan</button>
-          <button type="button" class="btn btn-ghost" id="btn-portal-reset" title="Hapus semua progres modul di perangkat ini">Reset data</button>
-          <input type="file" id="portal-restore-file" accept="application/json,.json" hidden>
-        </div>
       </div>
     </header>
 
@@ -71,6 +64,26 @@
       </div>
     </div>
 
+
+    <div class="login-modal" id="importModal" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+      <div class="login-modal__backdrop" id="importBackdrop"></div>
+      <div class="login-modal__card import-card">
+        <h3 id="importTitle">Pulihkan Progres</h3>
+        <p id="importIntro"></p>
+        <div id="importList" class="import-list"></div>
+        <fieldset class="import-mode" id="importModeBox">
+          <legend>Cara memulihkan</legend>
+          <label><input type="radio" name="importMode" value="merge" checked> <span><strong>Gabungkan (disarankan)</strong> — hanya pulihkan modul yang lebih maju dari progres di perangkat ini.</span></label>
+          <label><input type="radio" name="importMode" value="replace"> <span><strong>Timpa</strong> — pakai isi berkas untuk semua modul di atas, meski progres di perangkat ini lebih maju.</span></label>
+        </fieldset>
+        <p class="import-warn">Tutup tab modul lain yang sedang terbuka sebelum memulihkan, supaya tidak menimpa hasilnya.</p>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button type="button" class="btn btn-primary" id="btnImportConfirm" style="flex:1">Pulihkan</button>
+          <button type="button" class="btn btn-ghost" id="btnImportCancel">Batal</button>
+        </div>
+      </div>
+    </div>
+
     <main class="hub-main">
       <div class="hub-hero">
         <h2>Belajar Lebih Siap untuk Dunia Profesional</h2>
@@ -86,7 +99,6 @@
 
       <div class="module-grid">
         <button type="button" class="module-card mod-spt" data-module="./apps/spt/index.html" tabindex="0">
-          <div class="icon">🧾</div>
           <h3>Simulator SPT Pajak</h3>
           <p>
             Latihan isi SPT Tahunan Badan (Formulir 1771 + lampiran), modul ringkasan pajak,
@@ -101,7 +113,6 @@
         </button>
 
         <button type="button" class="module-card mod-accounting" data-module="./apps/accounting/index.html" tabindex="0">
-          <div class="icon">📊</div>
           <h3>Accounting Simulator</h3>
           <p>
             Siklus akuntansi lengkap: jurnal, buku besar, neraca saldo, penyesuaian, worksheet,
@@ -116,7 +127,6 @@
         </button>
 
         <button type="button" class="module-card mod-excel" data-module="./apps/excel/index.html" tabindex="0">
-          <div class="icon">📈</div>
           <h3>Excel Formula Practice</h3>
           <p>
             Latihan rumus Excel di atas dataset penjualan realistis: SUM, IF, COUNTIF, SUMIF,
@@ -132,7 +142,6 @@
 
 
         <button type="button" class="module-card mod-sqlpq" data-module="./apps/sql-pq/index.html" tabindex="0">
-          <div class="icon">🗄️</div>
           <h3>SQL &amp; Power Query Simulator</h3>
           <p>
             Belajar SQL &amp; Power Query dari dasar sampai mahir: dataset realistis, SQL editor
@@ -147,6 +156,29 @@
         </button>
       </div>
 
+
+      <section class="progress-panel" id="progressPanel" aria-labelledby="progressTitle">
+        <div class="progress-head">
+          <div>
+            <h3 id="progressTitle">Progres Saya</h3>
+            <p class="progress-sub" id="progressSub">Ringkasan belajar dari semua modul di perangkat ini.</p>
+          </div>
+          <div class="progress-actions">
+            <button type="button" class="btn btn-ghost" id="btnProgressPdf">Unduh Rekap (PDF)</button>
+            <button type="button" class="btn btn-ghost" id="btnProgressExport">Ekspor Progres</button>
+            <button type="button" class="btn btn-ghost" id="btnProgressImport">Impor Progres</button>
+            <input type="file" id="progressFile" accept="application/json,.json" hidden>
+          </div>
+        </div>
+        <div class="progress-totals" id="progressTotals" aria-live="polite"></div>
+        <div class="progress-grid" id="progressGrid"></div>
+        <div class="progress-status" id="progressStatus" role="status" aria-live="polite"></div>
+        <p class="progress-note">
+          Progres tersimpan di browser perangkat ini. Gunakan <strong>Ekspor Progres</strong> untuk cadangan atau pindah perangkat.
+          File ekspor memuat data modul apa adanya (termasuk nama/email bila Anda pernah login di SPT), jadi simpan dan bagikan dengan hati-hati.
+        </p>
+      </section>
+
       <p class="hub-footer">
         Portal Belajar · Berjalan di browser · Data modul lokal per aplikasi
       </p>
@@ -159,6 +191,10 @@
   <script src="./js/shared/firebase-config.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/portal.js"></script>
+  <script src="./js/shared/paper-config.js"></script>
+  <script src="./js/shared/pdf-export.js"></script>
+  <script src="./js/shared/progress-aggregator.js"></script>
+  <script src="./js/portal-progress.js"></script>
 
   <!-- PWA: daftarkan service worker (gratis, agar hub bisa dibuka offline) -->
   <script>

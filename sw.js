@@ -8,7 +8,7 @@
 // 2. Apapun di bawah ./apps/ → tiap modul punya service worker sendiri
 //    dengan scope masing-masing; root SW ini hanya menjaga shell hub.
 
-const CACHE_NAME = 'portal-shell-v5-transparent-scroll';
+const CACHE_NAME = 'portal-shell-v7-kb-sources'; // bumped: Knowledge Base kini menampilkan sumber & lencana tinjau (js/knowledge-base.js, css/knowledge-base.css)
 
 const APP_SHELL_LOCAL = [
     './',
@@ -20,6 +20,10 @@ const APP_SHELL_LOCAL = [
     './js/auth.js',
     './js/portal.js',
     './js/back-to-portal.js',
+    './js/portal-progress.js',
+    './js/shared/progress-aggregator.js',
+    './js/shared/paper-config.js',
+    './js/shared/pdf-export.js',
     './js/knowledge-base.js',
     './apps/spt/icons/favicon-32.png'
 ];

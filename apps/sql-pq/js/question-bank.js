@@ -39,6 +39,13 @@
     return { min: res.values[0][0], max: res.values[0][1], avg: res.values[0][2] };
   }
   function round2(n) { return Math.round(n * 100) / 100; }
+  function quantileOf(table, col, p) {
+    const eng = global.SQLPQ_Engine;
+    const cnt = eng.run(`SELECT COUNT("${col}") FROM "${table}" WHERE "${col}" IS NOT NULL`).values[0][0];
+    if (!cnt) return 0;
+    const off = Math.floor((cnt - 1) * p);
+    return eng.run(`SELECT "${col}" FROM "${table}" WHERE "${col}" IS NOT NULL ORDER BY "${col}" LIMIT 1 OFFSET ${off}`).values[0][0];
+  }
 
   const CONCEPTS = {
     where: {
@@ -329,10 +336,11 @@
         `SELECT * FROM "${r.table}" WHERE "${r.nameCol}" LIKE '${prefix}%'`,
         { prefix });
     } else if (which < 0.85) {
-      const rng = numericRange(r.table, r.numCol);
-      const span = Math.max(1, rng.max - rng.min);
-      const lo = Math.round(rng.min + span * 0.2);
-      const hi = Math.round(rng.min + span * 0.6);
+      // Persentil ke-20 s/d ke-60 (bukan min..max): pada dataset "kotor" satu nilai
+      // ekstrem (×50/×100) menggeser rentang min..max ke wilayah yang kosong,
+      // sehingga kunci jawaban kosong. floor/ceil menjamin rentang mencakup baris nyata.
+      const lo = Math.floor(quantileOf(r.table, r.numCol, 0.2));
+      const hi = Math.max(lo + 1, Math.ceil(quantileOf(r.table, r.numCol, 0.6)));
       return buildQuestion(1, "between", r.table,
         `Tampilkan baris dari tabel "${r.table}" yang nilai "${r.numCol}"-nya berada di antara ${lo} dan ${hi} (inklusif).`,
         `SELECT * FROM "${r.table}" WHERE "${r.numCol}" BETWEEN ${lo} AND ${hi}`,
@@ -493,6 +501,21 @@
     }
   }
 
+  // Soal level 5 (data quality) mengunci satu kolom tertentu, sedangkan
+  // makeDirty() menyebar kekotoran ke kolom acak — jadi sering kali kunci
+  // jawabannya KOSONG (mis. "baris bernilai negatif" padahal tidak ada).
+  // Kunci kosong membuat query asal seperti "WHERE 1=0" dinilai benar dan
+  // latihannya tidak mendidik. Ulang sampai ada isi; bila dataset memang
+  // bersih total, perilaku lama dipertahankan (dikembalikan apa adanya).
+  function hasEmptyAnswer(q) {
+    try { return global.SQLPQ_Engine.run(q.expectedSql).values.length === 0; } catch (e) { return false; }
+  }
+  function genLevel5NonEmpty(category) {
+    let q = genLevel5(category);
+    for (let i = 0; i < 12 && hasEmptyAnswer(q); i++) q = genLevel5(category);
+    return q;
+  }
+
   /**
    * category is required for levels 1/2/5 (flat dataset categories);
    * ignored for levels 3/4 (always uses the relational sample DB).
@@ -503,7 +526,7 @@
       case 2: return genLevel2(category || "sales");
       case 3: return genLevel3();
       case 4: return genLevel4();
-      case 5: return genLevel5(category || "sales");
+      case 5: return genLevel5NonEmpty(category || "sales");
       default: return genLevel1(category || "sales");
     }
   }

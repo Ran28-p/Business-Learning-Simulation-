@@ -39,6 +39,57 @@
   }
 
   /* ════════════════════════════════════════════════════════════════
+     SUMBER & KEPERCAYAAN MATERI (opsional, kompatibel mundur)
+     Field opsional per section:
+       sources:  [{ type, ref, note?, url? }]   → blok "Sumber & rujukan"
+       reviewed: 'YYYY-MM'                       → lencana "Ditinjau Okt 2026"
+     Field opsional per konten: disclaimer (string) → catatan di bawah judul.
+     Section tanpa field ini dirender persis seperti sebelumnya.
+     ════════════════════════════════════════════════════════════════ */
+  var SOURCE_TYPE_LABELS = {
+    uu: 'UU', pp: 'PP', perpres: 'Perpres', pmk: 'PMK', per: 'Peraturan DJP',
+    se: 'SE', psak: 'PSAK', isak: 'ISAK', standar: 'Standar', vendor: 'Dokumentasi resmi', lain: 'Rujukan'
+  };
+  var MONTHS_ID = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+  function formatReviewed(ym) {
+    var m = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(String(ym || ''));
+    return m ? MONTHS_ID[parseInt(m[2], 10) - 1] + ' ' + m[1] : '';
+  }
+  function safeUrl(u) {
+    return /^https:\/\/[^\s"'<>]+$/i.test(String(u || '')) ? String(u) : '';
+  }
+  function buildSourcesHtml(section, forPrint) {
+    if (!section) return '';
+    var list = Array.isArray(section.sources) ? section.sources : [];
+    var reviewed = formatReviewed(section.reviewed);
+    if (!list.length && !reviewed) return '';
+    var html = '<footer class="kb-sources">';
+    if (list.length) {
+      html += '<div class="kb-sources-title">Sumber &amp; rujukan</div><ul class="kb-sources-list">';
+      for (var i = 0; i < list.length; i++) {
+        var it = list[i] || {};
+        if (!it.ref) continue;
+        var label = SOURCE_TYPE_LABELS[it.type] || SOURCE_TYPE_LABELS.lain;
+        var url = safeUrl(it.url);
+        var refHtml = escapeHtml(it.ref);
+        if (url && !forPrint) {
+          refHtml = '<a href="' + escapeAttr(url) + '" target="_blank" rel="noopener noreferrer">' + refHtml + '</a>';
+        }
+        html += '<li><span class="kb-src-type">' + escapeHtml(label) + '</span> ' + refHtml +
+          (it.note ? ' <span class="kb-src-note">— ' + escapeHtml(it.note) + '</span>' : '') + '</li>';
+      }
+      html += '</ul>';
+    }
+    if (reviewed) html += '<div class="kb-reviewed">Ditinjau: ' + escapeHtml(reviewed) + '</div>';
+    return html + '</footer>';
+  }
+  function buildDisclaimerHtml(content, cls) {
+    return content && content.disclaimer
+      ? '<div class="' + cls + '">' + escapeHtml(content.disclaimer) + '</div>' : '';
+  }
+
+  /* ════════════════════════════════════════════════════════════════
      LAYER B — PRINT DOCUMENT MODEL
      Struktur DOM murni untuk print/PDF. TIDAK membawa UI interaktif:
      tanpa sidebar, tombol, search, dropdown, overlay, background app.
@@ -58,6 +109,12 @@
       '<h1 class="print-doc-title">' + escapeHtml(content.title || 'Modul Pengetahuan') + '</h1>' +
       (content.subtitle ? '<div class="print-doc-sub">' + escapeHtml(content.subtitle) + '</div>' : '');
     doc.appendChild(header);
+    if (content.disclaimer) {
+      var disc = document.createElement('div');
+      disc.className = 'print-doc-disclaimer';
+      disc.textContent = content.disclaimer;
+      doc.appendChild(disc);
+    }
 
     // ── Chapters: tiap topik = unit pagination (mulai halaman baru,
     //    tapi boleh memanjang beberapa halaman bila kontennya panjang) ──
@@ -87,6 +144,13 @@
         body.className = 'print-body';
         body.innerHTML = section.body || '';
         art.appendChild(body);
+
+        var srcHtml = buildSourcesHtml(section, true);
+        if (srcHtml) {
+          var srcWrap = document.createElement('div');
+          srcWrap.innerHTML = srcHtml;
+          art.appendChild(srcWrap.firstChild);
+        }
 
         ch.appendChild(art);
       }
@@ -135,6 +199,12 @@
     '.print-body strong{color:#0f172a;font-weight:700;}',
     '.print-body code{font-family:ui-monospace,Consolas,"SFMono-Regular",Menlo,monospace;font-size:10pt;background:#f1f5f9;padding:0.5pt 3pt;border-radius:2pt;}',
     '.print-body .kb-legal{font-size:9pt;color:#64748b;font-style:italic;}',
+    '.print-doc-disclaimer{font-family:Arial,Helvetica,sans-serif;font-size:9pt;color:#475569;border:0.75pt solid #cbd5e1;background:#f8fafc;border-radius:3pt;padding:5pt 8pt;margin:0 0 12pt;}',
+    '.print-section .kb-sources{font-family:Arial,Helvetica,sans-serif;font-size:9pt;color:#475569;border-top:0.75pt dashed #94a3b8;margin-top:8pt;padding-top:5pt;break-inside:avoid;}',
+    '.print-section .kb-sources-title{font-weight:700;margin-bottom:2pt;}',
+    '.print-section .kb-sources-list{margin:0 0 3pt;padding-left:14pt;}',
+    '.print-section .kb-src-type{font-weight:700;color:#0f172a;}',
+    '.print-section .kb-reviewed{font-style:italic;color:#64748b;}',
     '.print-body .kb-callout-title{display:block;font-weight:700;margin-bottom:3pt;}',
 
     /* Tables — unit atomic, header repeats, must not overflow */
@@ -332,7 +402,7 @@
         const sectionId = section.id || slug(section.heading, chapterId + '-' + (si + 1));
         contentHtml += `<article class="kb-section" id="${escapeAttr(sectionId)}" data-kb-chapter-parent="${escapeAttr(chapterId)}">`;
         contentHtml += `<h3 class="kb-section-title">${escapeHtml(section.heading)}</h3>`;
-        contentHtml += `<div class="kb-section-body">${section.body || ''}</div></article>`;
+        contentHtml += `<div class="kb-section-body">${section.body || ''}</div>${buildSourcesHtml(section, false)}</article>`;
       });
       contentHtml += `</section>`;
     });
@@ -367,6 +437,7 @@
                 <h1>${escapeHtml(content.title || '')}</h1>
                 ${content.subtitle ? `<p>${escapeHtml(content.subtitle)}</p>` : ''}
               </div>
+              ${buildDisclaimerHtml(content, 'kb-disclaimer')}
               ${contentHtml}
             </div>
           </main>
@@ -475,7 +546,8 @@
         let chapterHit = (chapter.title || '').toLowerCase().includes(query);
         (chapter.sections || []).forEach((section, si) => {
           const sectionId = section.id || slug(section.heading, chapterId + '-' + (si + 1));
-          const text = ((section.heading || '') + ' ' + (section.body || '').replace(/<[^>]+>/g, ' ')).toLowerCase();
+          const srcText = (section.sources || []).map((x) => ((x && x.ref) || '') + ' ' + ((x && x.note) || '')).join(' ');
+          const text = ((section.heading || '') + ' ' + (section.body || '').replace(/<[^>]+>/g, ' ') + ' ' + srcText).toLowerCase();
           const ok = text.includes(query);
           const navLi = overlay.querySelector(`.kb-nav-link[data-kb-target="${CSS.escape(sectionId)}"]`);
           if (navLi && navLi.parentElement) navLi.parentElement.hidden = !ok;
@@ -555,5 +627,5 @@
     document.body.classList.remove('kb-scroll-lock');
   }
 
-  window.KnowledgeBase = { open, close };
+  window.KnowledgeBase = { open, close, helpers: { buildSourcesHtml: buildSourcesHtml, formatReviewed: formatReviewed, safeUrl: safeUrl, SOURCE_TYPES: Object.keys(SOURCE_TYPE_LABELS) } };
 })();

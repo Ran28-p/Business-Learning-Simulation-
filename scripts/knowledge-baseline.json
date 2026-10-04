@@ -1,0 +1,37 @@
+{
+  "spt": {
+    "sections": 32,
+    "withSources": 27,
+    "exempt": 5,
+    "withoutSources": 0,
+    "withReviewed": 25
+  },
+  "accounting": {
+    "sections": 12,
+    "withSources": 11,
+    "exempt": 1,
+    "withoutSources": 0,
+    "withReviewed": 8
+  },
+  "excel": {
+    "sections": 30,
+    "withSources": 28,
+    "exempt": 2,
+    "withoutSources": 0,
+    "withReviewed": 2
+  },
+  "excel-pivot": {
+    "sections": 8,
+    "withSources": 5,
+    "exempt": 3,
+    "withoutSources": 0,
+    "withReviewed": 0
+  },
+  "sql-pq": {
+    "sections": 11,
+    "withSources": 10,
+    "exempt": 1,
+    "withoutSources": 0,
+    "withReviewed": 4
+  }
+}

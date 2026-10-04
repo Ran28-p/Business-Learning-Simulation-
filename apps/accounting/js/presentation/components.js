@@ -5,6 +5,7 @@
 
 import { getBadges } from '../business/appState.js';
 import { getAccounts } from '../accounting/engine.js';
+import { saveTheme, loadTheme } from '../storage/localStorage.js';
 import { showToast } from './modals.js';
 
 /**
@@ -100,11 +101,32 @@ export function updateScoreDisplay({ score, grade }) {
 }
 
 /**
- * Applies the saved theme on page load from global portal storage.
+ * Toggles light / dark theme and persists preference.
+ */
+export function toggleTheme() {
+  const htmlEl = document.documentElement;
+  const themeBtn = document.getElementById('themeBtn');
+
+  if (htmlEl.getAttribute('data-theme') === 'dark') {
+    htmlEl.removeAttribute('data-theme');
+    if (themeBtn) themeBtn.innerText = '🌙';
+    saveTheme('light');
+  } else {
+    htmlEl.setAttribute('data-theme', 'dark');
+    if (themeBtn) themeBtn.innerText = '☀️';
+    saveTheme('dark');
+  }
+}
+
+/**
+ * Applies the saved theme on page load.
  */
 export function applySavedTheme() {
-  const saved = localStorage.getItem('bls-theme') || 'light';
-  document.documentElement.setAttribute('data-theme', saved);
+  if (loadTheme() === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    const themeBtn = document.getElementById('themeBtn');
+    if (themeBtn) themeBtn.innerText = '☀️';
+  }
 }
 
 /**

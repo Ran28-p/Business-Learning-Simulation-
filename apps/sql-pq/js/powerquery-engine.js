@@ -117,7 +117,7 @@
       case "num": return node.value;
       case "str": return node.value;
       case "col":
-        if (!(node.name in row)) throw new Error('Kolom tidak ditemukan: "' + node.name + '"');
+        if (!Object.prototype.hasOwnProperty.call(row, node.name)) throw new Error('Kolom tidak ditemukan: "' + node.name + '"');
         return row[node.name];
       case "neg": return -toNumber(evalAst(node.expr, row));
       case "bin": {

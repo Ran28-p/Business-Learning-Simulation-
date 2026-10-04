@@ -280,7 +280,7 @@
                         { id: 'q_tarif', label: 'Tarif PPh Final UMKM (%)', type: 'number', correct: 0.5, hint: 'Sesuai PP 55 Tahun 2022 (pengganti PP 23/2018).' },
                         { id: 'q_pph', label: 'PPh Final Terutang (Rp)', type: 'number', correct: 500000, hint: 'Omset x 0.5%' }
                     ],
-                    explanation: 'Berdasarkan PP 55 Tahun 2022, WP Badan UMKM berbentuk CV dikenakan PPh Final 0,5% dari peredaran bruto. Batas bebas omset Rp 500 Juta HANYA berlaku untuk Orang Pribadi UMKM, bukan untuk Badan/CV.'
+                    explanation: 'Untuk masa pajak 2025, berdasarkan PP 55 Tahun 2022 dan ketentuan peralihan PP 20/2026 (berlaku s.d. akhir Tahun Pajak 2026), CV UMKM masih dikenakan PPh Final 0,5% dari peredaran bruto. Batas bebas omset Rp 500 Juta HANYA berlaku untuk Orang Pribadi UMKM, bukan untuk Badan/CV. Catatan: setelah masa peralihan, subjek final UMKM hanya Orang Pribadi, PT Perorangan, dan Koperasi; CV biasa memakai tarif umum / Pasal 31E.'
                 },
                 {
                     id: 'final2',
@@ -552,18 +552,19 @@
 
             updateProfileUI();
             
-            const savedTheme = localStorage.getItem('bls-theme') || localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                if (savedTheme === 'dark') document.body.setAttribute('data-theme', 'dark');
+                else document.body.removeAttribute('data-theme');
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.setAttribute('data-theme', 'dark');
+            }
 
-            try {
-                const portalName = sessionStorage.getItem('portal_user_name');
-                const portalEmail = sessionStorage.getItem('portal_user_email');
-                if (portalName && (!appState.user.displayName || appState.user.displayName === 'Tamu')) {
-                    appState.user.displayName = portalName;
-                    if (portalEmail) appState.user.email = portalEmail;
-                    updateProfileUI();
-                }
-            } catch (_) {}
+            const themeToggle = document.getElementById('theme-toggle');
+            if(themeToggle) {
+                themeToggle.checked = document.body.getAttribute('data-theme') === 'dark';
+                themeToggle.addEventListener('change', toggleTheme);
+            }
         }
 
         // CATATAN: fungsi saveData() versi localStorage yang lama sudah dihapus dari sini —
@@ -1005,42 +1006,55 @@ function logoutUser() {
         function downloadForm1770PDF() { downloadFormPDF('view-form1770', 'f1770', 5, '1770'); }
         function downloadForm1771PDF() { downloadFormPDF('view-form1771', 'f1771', 6, '1771'); }
 
-        function syncMobileSidebar(open) {
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            const toggleBtn = document.getElementById('sidebar-toggle');
-            if (!sidebar) return;
-            const isOpen = Boolean(open);
-            sidebar.classList.toggle('mobile-open', isOpen);
-            if (backdrop) backdrop.classList.toggle('active', isOpen);
-            if (toggleBtn) {
-                toggleBtn.setAttribute('aria-expanded', String(isOpen));
-                toggleBtn.setAttribute('title', isOpen ? 'Tutup menu' : 'Buka menu');
+        function toggleTheme() {
+            const body = document.body;
+            if(body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
             }
-            document.body.style.overflow = isOpen ? 'hidden' : '';
+            const themeToggle = document.getElementById('theme-toggle');
+            if(themeToggle) themeToggle.checked = document.body.getAttribute('data-theme') === 'dark';
         }
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             if(!sidebar) return;
+            const backdrop = document.getElementById('sidebar-backdrop');
             const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+            // FIX: di mobile, tombol ini buka/tutup drawer (mobile-open + backdrop gelap).
+            // Di desktop, tombol ini tetap perilaku lama: mengecilkan sidebar jadi ikon saja (collapsed).
+            let isOpenNow;
             if (isMobile) {
-                syncMobileSidebar(!sidebar.classList.contains('mobile-open'));
+                sidebar.classList.toggle('mobile-open');
+                isOpenNow = sidebar.classList.contains('mobile-open');
+                if (backdrop) backdrop.classList.toggle('active', isOpenNow);
             } else {
                 sidebar.classList.toggle('collapsed');
-                const toggleBtn = document.getElementById('sidebar-toggle');
-                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', String(!sidebar.classList.contains('collapsed')));
+                isOpenNow = !sidebar.classList.contains('collapsed');
+            }
+
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            if(toggleBtn) {
+                toggleBtn.setAttribute('aria-expanded', String(isOpenNow));
+                toggleBtn.setAttribute('title', isOpenNow ? 'Sembunyikan menu' : 'Buka menu');
             }
         }
 
-        function closeMobileSidebar() { syncMobileSidebar(false); }
+        // FIX: tutup drawer mobile otomatis begitu backdrop di-tap, atau salah satu menu navigasi dipilih —
+        // supaya user tidak perlu tap ☰ dua kali (buka menu -> pilih menu -> harus tutup manual lagi).
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar) sidebar.classList.remove('mobile-open');
+            if (backdrop) backdrop.classList.remove('active');
+        }
         document.addEventListener('DOMContentLoaded', function() {
             const backdrop = document.getElementById('sidebar-backdrop');
-            if (backdrop) backdrop.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                closeMobileSidebar();
-            });
+            if (backdrop) backdrop.addEventListener('click', closeMobileSidebar);
 
             document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(btn) {
                 btn.addEventListener('click', function() {
@@ -1048,11 +1062,9 @@ function logoutUser() {
                 });
             });
 
+            // Reset state kalau layar di-rotate/resize dari mobile ke desktop supaya tidak nyangkut terbuka
             window.addEventListener('resize', function() {
                 if (!window.matchMedia('(max-width: 768px)').matches) closeMobileSidebar();
-            });
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape') closeMobileSidebar();
             });
         });
 
@@ -1625,12 +1637,8 @@ function logoutUser() {
             const xpGain = Math.round(score * 1.5);
             document.getElementById('result-xp-gain').innerText = `+${xpGain} XP Diperoleh!`;
 
-            let explHtml = `<strong>Rincian Pengecekan Formulir (${checks.length} titik cek):</strong><ul>`;
-            checks.forEach(function(c) {
-                explHtml += '<li>' + (c.ok ? '✅' : '❌') + ' ' + c.label + (c.ok ? '' : ' — seharusnya: <strong>' + c.correctVal + '</strong>') + '</li>';
-            });
-            explHtml += '</ul>';
-            document.getElementById('result-explanation').innerHTML = explHtml;
+            // Pembahasan per titik cek (rumus, dasar, jebakan) — js/data/form-pembahasan.js
+            document.getElementById('result-explanation').innerHTML = FormPembahasan.render(checks);
 
             appState.user.xp += xpGain;
             appState.user.history.push({
@@ -2598,12 +2606,8 @@ function logoutUser() {
             const xpGain = Math.round(score * 2); // 1771 paling kompleks, dihargai paling tinggi
             document.getElementById('result-xp-gain').innerText = `+${xpGain} XP Diperoleh!`;
 
-            let explHtml = `<strong>Rincian Pengecekan Formulir (${checks.length} titik cek):</strong><ul>`;
-            checks.forEach(function(c) {
-                explHtml += '<li>' + (c.ok ? '✅' : '❌') + ' ' + c.label + (c.ok ? '' : ' — seharusnya: <strong>' + c.correctVal + '</strong>') + '</li>';
-            });
-            explHtml += '</ul>';
-            document.getElementById('result-explanation').innerHTML = explHtml;
+            // Pembahasan per titik cek (rumus, dasar, jebakan) — js/data/form-pembahasan.js
+            document.getElementById('result-explanation').innerHTML = FormPembahasan.render(checks);
 
             appState.user.xp += xpGain;
             appState.user.history.push({

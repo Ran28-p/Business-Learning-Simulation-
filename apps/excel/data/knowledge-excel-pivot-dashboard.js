@@ -20,7 +20,10 @@ window.KNOWLEDGE_CONTENT_EXCEL_PIVOT_DASHBOARD = {
 <p class="kb-lead">Pivot Table adalah fitur Excel untuk meringkas, mengelompokkan, dan menganalisis data mentah dalam jumlah besar menjadi tabel ringkas yang mudah dibaca — tanpa perlu menulis satu pun rumus manual.</p>
 <p>Bayangkan kamu punya 1.000 baris data transaksi penjualan (tanggal, wilayah, produk, jumlah). Untuk tahu "total penjualan per wilayah" secara manual, kamu perlu menulis SUMIF untuk tiap wilayah satu per satu. Pivot Table melakukan ini otomatis — cukup <em>drag-and-drop</em> nama field ke area Baris, Kolom, atau Nilai.</p>
 <div class="kb-tip"><span class="kb-callout-title">💡 Kapan Memakai Pivot Table</span>Gunakan Pivot Table ketika: (1) data mentah berjumlah banyak baris, (2) kamu perlu meringkas berdasarkan kategori (wilayah, produk, bulan, dll), dan (3) kamu ingin bisa cepat mengubah sudut pandang ringkasan tanpa menulis ulang rumus.</div>
-<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Buka menu <strong>"2. Pivot Table"</strong> pada latihan interaktif Pivot Table &amp; Dashboard di aplikasi ini. Lihat tabel data mentahnya di tab "1. Data Sumber" — perhatikan setiap barisnya adalah satu transaksi, persis seperti contoh 1.000 baris di atas (bedanya di sini datanya 180-an baris supaya ringan dipraktikkan).</div>`
+<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Buka menu <strong>"2. Pivot Table"</strong> pada latihan interaktif Pivot Table &amp; Dashboard di aplikasi ini. Lihat tabel data mentahnya di tab "1. Data Sumber" — perhatikan setiap barisnya adalah satu transaksi, persis seperti contoh 1.000 baris di atas (bedanya di sini datanya 180-an baris supaya ringan dipraktikkan).</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Support — Create a PivotTable to analyze worksheet data', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
+          ]
         },
         {
           id: 'cara-membuat-pivot',
@@ -44,7 +47,10 @@ window.KNOWLEDGE_CONTENT_EXCEL_PIVOT_DASHBOARD = {
 </ol>
 <div class="kb-formula">Konsep di baliknya: setiap sel Pivot Table = SUMIFS(kolom_nilai, kolom_baris, "kategori_baris", kolom_kolom, "kategori_kolom")</div>
 <p>Memahami rumus konseptual di atas sangat membantu — Pivot Table sebenarnya "hanya" menjalankan banyak SUMIFS otomatis di belakang layar untuk setiap kombinasi baris × kolom.</p>
-<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Di latihan interaktif, dropdown "Baris", "Kolom", dan "Nilai" pada tab "2. Pivot Table" persis meniru drag-and-drop field di Excel asli. Coba atur Baris = Wilayah, Kolom = Kategori Produk, Nilai = Total, lalu klik "Buat/Perbarui Pivot" — dan lihat kotak pratinjau formula di bawahnya untuk melihat formula SUMIFS sungguhan yang dijalankan oleh engine HyperFormula.</div>`
+<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Di latihan interaktif, dropdown "Baris", "Kolom", dan "Nilai" pada tab "2. Pivot Table" persis meniru drag-and-drop field di Excel asli. Coba atur Baris = Wilayah, Kolom = Kategori Produk, Nilai = Total, lalu klik "Buat/Perbarui Pivot" — dan lihat kotak pratinjau formula di bawahnya untuk melihat formula SUMIFS sungguhan yang dijalankan oleh engine HyperFormula.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Support — Create a PivotTable to analyze worksheet data', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
+          ]
         },
         {
           id: 'grouping-filtering',
@@ -54,7 +60,10 @@ window.KNOWLEDGE_CONTENT_EXCEL_PIVOT_DASHBOARD = {
 <p><strong>Filtering</strong> — ada dua cara: (1) drag field ke area <em>Filters</em> untuk menyaring seluruh Pivot Table, atau (2) klik ikon dropdown pada header Rows/Columns untuk menyaring nilai tertentu saja (mis. hanya tampilkan 3 wilayah tertentu, sembunyikan sisanya) tanpa menghapus data aslinya.</p>
 <p><strong>Calculated Field</strong> — kolom hasil hitungan baru yang dibuat di dalam Pivot Table itu sendiri (menu <em>PivotTable Analyze → Fields, Items & Sets → Calculated Field</em>), misalnya menghitung "Margin %" dari Laba dibagi Penjualan, padahal kolom "Margin %" tidak ada di data mentah aslinya.</p>
 <div class="kb-warning"><span class="kb-callout-title">⚠️ Hati-Hati dengan Calculated Field</span>Calculated Field menghitung berdasarkan <em>total hasil agregasi</em>, bukan baris per baris — untuk rasio seperti margin %, ini biasanya benar. Tapi untuk perhitungan yang butuh urutan operasi berbeda (misalnya rata-rata dari rata-rata), hasilnya bisa menyesatkan. Kalau ragu, lebih aman menghitung kolom tambahan di data mentah sebelum masuk ke Pivot Table.</div>
-<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Pada latihan interaktif, coba ganti Agregasi menjadi "Count" — ini adalah bentuk sederhana dari mengubah cara Pivot Table meringkas data, mirip konsep di balik grouping/filtering: kamu mengontrol <em>bagaimana</em> data diringkas, bukan hanya <em>apa</em> yang diringkas.</div>`
+<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Pada latihan interaktif, coba ganti Agregasi menjadi "Count" — ini adalah bentuk sederhana dari mengubah cara Pivot Table meringkas data, mirip konsep di balik grouping/filtering: kamu mengontrol <em>bagaimana</em> data diringkas, bukan hanya <em>apa</em> yang diringkas.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Support — Create a PivotTable to analyze worksheet data', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
+          ]
         },
         {
           id: 'multiple-values-layout',
@@ -70,7 +79,10 @@ window.KNOWLEDGE_CONTENT_EXCEL_PIVOT_DASHBOARD = {
 <tr><td><strong>Tabular Form</strong></td><td>Mirip tabel data biasa, paling mudah dibaca ulang sebagai data mentah baru (bisa di-copy ke sumber lain).</td></tr>
 </tbody>
 </table></div>
-<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Latihan interaktif di aplikasi ini sengaja disederhanakan menjadi satu Value field agar konsepnya jelas dulu. Setelah nyaman dengan itu, coba praktikkan multiple value fields langsung di Excel/Google Sheets sungguhan menggunakan dataset serupa (bisa dicontek dari tab "1. Data Sumber").</div>`
+<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Latihan interaktif di aplikasi ini sengaja disederhanakan menjadi satu Value field agar konsepnya jelas dulu. Setelah nyaman dengan itu, coba praktikkan multiple value fields langsung di Excel/Google Sheets sungguhan menggunakan dataset serupa (bisa dicontek dari tab "1. Data Sumber").</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Support — Create a PivotTable to analyze worksheet data', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
+          ]
         }
       ]
     },
@@ -81,6 +93,7 @@ window.KNOWLEDGE_CONTENT_EXCEL_PIVOT_DASHBOARD = {
         {
           id: 'prinsip-dashboard',
           heading: '2.1 Prinsip Dashboard yang Baik',
+          noSourceNeeded: 'Prinsip desain dan praktik penyajian; bukan ketentuan baku',
           body: `
 <p class="kb-lead">Dashboard adalah satu halaman ringkas yang menampilkan metrik-metrik terpenting agar bisa dipahami dalam hitungan detik — bukan sekadar kumpulan chart yang dipasang berdampingan.</p>
 <ul>
@@ -95,6 +108,7 @@ window.KNOWLEDGE_CONTENT_EXCEL_PIVOT_DASHBOARD = {
         {
           id: 'tutorial-dashboard',
           heading: '2.2 Tutorial Step-by-Step Membuat Dashboard dari Data Penjualan',
+          noSourceNeeded: 'Tutorial prosedural langkah demi langkah; tidak memuat klaim regulasi/standar',
           body: `
 <p class="kb-lead">Berikut alur umum membuat dashboard penjualan sederhana di Excel, dari data mentah sampai jadi:</p>
 <ol>
@@ -123,11 +137,15 @@ window.KNOWLEDGE_CONTENT_EXCEL_PIVOT_DASHBOARD = {
 </table></div>
 <p><strong>KPI Card di Excel</strong> biasanya bukan fitur bawaan khusus, melainkan sel biasa yang diformat: font besar (28-40pt), warna latar kontras, kadang ditambah ikon panah naik/turun dengan Conditional Formatting untuk menunjukkan tren dibanding periode sebelumnya.</p>
 <p><strong>Slicer</strong> adalah tombol filter visual yang terhubung ke satu atau lebih Pivot Table/Pivot Chart. Satu klik pada slicer akan memfilter semua elemen dashboard yang terhubung dengannya secara bersamaan — inilah yang membuat dashboard terasa "interaktif" dibanding sekumpulan chart statis.</p>
-<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Bandingkan dua chart di tab Dashboard: "Total Penjualan per Wilayah" pakai Bar Chart karena membandingkan kategori sejajar, sedangkan "Total Penjualan per Bulan" juga pakai bentuk serupa di sini — coba pikirkan, kalau datanya mencakup 2-3 tahun sekaligus, jenis chart mana yang lebih tepat dipakai untuk tren bulanannya, Bar atau Line?</div>`
+<div class="kb-example"><span class="kb-callout-title">🎯 Latihan Singkat</span>Bandingkan dua chart di tab Dashboard: "Total Penjualan per Wilayah" pakai Bar Chart karena membandingkan kategori sejajar, sedangkan "Total Penjualan per Bulan" juga pakai bentuk serupa di sini — coba pikirkan, kalau datanya mencakup 2-3 tahun sekaligus, jenis chart mana yang lebih tepat dipakai untuk tren bulanannya, Bar atau Line?</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Support — Use slicers to filter data', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
+          ]
         },
         {
           id: 'update-dinamis',
           heading: '2.4 Cara Mengisi / Meng-update Dashboard Secara Dinamis',
+          noSourceNeeded: 'Prosedur kerja; tidak memuat klaim regulasi/standar',
           body: `
 <p class="kb-lead">Dashboard yang baik seharusnya tidak perlu dibangun ulang setiap ada data baru. Beberapa teknik supaya dashboard ter-update otomatis:</p>
 <ul>

@@ -619,3 +619,13 @@ body { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; }
 .btn:focus-visible, .tc-back:focus-visible { outline: 2px solid var(--tc-primary); outline-offset: 3px; }
 @media (max-width: 640px) { .tc-shell { padding: 20px 12px 100px; } }
 
+/* Pembahasan berlapis */
+.tcpb { margin-top: 10px; padding: 4px 12px 8px; border: 1px solid var(--tc-border); border-radius: 10px; background: var(--tc-card); color: var(--tc-text); font-size: 0.88rem; line-height: 1.55; }
+.tcpb-row { padding: 8px 0; border-bottom: 1px dashed var(--tc-border); }
+.tcpb-row:last-child { border-bottom: 0; }
+.tcpb-row p { margin: 4px 0 0; }
+.tcpb-row ol, .tcpb-row ul { margin: 4px 0 0; padding-left: 20px; }
+.tcpb-label { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--tc-muted); }
+.tcpb-warn .tcpb-label { color: #b45309; }
+.tcpb-tip .tcpb-label { color: #047857; }
+

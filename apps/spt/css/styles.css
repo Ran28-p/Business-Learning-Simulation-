@@ -1505,3 +1505,13 @@ input:focus, select:focus, textarea:focus {
   .topbar h1 { font-size: 1.45rem; }
 }
 
+/* Pembahasan per titik cek (mode Isi Formulir) */
+.fp-list { list-style: none; padding-left: 0; margin: 10px 0 0; }
+.fp-list > li { padding: 6px 0; }
+.fp-note { margin-top: 8px; font-size: 0.9rem; color: var(--text-muted, #64748b); }
+.fp-detail { margin: 6px 0 4px 24px; border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px; background: var(--bg-card, transparent); font-size: 0.88rem; line-height: 1.55; }
+.fp-detail summary { cursor: pointer; font-weight: 600; padding: 2px 0; }
+.fp-row { padding: 5px 0; border-top: 1px dashed var(--border); }
+.fp-label { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted, #64748b); }
+.fp-warn .fp-label { color: #b45309; }
+

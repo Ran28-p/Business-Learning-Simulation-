@@ -1,0 +1,42 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['xp', 'level'])",
+
+        "xp": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10000000"
+        },
+        "level": {
+          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100000"
+        },
+        "updatedAt": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 4102444800000"
+        },
+        "email": {
+          ".validate": "newData.isString() && newData.val().length <= 254"
+        },
+        "displayName": {
+          ".validate": "newData.isString() && newData.val().length <= 100"
+        },
+        "history": {
+          "$index": {
+            ".validate": "$index.matches(/^[0-9]{1,4}$/) && newData.hasChildren(['date', 'score'])",
+            "date":   { ".validate": "newData.isString() && newData.val().length <= 40" },
+            "module": { ".validate": "newData.isString() && newData.val().length <= 100" },
+            "mode":   { ".validate": "newData.isString() && newData.val().length <= 50" },
+            "score":  { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000" },
+            "$other": { ".validate": false }
+          }
+        },
+
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}

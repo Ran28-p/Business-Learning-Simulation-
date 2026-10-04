@@ -4,7 +4,7 @@
 // diambil dari pivot-dashboard/ dan dari ../../vendor/hyperformula di root
 // portal — keduanya tetap same-origin jadi otomatis tercakup).
 
-const CACHE_NAME = 'sim-excel-shell-v9-more-variety'; // bumped: LET dikembalikan (fix _xlpm. prefix), pool rumus diperluas semua level, 6 materi kini semua pakai pool acak, katalog data diperluas
+const CACHE_NAME = 'sim-excel-shell-v12-fase3'; // bumped: Fase 3 — bab Pembahasan Fungsi (versi Excel, kesalahan umum)
 
 const APP_SHELL_LOCAL = [
     './',

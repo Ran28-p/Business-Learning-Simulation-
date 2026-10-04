@@ -52,6 +52,7 @@ Buka `http://localhost:8000` pada browser. Untuk mengakses modul secara langsung
 2. Masuk dengan magic link Firebase, atau pilih **Lanjutkan sebagai Tamu**.
 3. Pilih simulator dari portal. Modul juga dapat dibuka langsung melalui URL.
 4. Gunakan tombol **← Portal** di setiap modul untuk kembali ke hub.
+5. Lihat ringkasan belajar semua modul di panel **Progres Saya**. Dari panel itu Anda dapat **Ekspor Progres** (satu file JSON untuk semua modul, untuk cadangan atau pindah perangkat), **Impor Progres** (mode Gabungkan atau Timpa; cadangan lengkap Simulator SPT juga diterima), dan **Unduh Rekap (PDF)**. Rekap PDF bukan sertifikat: datanya berasal dari browser peserta dan tidak diverifikasi.
 
 ## Test dan pemeriksaan kualitas
 
@@ -59,12 +60,22 @@ Buka `http://localhost:8000` pada browser. Untuk mengakses modul secara langsung
 # Dari root: cek syntax JavaScript, validitas JSON, dan link lokal statis
 node scripts/ci-lint.mjs
 
+# Dari root: periksa Firebase Rules (tidak ada akses publik, skema sinkron dengan app)
+node scripts/check-firebase-rules.mjs
+
 # Dari root: install dependensi test yang dikunci, lalu jalankan seluruh test Excel
 npm ci --prefix apps/excel
 npm test --prefix apps/excel
+
+# Modul lain tidak butuh npm install — cukup Node bawaan
+npm test --prefix apps/accounting
+npm test --prefix apps/sql-pq
+
+# Progres lintas modul di portal (dashboard, ekspor/impor, rekap PDF)
+node tests/test-portal-progress.mjs
 ```
 
-CI GitHub Actions di `.github/workflows/ci-deploy.yml` menjalankan kedua pemeriksaan tersebut pada push dan pull request. Deploy GitHub Pages hanya dilakukan setelah test dan lint lulus.
+CI GitHub Actions di `.github/workflows/ci-deploy.yml` menjalankan seluruh pemeriksaan tersebut (test keempat modul, lint, dan pemeriksaan Firebase Rules) pada push dan pull request. Deploy GitHub Pages hanya dilakukan setelah semuanya lulus.
 
 ## Arsitektur ringkas
 
@@ -74,7 +85,11 @@ CI GitHub Actions di `.github/workflows/ci-deploy.yml` menjalankan kedua pemerik
 ├── sw.js                      # Service worker portal
 ├── css/                       # Style bersama
 ├── js/                        # Auth, portal, dan komponen bersama
+├── tests/test-portal-progress.mjs  # Test dashboard progres lintas modul
 ├── scripts/ci-lint.mjs        # Validasi repo tanpa build step
+├── scripts/check-firebase-rules.mjs  # Pemeriksa Firebase Rules (statis + simulasi)
+├── database.rules.json        # Firebase Realtime Database Rules (deploy manual, lihat SECURITY.md)
+├── firebase.json              # Menunjuk ke database.rules.json untuk Firebase CLI
 ├── vendor/                    # Library browser yang divendor
 ├── apps/
 │   ├── accounting/            # Engine, generator, UI, dan tax workspace
@@ -102,4 +117,5 @@ Setiap aplikasi memiliki service worker sendiri sehingga shell aplikasi dapat di
 - Ikuti token desain di [`design.md`](design.md) dan struktur modul yang ada.
 - Tambahkan test untuk logika baru yang dapat diuji dengan Node.
 - Jika menambah modul baru: buat folder di `apps/`, daftarkan dari portal, sediakan navigasi kembali ke portal, service worker, dan masukkan aset lokalnya dalam strategi offline.
+- Dashboard **Progres Saya** di portal membaca key `localStorage` tiap modul lewat `js/shared/progress-aggregator.js`. Kalau sebuah modul mengganti key atau skema progresnya, perbarui aggregator itu — `tests/test-portal-progress.mjs` membandingkan langsung dengan kode sumber modul dan akan gagal di CI sampai keduanya sinkron. Untuk modul baru, tambahkan entri di daftar `MODULES` aggregator.
 - Sebelum mengirim perubahan, jalankan lint dan test di atas.

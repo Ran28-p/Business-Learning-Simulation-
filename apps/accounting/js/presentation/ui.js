@@ -10,6 +10,7 @@ import {
   renderBadges,
   updateNavbarStats,
   updateScoreDisplay,
+  toggleTheme,
   applySavedTheme,
   exportJournalCSV,
   exportToPDF
@@ -590,27 +591,26 @@ function _applyRestoredSession(session) {
 
 /* ─── Mobile drawer (sidebar off-canvas on <1024px) ─── */
 
-function setMobileDrawerOpen(open) {
+function handleToggleMobileDrawer() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebarOverlay');
   const btn = document.getElementById('btnSidebarToggle');
   if (!sidebar) return;
 
-  const isOpen = Boolean(open);
-  sidebar.classList.toggle('mobile-open', isOpen);
-  if (overlay) overlay.classList.toggle('show', isOpen);
-  if (btn) btn.setAttribute('aria-expanded', String(isOpen));
-  document.body.style.overflow = isOpen ? 'hidden' : '';
-}
-
-function handleToggleMobileDrawer() {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar) return;
-  setMobileDrawerOpen(!sidebar.classList.contains('mobile-open'));
+  const open = sidebar.classList.toggle('mobile-open');
+  if (overlay) overlay.classList.toggle('show', open);
+  if (btn) btn.setAttribute('aria-expanded', String(open));
+  document.body.style.overflow = open ? 'hidden' : '';
 }
 
 function closeMobileDrawer() {
-  setMobileDrawerOpen(false);
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const btn = document.getElementById('btnSidebarToggle');
+  if (sidebar) sidebar.classList.remove('mobile-open');
+  if (overlay) overlay.classList.remove('show');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
 }
 
 /* ─── Mode Kerja (focus sidebar) ─── */
@@ -660,6 +660,10 @@ export function bindUIEvents() {
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeMobileDrawer();
   });
+
+  // Theme
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
 
   // Mode Kerja (collapse sidebar for more working room)
   const focusModeBtn = document.getElementById('focusModeBtn');

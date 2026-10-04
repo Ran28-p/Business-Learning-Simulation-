@@ -281,6 +281,28 @@
     };
   }
 
+  // Pembahasan berlapis (Fase 3): semua teks di-escape; blok kosong tidak dirender.
+  function pembahasanHtml(q) {
+    var pb = q && q.pembahasan;
+    if (!pb || !pb.konsep) return "";
+    var row = function (label, body, cls) {
+      return body ? '<div class="tcpb-row ' + (cls || "") + '"><span class="tcpb-label">' + label + "</span>" + body + "</div>" : "";
+    };
+    var h = '<div class="tcpb">';
+    h += row("Mengapa jawabannya begitu", "<p>" + escapeHtml(pb.konsep) + "</p>");
+    if (pb.dasar) h += row("Dasar", "<p>" + escapeHtml(pb.dasar) + "</p>");
+    if (Array.isArray(pb.langkah) && pb.langkah.length) {
+      h += row("Langkah hitung", "<ol>" + pb.langkah.map(function (x) { return "<li>" + escapeHtml(x) + "</li>"; }).join("") + "</ol>");
+    }
+    var keys = pb.salah ? Object.keys(pb.salah) : [];
+    if (keys.length) {
+      h += row("Mengapa opsi lain kurang tepat", "<ul>" + keys.map(function (k) { return "<li><strong>" + escapeHtml(k) + "</strong> — " + escapeHtml(pb.salah[k]) + "</li>"; }).join("") + "</ul>");
+    }
+    if (pb.jebakan) h += row("Jebakan umum", "<p>" + escapeHtml(pb.jebakan) + "</p>", "tcpb-warn");
+    if (pb.ingat) h += row("Cara mengingat", "<p>" + escapeHtml(pb.ingat) + "</p>", "tcpb-tip");
+    return h + "</div>";
+  }
+
   function checkAnswer(q) {
     if (state.locked) return;
     const selected = ($('input[name="tcAns"]:checked') || {}).value;
@@ -300,9 +322,9 @@
     });
     const fb = $("#tcFeedback");
     fb.className = "tc-feedback show " + (correct ? "ok" : "bad");
-    fb.innerHTML = correct
+    fb.innerHTML = (correct
       ? `<strong>Benar.</strong> ${escapeHtml(q.explanation || "")}`
-      : `<strong>Belum tepat.</strong> Jawaban yang benar: <em>${escapeHtml(q.answer)}</em><br>${escapeHtml(q.explanation || "")}`;
+      : `<strong>Belum tepat.</strong> Jawaban yang benar: <em>${escapeHtml(q.answer)}</em><br>${escapeHtml(q.explanation || "")}`) + pembahasanHtml(q);
     $("#tcCheck").disabled = true;
     $("#tcNext").disabled = false;
   }

@@ -1,0 +1,9 @@
+{
+  "name": "sql-pq-simulator",
+  "version": "1.0.0",
+  "description": "Simulator SQL & Power Query berbasis HTML/CSS/JavaScript murni, berjalan sepenuhnya di browser (SQLite/WebAssembly + mesin Power Query buatan sendiri). File ini HANYA dipakai untuk menjalankan pengujian otomatis (tests/) -- aplikasinya sendiri TIDAK butuh npm install atau proses build apa pun, cukup dibuka lewat server statis. File test berekstensi .mjs (ES module), sedangkan file aplikasi di js/ adalah script klasik, jadi package ini sengaja TIDAK memakai type=module. Test memakai sql.js hasil vendor (vendor/sql-js) sehingga query dieksekusi sungguhan, tanpa dependency npm.",
+  "private": true,
+  "scripts": {
+    "test": "node tests/test-grading-engine.mjs && node tests/test-powerquery-engine.mjs && node tests/test-dataset-generator.mjs && node tests/test-question-bank.mjs && node tests/test-pq-practice.mjs && node tests/test-progress-manager.mjs && node tests/test-sql-pembahasan.mjs"
+  }
+}
