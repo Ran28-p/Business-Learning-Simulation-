@@ -153,5 +153,92 @@ bad('riwayat: kunci bukan angka', Object.assign(base(), { history: { abc: entry(
 bad('riwayat: indeks ≥ 10.000 (batas anti-penuhi kuota)', Object.assign(base(), { history: { 12345: entry() } }));
 check(canWrite(ME, 'user-aaa', Object.assign(base(), { history: { 9999: entry() } })), 'riwayat: indeks 9999 (batas atas) masih diterima');
 
+// ============================================================ C. portalSync ==
+// Cabang sinkron cloud lintas modul (js/shared/cloud-sync*.js). SENGAJA terpisah dari users/$uid
+// (skema SPT yang menolak field asing) supaya sinkron SPT yang sudah berjalan tidak terganggu.
+section('C. portalSync (sinkron cloud Accounting, Excel, SQL, Game Hub)');
+import vm from 'node:vm';
+const rd = (rel) => readFileSync(join(ROOT, rel), 'utf8');
+globalThis.window = globalThis;
+for (const f of ['js/shared/progress-aggregator.js', 'js/shared/gamehub-engine.js', 'js/shared/cloud-sync-core.js']) vm.runInThisContext(rd(f), { filename: f });
+const PPx = globalThis.PortalProgress, CSx = globalThis.CloudSyncCore;
+
+const psRoot = rules.portalSync, psNode = psRoot && psRoot.$uid;
+check(!!psNode, 'portalSync/$uid harus ada');
+check(psRoot && Object.keys(psRoot).filter((k) => !k.startsWith('.')).join() === '$uid', 'portalSync hanya boleh punya wildcard $uid');
+check(rules['.read'] === false && rules['.write'] === false, 'root tetap tertutup');
+check(!!(psNode && psNode.$unit && psNode.$unit.$other && psNode.$unit.$other['.validate'] === false), 'portalSync/$uid/$unit harus menolak field di luar skema');
+check(!!(psNode && psNode.$unit && psNode.$unit.data && psNode.$unit.data.$key), 'portalSync/.../data/$key harus punya aturan');
+check(JSON.stringify(Object.keys(userNode).filter((k) => !k.startsWith('.') && !k.startsWith('$')).sort()) === JSON.stringify(['displayName', 'email', 'history', 'level', 'updatedAt', 'xp']), 'users/$uid TIDAK berubah (skema SPT utuh)');
+
+// Field yang ditulis adapter (buildRemote) harus punya aturan — sumber kebenaran: cloud-sync-core.js
+const coreSrc = rd('js/shared/cloud-sync-core.js');
+const docLit = coreSrc.match(/var doc = \{([^}]*)\}/);
+const docFields = docLit ? [...docLit[1].matchAll(/(?:^|,)\s*([A-Za-z_]\w*)\s*:/g)].map((m) => m[1]) : [];
+console.log('  Field dokumen yang ditulis adapter:', [...docFields, 'data'].sort().join(', '));
+check(docFields.length >= 6, 'pemindai harus menemukan field dokumen di buildRemote (kalau 0, pola kode berubah — perbarui pemindai)');
+for (const f of [...docFields, 'data']) check(psNode && psNode.$unit && psNode.$unit[f], `field "${f}" ditulis adapter tetapi TIDAK punya aturan di portalSync`);
+for (const f of Object.keys((psNode && psNode.$unit) || {}).filter((k) => !k.startsWith('.') && !k.startsWith('$') && k !== 'data'))
+  check(docFields.includes(f), `aturan portalSync "${f}" tidak ada penulisnya di cloud-sync-core.js (sisa lama?)`);
+
+// Daftar kunci per unit di aturan = daftar kunci agregator (satu sumber kebenaran). Kunci SPT tidak boleh muncul.
+const keyRule = psNode && psNode.$unit && psNode.$unit.data && psNode.$unit.data.$key && psNode.$unit.data.$key['.validate'];
+const unitsCore = CSx.create({ PP: PPx, GH: globalThis.GameHubEngine, storage: { getItem: () => null, setItem() {}, removeItem() {} } }).units;
+for (const u of unitsCore) for (const k of u.keys) {
+  const enc = CSx.encodeKey(k);
+  const mentioned = typeof keyRule === 'string' && (keyRule.includes(enc) || keyRule.includes(k) ||
+    (k.startsWith('ACT_MASTER_') && /ACT_MASTER_\(STATE\|PROGRESS\|TAX_STATE\)/.test(keyRule) && ['ACT_MASTER_STATE', 'ACT_MASTER_PROGRESS', 'ACT_MASTER_TAX_STATE'].includes(k)) ||
+    (k.startsWith('sqlpq_') && /sqlpq_\(progress_v1\|dataset_history_v1\)/.test(keyRule)));
+  check(mentioned, `kunci "${k}" (unit ${u.id}) tidak ada di aturan portalSync/data/$key`);
+}
+for (const k of PPx.MODULES.find((m) => m.id === 'spt').keys) check(typeof keyRule === 'string' && !keyRule.includes(k), `kunci SPT "${k}" tidak boleh ada di portalSync`);
+
+function canWritePS(auth, uid, payload) {
+  if (!evalExpr(psNode['.write'], { $uid: uid }, { newData: snap(payload), auth })) return false;
+  return validateTree(psNode, normalize(payload), { $uid: uid }, auth);
+}
+const canReadPS = (auth, uid) => evalExpr(psNode['.read'], { $uid: uid }, { newData: snap(null), auth });
+
+// Payload NYATA: dibuat oleh buildRemote dari data bentuk asli modul
+const mem = new Map([['sqlpq_progress_v1', JSON.stringify({ xp: 320, totalAnswered: 20, totalCorrect: 16, completedLessons: {}, history: [] })],
+  ['efpg:progress', JSON.stringify({ xp: 90, soalDikerjakan: 6, jawabanBenar: 4, levelAktif: 1, riwayat: [] })],
+  ['ACT_MASTER_STATE', JSON.stringify({ xp: 20, level: 1, history: [{ t: 1 }] })],
+  ['gamehub_state_v1', JSON.stringify({ v: 1, day: '2026-10-12', bonusXp: 130, totalClaims: 4 })]]);
+const coreReal = CSx.create({ PP: PPx, GH: globalThis.GameHubEngine, storage: { getItem: (k) => (mem.has(k) ? mem.get(k) : null), setItem() {}, removeItem() {} }, now: () => Date.now() });
+const docOf = (id) => { const u = coreReal.units.find((x) => x.id === id); return coreReal.buildRemote(u, coreReal.readLocal(u), 0, 'dev1'); };
+const UID = 'user-aaa';
+check(canReadPS(ME, UID), 'pemilik boleh membaca portalSync miliknya');
+check(!canReadPS(OTHER, UID), 'pengguna lain TIDAK boleh membaca portalSync orang lain');
+check(!canReadPS(NOBODY, UID), 'tanpa login TIDAK boleh membaca portalSync');
+for (const id of ['accounting', 'excel', 'sqlpq', 'gamehub']) check(canWritePS(ME, UID, { [id]: docOf(id) }), `dokumen nyata unit ${id} diterima`);
+check(canWritePS(ME, UID, { sqlpq: { rev: 2, updatedAt: Date.now(), device: 'd', hash: 'abc', xp: 0, act: 0 } }), 'dokumen kosong (hasil reset, tanpa data) diterima');
+check(!canWritePS(OTHER, UID, { sqlpq: docOf('sqlpq') }), 'pengguna lain TIDAK boleh menulis ke portalSync orang lain');
+check(!canWritePS(NOBODY, UID, { sqlpq: docOf('sqlpq') }), 'tanpa login TIDAK boleh menulis portalSync');
+const badPS = (label, payload) => check(!canWritePS(ME, UID, payload), 'portalSync ditolak: ' + label);
+const D = (over) => Object.assign({}, docOf('sqlpq'), over);
+badPS('unit tak dikenal (spt)', { spt: docOf('sqlpq') });
+badPS('unit tak dikenal (admin)', { admin: docOf('sqlpq') });
+badPS('rev negatif', { sqlpq: D({ rev: -1 }) });
+badPS('rev teks', { sqlpq: D({ rev: '1' }) });
+badPS('rev di atas batas', { sqlpq: D({ rev: 1e9 }) });
+badPS('tanpa rev', { sqlpq: (({ rev, ...r }) => r)(docOf('sqlpq')) });
+badPS('tanpa hash', { sqlpq: (({ hash, ...r }) => r)(docOf('sqlpq')) });
+badPS('tanpa updatedAt', { sqlpq: (({ updatedAt, ...r }) => r)(docOf('sqlpq')) });
+badPS('hash > 32 karakter', { sqlpq: D({ hash: 'a'.repeat(33) }) });
+badPS('device > 64 karakter', { sqlpq: D({ device: 'd'.repeat(65) }) });
+badPS('xp negatif', { sqlpq: D({ xp: -1 }) });
+badPS('xp di atas batas', { sqlpq: D({ xp: 1e10 }) });
+badPS('field tak dikenal (isAdmin)', { sqlpq: D({ isAdmin: true }) });
+badPS('field tak dikenal bersarang', { sqlpq: D({ extra: { a: 1 } }) });
+badPS('data: kunci SPT diselundupkan', { sqlpq: D({ data: { spt_simulator_data: '{}' } }) });
+badPS('data: kunci milik unit lain (Excel di unit SQL)', { sqlpq: D({ data: { 'efpg%3Aprogress': '{}' } }) });
+badPS('data: kunci Game Hub di unit Accounting', { accounting: Object.assign(docOf('accounting'), { data: { gamehub_state_v1: '{}' } }) });
+badPS('data: kunci tidak ter-encode (efpg:progress)', { excel: Object.assign(docOf('excel'), { data: { 'efpg:progress': '{}' } }) });
+badPS('data: nilai bukan teks', { sqlpq: D({ data: { sqlpq_progress_v1: { xp: 1 } } }) });
+badPS('data: nilai > 2.000.000 karakter', { sqlpq: D({ data: { sqlpq_progress_v1: 'x'.repeat(2000001) } }) });
+check(canWritePS(ME, UID, { sqlpq: D({ data: { sqlpq_progress_v1: 'x'.repeat(2000000) } }) }), 'data: nilai tepat 2.000.000 karakter (batas atas) masih diterima');
+// SPT tidak boleh menulis lewat jalur users/$uid dengan field portalSync
+check(!canWrite(ME, 'user-aaa', Object.assign(base(), { portalSync: { sqlpq: docOf('sqlpq') } })), 'users/$uid menolak field portalSync (cabang terpisah)');
+
 console.log(`\n${failed ? '❌' : '✅'} Rules: ${passed} lulus, ${failed} gagal`);
 process.exit(failed ? 1 : 0);

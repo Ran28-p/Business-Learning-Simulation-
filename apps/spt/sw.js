@@ -18,7 +18,7 @@
 //   v11 — tambah semua halaman entri sub-modul ke precache install supaya app benar-benar
 //         bisa dibuka offline sejak pertama kali install, bukan baru ter-cache setelah
 //         user pernah online membuka modul tersebut satu kali
-const CACHE_NAME = 'sim-spt-shell-v20-fase5'; // bumped: Fase 5 — ringkasan PPh Final modul_pajak diperbarui (PP 55/2022 s.t.d.d. PP 20/2026, dividen, deposito)
+const CACHE_NAME = 'sim-spt-shell-v24c-gamehub'; // bumped: redesign UI (design-system.css, ds-modules.css)
 
 // File dari domain sendiri — wajib berhasil di-cache saat install.
 const APP_SHELL_LOCAL = [

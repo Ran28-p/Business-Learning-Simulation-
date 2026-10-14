@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id" data-app="gamehub">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Game Hub — Portal Belajar</title>
+<meta name="description" content="Misi harian, XP gabungan, level, streak, dan lencana dari progres belajar nyata di SPT, Accounting, Excel, serta SQL & Power Query.">
+<link rel="stylesheet" href="../../css/design-system.css">
+<link rel="stylesheet" href="../../css/ds-modules.css">
+<link rel="stylesheet" href="./css/style.css">
+<script src="../../js/shared/theme.js"></script>
+</head>
+<body>
+  <a class="ds-skip-link" href="#gh-main">Lewati ke konten utama</a>
+
+  <header class="gh-header">
+    <div class="gh-brand">
+      <span class="gh-brand__mark" aria-hidden="true">🎮</span>
+      <div>
+        <h1>Game Hub</h1>
+        <p>Misi, XP gabungan &amp; lencana dari progres nyata</p>
+      </div>
+    </div>
+    <div class="gh-header__actions"></div>
+  </header>
+
+  <main class="gh-main" id="gh-main" tabindex="-1">
+
+    <!-- Kartu pemain -->
+    <section class="gh-player" aria-labelledby="gh-player-title">
+      <div class="gh-player__badge" aria-hidden="true"><span id="gh-level-num">1</span></div>
+      <div class="gh-player__info">
+        <p class="gh-eyebrow">Peringkat pemain</p>
+        <h2 id="gh-player-title"><span id="gh-level-title">Pemula</span> · Level <span id="gh-level-label">1</span></h2>
+        <div class="gh-xpbar" role="progressbar" aria-label="Kemajuan menuju level berikutnya" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="gh-xpbar">
+          <span id="gh-xpbar-fill" style="width:0%"></span>
+        </div>
+        <p class="gh-xpnote" id="gh-xpnote">Memuat…</p>
+      </div>
+      <dl class="gh-stats">
+        <div><dt>XP gabungan</dt><dd id="gh-xp-total">0</dd></div>
+        <div><dt>XP modul</dt><dd id="gh-xp-module">0</dd></div>
+        <div><dt>Bonus misi</dt><dd id="gh-xp-bonus">0</dd></div>
+        <div><dt>Streak</dt><dd id="gh-streak">0 hari</dd></div>
+      </dl>
+    </section>
+
+    <!-- Misi harian -->
+    <section aria-labelledby="gh-missions-title">
+      <div class="gh-section-head">
+        <h2 id="gh-missions-title">Misi hari ini</h2>
+        <p class="gh-hint">Dihitung dari aktivitas nyata di modul sejak Anda membuka Game Hub hari ini. Klaim sebelum hari berganti.</p>
+      </div>
+      <div class="gh-missions" id="gh-missions"></div>
+    </section>
+
+    <!-- Misi mingguan -->
+    <section aria-labelledby="gh-weekly-title">
+      <h2 class="gh-visually-hidden" id="gh-weekly-title">Misi mingguan</h2>
+      <div class="gh-weekly" id="gh-weekly"></div>
+    </section>
+
+    <!-- Arena modul -->
+    <section aria-labelledby="gh-arena-title" id="gh-arena">
+      <div class="gh-section-head">
+        <h2 id="gh-arena-title">Pilih arena</h2>
+        <p class="gh-hint">Setiap modul punya XP dan level sendiri; semuanya dijumlahkan ke XP gabungan.</p>
+      </div>
+      <div class="gh-arena" id="gh-modules"></div>
+    </section>
+
+    <!-- Lencana -->
+    <section aria-labelledby="gh-ach-title">
+      <div class="gh-section-head">
+        <h2 id="gh-ach-title">Lencana</h2>
+        <p class="gh-hint" id="gh-ach-count"></p>
+      </div>
+      <ul class="gh-badges" id="gh-achievements"></ul>
+    </section>
+
+    <!-- Riwayat -->
+    <section class="gh-card" aria-labelledby="gh-log-title">
+      <h2 id="gh-log-title">Riwayat klaim</h2>
+      <ul class="gh-log" id="gh-log"></ul>
+    </section>
+
+    <p class="gh-footnote">Data Game Hub tersimpan di perangkat ini. XP modul tetap milik masing-masing modul dan ikut Ekspor Progres di portal; bonus misi dan lencana Game Hub belum termasuk dalam berkas ekspor.</p>
+  </main>
+
+  <div class="gh-toast" id="gh-toast" role="status" aria-live="polite"></div>
+
+  <script src="../../js/shared/progress-aggregator.js"></script>
+  <script src="../../js/shared/gamehub-engine.js"></script>
+  <script src="./js/app.js"></script>
+  <script src="../../js/shared/app-shell.js"></script>
+  <script src="../../js/shared/cloud-sync.js"></script>
+</body>
+</html>

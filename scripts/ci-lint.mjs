@@ -93,6 +93,24 @@ walk(ROOT, (file) => {
 });
 log(`  ${htmlChecked} file .html dicek, ${refsChecked} link lokal diverifikasi.`);
 
+// ---------- 4b. Integritas CSS ----------
+// Komentar yang tidak tertutup atau kurung kurawal tak seimbang membuat SELURUH aturan sesudahnya
+// diabaikan browser tanpa error apa pun (halaman tampil "polos"). Cek murah, menangkap kelas bug itu.
+log('== Cek integritas .css (komentar & kurung kurawal) ==');
+let cssChecked = 0;
+walk(ROOT, (file) => {
+  if (!/\.css$/.test(file) || /[\\/](vendor|node_modules)[\\/]/.test(file) || /\.min\.css$/.test(file)) return;
+  cssChecked++;
+  const css = readFileSync(file, 'utf8');
+  const rel = relative(ROOT, file);
+  const opens = css.split('/*').length - 1, closes = css.split('*/').length - 1;
+  if (opens !== closes) { fail(`CSS: komentar tidak seimbang di ${rel} (buka ${opens}, tutup ${closes}) — aturan sesudah komentar yang tak tertutup akan hilang`); return; }
+  const code = css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(["'])(?:\\.|(?!\1)[^\\\n])*\1/g, '""');
+  const o = code.split('{').length - 1, c = code.split('}').length - 1;
+  if (o !== c) fail(`CSS: kurung kurawal tidak seimbang di ${rel} ({ ${o} vs } ${c})`);
+});
+log(`  ${cssChecked} file .css dicek.`);
+
 // ---------- 4. Konsistensi tarif PPN lintas-app ----------
 // apps/spt (classic script) dan apps/accounting (ES module) TIDAK bisa saling
 // import file konstanta yang sama (beda sistem modul), jadi tarif PPN yang

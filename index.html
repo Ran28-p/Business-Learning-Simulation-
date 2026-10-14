@@ -8,11 +8,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>try{if(localStorage.getItem("portal_theme")==="dark")document.documentElement.setAttribute("data-theme","dark")}catch(e){}</script>
+  <link rel="stylesheet" href="./css/design-system.css" />
   <link rel="stylesheet" href="./css/portal.css" />
   <link rel="stylesheet" href="./css/responsive-foundation.css" />
   <link rel="icon" href="./apps/spt/icons/favicon-32.png" />
+  <script src="./js/shared/theme.js"></script>
 </head>
 <body>
+  <a class="ds-skip-link" href="#hub-content">Lewati ke konten utama</a>
   <!-- Boot -->
   <section id="screen-boot" class="screen active">
     <div class="boot">
@@ -24,28 +28,31 @@
   <!-- Hub -->
   <section id="screen-hub" class="screen">
     <header class="hub-header">
-      <div class="brand" style="margin:0">
-        <div class="brand-mark" style="width:40px;height:40px;font-size:15px;border-radius:12px">PB</div>
-        <div>
-          <h1 style="font-size:1.05rem">Portal Belajar</h1>
-          <p style="margin:0;font-size:0.78rem;color:var(--muted)">Pilih modul latihan</p>
+      <div class="hub-brand">
+        <div class="brand-mark" aria-hidden="true">PB</div>
+        <div class="hub-brand__text">
+          <h1>Portal Belajar</h1>
+          <p>Business Learning Simulation</p>
         </div>
       </div>
       <div class="hub-user">
+        <button type="button" class="icon-btn" id="btn-theme" aria-label="Ganti tema terang/gelap" aria-pressed="false" title="Ganti tema">
+          <span aria-hidden="true" id="btn-theme-icon">🌙</span>
+        </button>
         <div class="avatar" id="hub-user-avatar" aria-label="Profil Pengguna">?</div>
         <div class="meta">
           <div class="name" id="hub-user-name">—</div>
           <div class="email" id="hub-user-email">—</div>
         </div>
-        <button type="button" class="btn btn-ghost" id="btn-login" style="padding:8px 12px;margin-left:8px">Masuk</button>
-        <button type="button" class="btn btn-ghost" id="btn-logout" style="padding:8px 12px;margin-left:8px;display:none">Keluar</button>
+        <button type="button" class="ds-btn ds-btn--secondary" id="btn-login">Masuk</button>
+        <button type="button" class="ds-btn ds-btn--secondary" id="btn-logout" style="display:none">Keluar</button>
       </div>
     </header>
 
     <!-- Inline login modal -->
-    <div class="login-modal" id="loginModal">
-      <div class="login-modal__backdrop" id="loginBackdrop"></div>
-      <div class="login-modal__card">
+    <div class="ds-dialog" id="loginModal">
+      <div class="ds-dialog__backdrop" id="loginBackdrop"></div>
+      <div class="ds-dialog__card">
         <h3>Masuk dengan Email</h3>
         <p>Kami akan mengirimkan link login ke email Anda — tidak perlu password.</p>
         <div class="field">
@@ -58,16 +65,16 @@
         </div>
         <div class="feedback" id="login-feedback"></div>
         <div style="display:flex;gap:8px;margin-top:16px">
-          <button type="button" class="btn btn-primary" id="btn-send-link" style="flex:1">Kirim Link Login</button>
-          <button type="button" class="btn btn-ghost" id="btn-cancel-login">Batal</button>
+          <button type="button" class="ds-btn ds-btn--primary" id="btn-send-link" style="flex:1">Kirim Link Login</button>
+          <button type="button" class="ds-btn ds-btn--secondary" id="btn-cancel-login">Batal</button>
         </div>
       </div>
     </div>
 
 
-    <div class="login-modal" id="importModal" role="dialog" aria-modal="true" aria-labelledby="importTitle">
-      <div class="login-modal__backdrop" id="importBackdrop"></div>
-      <div class="login-modal__card import-card">
+    <div class="ds-dialog" id="importModal" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+      <div class="ds-dialog__backdrop" id="importBackdrop"></div>
+      <div class="ds-dialog__card import-card">
         <h3 id="importTitle">Pulihkan Progres</h3>
         <p id="importIntro"></p>
         <div id="importList" class="import-list"></div>
@@ -78,110 +85,167 @@
         </fieldset>
         <p class="import-warn">Tutup tab modul lain yang sedang terbuka sebelum memulihkan, supaya tidak menimpa hasilnya.</p>
         <div style="display:flex;gap:8px;margin-top:16px">
-          <button type="button" class="btn btn-primary" id="btnImportConfirm" style="flex:1">Pulihkan</button>
-          <button type="button" class="btn btn-ghost" id="btnImportCancel">Batal</button>
+          <button type="button" class="ds-btn ds-btn--primary" id="btnImportConfirm" style="flex:1">Pulihkan</button>
+          <button type="button" class="ds-btn ds-btn--secondary" id="btnImportCancel">Batal</button>
         </div>
       </div>
     </div>
 
-    <main class="hub-main">
-      <div class="hub-hero">
-        <h2>Belajar Lebih Siap untuk Dunia Profesional</h2>
-        <p class="lead justified">
-          Kembangkan kompetensi pajak, akuntansi, Excel, serta SQL dan Power Query melalui simulasi yang praktis dan relevan. Setiap modul dirancang untuk membantu Anda membangun pemahaman, mengasah ketelitian, dan meningkatkan kesiapan kerja secara bertahap. Pilih modul yang ingin dikuasai, lalu mulai perjalanan belajar Anda hari ini.
-        </p>
-      </div>
+    <main class="hub-main" id="hub-content" tabindex="-1">
+      <section class="hub-intro" aria-labelledby="hubTitle">
+        <div>
+          <p class="eyebrow">Pusat belajar</p>
+          <h2 id="hubTitle">Belajar lebih siap untuk dunia profesional</h2>
+          <p class="lead">Latih pajak, akuntansi, Excel, serta SQL dan Power Query lewat simulasi praktis. Progres tersimpan di perangkat ini dan ringkasannya tampil di bawah.</p>
+        </div>
+        <div class="progress-totals" id="progressTotals" aria-live="polite"></div>
+      </section>
 
       <div class="resume-banner" id="resumeBanner">
         <div class="resume-banner__text">Lanjutkan sesi terakhir: <strong id="resumeBannerLabel">—</strong></div>
-        <button type="button" class="btn btn-primary" id="resumeBannerBtn" style="padding:8px 16px">Lanjutkan →</button>
+        <button type="button" class="ds-btn ds-btn--primary" id="resumeBannerBtn">Lanjutkan <span aria-hidden="true">→</span></button>
       </div>
 
-      <div class="module-grid">
-        <button type="button" class="module-card mod-spt" data-module="./apps/spt/index.html" tabindex="0">
+      <a class="gh-banner" href="./apps/game-hub/index.html" id="ghBanner" aria-labelledby="ghBannerTitle">
+        <span class="gh-banner__icon" aria-hidden="true">🎮</span>
+        <span class="gh-banner__text">
+          <span class="gh-banner__eyebrow">Game Hub</span>
+          <strong id="ghBannerTitle">Misi harian, XP gabungan &amp; lencana</strong>
+          <span class="gh-banner__stats" id="ghBannerStats">Selesaikan misi dari progres nyata di keempat modul.</span>
+        </span>
+        <span class="gh-banner__cta">Buka Game Hub <span aria-hidden="true">→</span></span>
+      </a>
+
+      <section aria-labelledby="modulTitle">
+        <h2 class="section-title" id="modulTitle">Modul belajar</h2>
+        <div class="module-grid">
+        <button type="button" class="module-card ds-mod-spt mod-spt" data-module="./apps/spt/index.html" data-mod-id="spt">
+          <span class="module-card__head">
+            <span class="icon" aria-hidden="true">🧾</span>
+            <span class="module-card__status" data-progress-for="spt">Belum dimulai</span>
+          </span>
           <h3>Simulator SPT Pajak</h3>
-          <p>
-            Latihan isi SPT Tahunan Badan (Formulir 1771 + lampiran), modul ringkasan pajak,
-            kuis, dan kasus berbasis aturan perpajakan Indonesia.
-          </p>
-          <div class="tags">
-            <span class="tag">PPh Badan</span>
-            <span class="tag">Formulir 1771</span>
-            <span class="tag">Kuis Pajak</span>
-          </div>
-          <div class="cta">Buka Simulator SPT →</div>
+          <p>Isi SPT Tahunan Badan (Formulir 1771 + lampiran), modul ringkasan pajak, kuis, dan kasus berbasis aturan perpajakan Indonesia.</p>
+          <span class="tags"><span class="tag">PPh Badan</span><span class="tag">Formulir 1771</span><span class="tag">Kuis Pajak</span></span>
+          <span class="cta">Buka Simulator SPT <span aria-hidden="true">→</span></span>
         </button>
-
-        <button type="button" class="module-card mod-accounting" data-module="./apps/accounting/index.html" tabindex="0">
+        <button type="button" class="module-card ds-mod-accounting mod-accounting" data-module="./apps/accounting/index.html" data-mod-id="accounting">
+          <span class="module-card__head">
+            <span class="icon" aria-hidden="true">📊</span>
+            <span class="module-card__status" data-progress-for="accounting">Belum dimulai</span>
+          </span>
           <h3>Accounting Simulator</h3>
-          <p>
-            Siklus akuntansi lengkap: jurnal, buku besar, neraca saldo, penyesuaian, worksheet,
-            laporan keuangan, penutupan, plus modul invoice &amp; rekonsiliasi PPN.
-          </p>
-          <div class="tags">
-            <span class="tag">Jurnal</span>
-            <span class="tag">Laporan Keuangan</span>
-            <span class="tag">PPN &amp; Invoice</span>
-          </div>
-          <div class="cta">Buka Accounting →</div>
+          <p>Siklus akuntansi lengkap: jurnal, buku besar, neraca saldo, penyesuaian, worksheet, laporan keuangan, penutupan, plus invoice &amp; rekonsiliasi PPN.</p>
+          <span class="tags"><span class="tag">Jurnal</span><span class="tag">Laporan Keuangan</span><span class="tag">PPN &amp; Invoice</span></span>
+          <span class="cta">Buka Accounting <span aria-hidden="true">→</span></span>
         </button>
-
-        <button type="button" class="module-card mod-excel" data-module="./apps/excel/index.html" tabindex="0">
+        <button type="button" class="module-card ds-mod-excel mod-excel" data-module="./apps/excel/index.html" data-mod-id="excel">
+          <span class="module-card__head">
+            <span class="icon" aria-hidden="true">📈</span>
+            <span class="module-card__status" data-progress-for="excel">Belum dimulai</span>
+          </span>
           <h3>Excel Formula Practice</h3>
-          <p>
-            Latihan rumus Excel di atas dataset penjualan realistis: SUM, IF, COUNTIF, SUMIF,
-            fungsi teks &amp; tanggal — dengan validasi hasil, XP, dan badge.
-          </p>
-          <div class="tags">
-            <span class="tag">Level 1–2</span>
-            <span class="tag">Dataset Penjualan</span>
-            <span class="tag">XP &amp; Badge</span>
-          </div>
-          <div class="cta">Buka Excel Practice →</div>
+          <p>Latihan rumus Excel di atas dataset penjualan realistis dengan validasi hasil, XP, dan badge. Soal dibuat otomatis per level.</p>
+          <span class="tags"><span class="tag">Level 1–2</span><span class="tag">Dataset Penjualan</span><span class="tag">XP &amp; Badge</span></span>
+          <span class="cta">Buka Excel Practice <span aria-hidden="true">→</span></span>
         </button>
-
-
-        <button type="button" class="module-card mod-sqlpq" data-module="./apps/sql-pq/index.html" tabindex="0">
-          <h3>SQL &amp; Power Query Simulator</h3>
-          <p>
-            Belajar SQL &amp; Power Query dari dasar sampai mahir: dataset realistis, SQL editor
-            sungguhan di browser (SQLite/WASM), penilaian otomatis, dan simulasi transformasi Power Query.
-          </p>
-          <div class="tags">
-            <span class="tag">SQL Editor Nyata</span>
-            <span class="tag">Dataset Generator</span>
-            <span class="tag">Power Query M-Code</span>
-          </div>
-          <div class="cta">Buka SQL &amp; Power Query →</div>
+        <button type="button" class="module-card ds-mod-sqlpq mod-sqlpq" data-module="./apps/sql-pq/index.html" data-mod-id="sqlpq">
+          <span class="module-card__head">
+            <span class="icon" aria-hidden="true">🗄️</span>
+            <span class="module-card__status" data-progress-for="sqlpq">Belum dimulai</span>
+          </span>
+          <h3>SQL &amp; Power Query</h3>
+          <p>SQL editor sungguhan di browser (SQLite/WASM), dataset generator, penilaian otomatis, dan simulasi transformasi Power Query.</p>
+          <span class="tags"><span class="tag">SQL Editor Nyata</span><span class="tag">Dataset Generator</span><span class="tag">Power Query M</span></span>
+          <span class="cta">Buka SQL &amp; Power Query <span aria-hidden="true">→</span></span>
         </button>
+        </div>
+      </section>
+
+      <div class="hub-columns">
+        <section class="ds-card panel" aria-labelledby="recentTitle">
+          <h2 class="section-title" id="recentTitle">Aktivitas terbaru</h2>
+          <ul class="feed" id="recentList"></ul>
+        </section>
+        <section class="ds-card panel" aria-labelledby="achTitle">
+          <h2 class="section-title" id="achTitle">Pencapaian</h2>
+          <ul class="feed" id="achievementList"></ul>
+        </section>
       </div>
 
-
-      <section class="progress-panel" id="progressPanel" aria-labelledby="progressTitle">
+      <section class="ds-card panel progress-panel" id="progressPanel" aria-labelledby="progressTitle">
         <div class="progress-head">
           <div>
-            <h3 id="progressTitle">Progres Saya</h3>
+            <h2 class="section-title" id="progressTitle">Progres Saya</h2>
             <p class="progress-sub" id="progressSub">Ringkasan belajar dari semua modul di perangkat ini.</p>
           </div>
           <div class="progress-actions">
-            <button type="button" class="btn btn-ghost" id="btnProgressPdf">Unduh Rekap (PDF)</button>
-            <button type="button" class="btn btn-ghost" id="btnProgressExport">Ekspor Progres</button>
-            <button type="button" class="btn btn-ghost" id="btnProgressImport">Impor Progres</button>
+            <button type="button" class="ds-btn ds-btn--secondary" id="btnProgressPdf">Unduh Rekap (PDF)</button>
+            <button type="button" class="ds-btn ds-btn--secondary" id="btnProgressExport">Ekspor Progres</button>
+            <button type="button" class="ds-btn ds-btn--secondary" id="btnProgressImport">Impor Progres</button>
             <input type="file" id="progressFile" accept="application/json,.json" hidden>
           </div>
         </div>
-        <div class="progress-totals" id="progressTotals" aria-live="polite"></div>
         <div class="progress-grid" id="progressGrid"></div>
         <div class="progress-status" id="progressStatus" role="status" aria-live="polite"></div>
+        <div class="cloud-box" id="cloudBox">
+          <div class="cloud-box__head">
+            <div>
+              <h3 class="cloud-box__title">Sinkron cloud</h3>
+              <p class="cloud-box__status" id="cloudStatus" role="status" aria-live="polite">Masuk untuk menyimpan progres di cloud.</p>
+            </div>
+            <button type="button" class="ds-btn ds-btn--secondary" id="btnCloudSync" disabled>Sinkronkan sekarang</button>
+          </div>
+          <div class="cloud-choice" id="cloudChoice" hidden>
+            <p id="cloudChoiceText">Data di perangkat ini berbeda dengan data akun Anda di cloud. Pilih cara menggabungkan; tidak ada yang diubah sebelum Anda memilih.</p>
+            <ul class="cloud-choice__list" id="cloudChoiceList"></ul>
+            <div class="cloud-choice__actions">
+              <button type="button" class="ds-btn ds-btn--primary" id="cloudChoiceMerge">Gabungkan (yang lebih maju menang)</button>
+              <button type="button" class="ds-btn ds-btn--secondary" id="cloudChoiceCloud">Pakai data cloud</button>
+              <button type="button" class="ds-btn ds-btn--secondary" id="cloudChoiceLocal">Pakai data perangkat ini</button>
+            </div>
+          </div>
+          <p class="cloud-box__note">Disinkronkan: Accounting, Excel, SQL &amp; Power Query, dan Game Hub (bonus XP &amp; lencana). Simulator SPT punya sinkron cloud sendiri. Reset progres di satu perangkat ikut berlaku di perangkat lain.</p>
+        </div>
         <p class="progress-note">
           Progres tersimpan di browser perangkat ini. Gunakan <strong>Ekspor Progres</strong> untuk cadangan atau pindah perangkat.
           File ekspor memuat data modul apa adanya (termasuk nama/email bila Anda pernah login di SPT), jadi simpan dan bagikan dengan hati-hati.
         </p>
       </section>
 
-      <p class="hub-footer">
-        Portal Belajar · Berjalan di browser · Data modul lokal per aplikasi
-      </p>
+      <section class="ds-card panel analytics-panel" id="analyticsPanel" aria-labelledby="analyticsTitle">
+        <div class="progress-head">
+          <div>
+            <h2 class="section-title" id="analyticsTitle">Analitik belajar</h2>
+            <p class="progress-sub">Topik yang perlu diulang, dihitung dari jawaban yang tercatat di perangkat ini (bukan perkiraan).</p>
+          </div>
+        </div>
+        <p class="analytics-empty" id="analyticsEmpty" hidden>Belum cukup data. Kerjakan beberapa soal di modul; saran muncul setelah ada jawaban benar dan salah yang tercatat.</p>
+        <ol class="rec-list" id="recList"></ol>
+        <details class="rec-more" id="recMore" hidden>
+          <summary>Lihat rincian per modul</summary>
+          <div class="rec-modules" id="analyticsModules"></div>
+        </details>
+
+        <div class="recap-box" id="recapBox">
+          <h3>Rekap untuk pengajar</h3>
+          <p class="recap-lead">Jika belajar dalam kelompok, Anda bisa mengunduh ringkasan progres lalu menyerahkannya sendiri kepada pengajar. Hanya angka ringkasan yang ikut; <strong>tidak</strong> ada jawaban, data perusahaan, atau NPWP. Tidak ada yang dikirim otomatis.</p>
+          <div class="recap-form">
+            <label class="recap-field" for="recapName"><span>Nama di rekap</span>
+              <input type="text" id="recapName" maxlength="60" autocomplete="name" placeholder="Nama yang dikenal pengajar">
+            </label>
+            <label class="recap-check"><input type="checkbox" id="recapEmail" disabled> <span>Sertakan email: <b id="recapEmailShow">masuk dulu untuk memilih</b></span></label>
+          </div>
+          <details class="recap-preview"><summary>Lihat persis isi berkas yang akan diunduh</summary><pre id="recapPreview" tabindex="0"></pre></details>
+          <p class="recap-error" id="recapError" role="alert" hidden></p>
+          <div class="recap-actions">
+            <button type="button" class="ds-btn ds-btn--primary" id="btnRecap">Unduh rekap (.json)</button>
+            <a class="recap-link" href="./apps/pengajar/index.html">Untuk pengajar: buka Ruang Pengajar →</a>
+          </div>
+        </div>
+      </section>
+
+      <p class="hub-footer">Portal Belajar · Berjalan di browser · Data modul lokal per aplikasi</p>
     </main>
   </section>
 
@@ -194,7 +258,11 @@
   <script src="./js/shared/paper-config.js"></script>
   <script src="./js/shared/pdf-export.js"></script>
   <script src="./js/shared/progress-aggregator.js"></script>
+  <script src="./js/shared/gamehub-engine.js"></script>
+  <script src="./js/shared/learning-analytics.js"></script>
   <script src="./js/portal-progress.js"></script>
+  <script src="./js/portal-analytics.js"></script>
+  <script src="./js/shared/cloud-sync.js"></script>
 
   <!-- PWA: daftarkan service worker (gratis, agar hub bisa dibuka offline) -->
   <script>

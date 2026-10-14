@@ -32,7 +32,13 @@
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-.kb-overlay[data-theme="dark"] {
+/* Overlay ikut tema halaman: <html data-theme="dark"> (Accounting, SQL, Excel, portal) atau
+   <body data-theme="dark"> (Simulator SPT). Sebelumnya hanya atribut di overlay itu sendiri yang
+   dikenali — tidak pernah dipasang — sehingga panel selalu terang sementara teks judul mewarisi
+   warna halaman (terang di mode gelap) → judul tak terbaca. */
+.kb-overlay[data-theme="dark"],
+:root[data-theme="dark"] .kb-overlay,
+body[data-theme="dark"] .kb-overlay {
   --kb-primary: #60a5fa;
   --kb-primary-dark: #93c5fd;
   --kb-ink: #f1f5f9;
@@ -47,10 +53,18 @@
   --kb-example-bg: rgba(96,165,250,0.1);
   --kb-example-border: #60a5fa;
 }
+/* Mode gelap: header navy solid (gradien dari --kb-primary terang membuat teks putih sulit dibaca) */
+.kb-overlay[data-theme="dark"] .kb-header,
+:root[data-theme="dark"] .kb-overlay .kb-header,
+body[data-theme="dark"] .kb-overlay .kb-header { background: #12305c; border-bottom: 1px solid #1a4480; }
+.kb-overlay[data-theme="dark"] .kb-btn--primary,
+:root[data-theme="dark"] .kb-overlay .kb-btn--primary,
+body[data-theme="dark"] .kb-overlay .kb-btn--primary { color: #12305c; }
 .kb-overlay.kb-overlay--visible { opacity: 1; }
 body.kb-scroll-lock { overflow: hidden; }
 
 .kb-panel {
+  color: var(--kb-ink);
   width: 100%;
   max-width: 1120px;
   height: 100%;

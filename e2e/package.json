@@ -1,0 +1,12 @@
+{
+  "name": "bls-e2e",
+  "private": true,
+  "description": "Uji browser (Playwright) untuk Portal Belajar: layout responsif, tema gelap, profil pengguna, data nyata.",
+  "scripts": {
+    "test": "playwright test",
+    "test:update": "playwright test --update-snapshots"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0"
+  }
+}

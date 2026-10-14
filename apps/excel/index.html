@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-app="excel">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -12,6 +12,9 @@
 <link rel="stylesheet" href="./css/responsive.css" />
 <link rel="stylesheet" href="../../css/responsive-foundation.css" />
 <link rel="stylesheet" href="../../css/knowledge-base.css" />
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/ds-modules.css">
+  <script src="../../js/shared/theme.js"></script>
 </head>
 <body>
 
@@ -94,7 +97,6 @@
     else console.warn('KnowledgeBase belum siap');
   });
 </script>
-  <script src="../../js/back-to-portal.js"></script>
 
   <!-- PWA: daftarkan service worker (gratis, agar modul bisa dibuka offline) -->
   <script>
@@ -106,5 +108,7 @@
         });
     }
   </script>
+  <script src="../../js/shared/app-shell.js"></script>
+  <script src="../../js/shared/cloud-sync.js"></script>
 </body>
 </html>

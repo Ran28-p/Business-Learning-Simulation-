@@ -1,0 +1,344 @@
+/* ==========================================================================
+   Portal Belajar — Design System v2 (shared)
+   Sumber kebenaran: design.md. Dimuat oleh portal DAN semua modul.
+
+   Isi:
+     1. Token (warna, tipografi, spasi, radius, bayangan, motion)   — light + dark
+     2. Aksen per modul (--ds-accent) lewat atribut  <html data-app="…">
+     3. Jembatan (bridge) ke nama variabel lama tiap modul — tanpa menyentuh logika
+     4. Primitif komponen ber-prefix .ds-  (tombol, kartu, chip, progress, tabel, dialog)
+     5. Aksesibilitas global (fokus, target sentuh, reduced motion)
+
+   Prinsip: tanpa framework, tanpa build, tanpa font/CDN tambahan. Dark mode tetap
+   mengikuti atribut data-theme="dark" yang sudah dipakai tiap modul (di <html>, atau
+   di <body> untuk Simulator SPT).
+   ========================================================================== */
+
+/* ── 1. TOKEN ─────────────────────────────────────────────────────────── */
+:root {
+  /* Navy & biru (identitas utama) */
+  --ds-navy-950: #071426;
+  --ds-navy-900: #0a1f3d;
+  --ds-navy-800: #12305c;
+  --ds-navy-700: #1a4480;
+  --ds-primary: #1d4ed8;
+  --ds-primary-hover: #1e40af;
+  --ds-primary-soft: #eaf1ff;
+  --ds-on-primary: #ffffff;
+  --ds-on-accent: #ffffff;
+
+  /* Netral (slate) */
+  --ds-bg: #f3f6fa;
+  --ds-surface: #ffffff;
+  --ds-surface-2: #f8fafc;
+  --ds-border: #dbe3ee;
+  --ds-border-strong: #b9c6d8;
+  --ds-text: #0f1b2d;
+  --ds-muted: #55657d;
+
+  /* Semantik */
+  --ds-success: #15803d;  --ds-success-soft: #eef9f2;
+  --ds-warning: #b45309;  --ds-warning-soft: #fff4e0;
+  --ds-danger:  #b91c1c;  --ds-danger-soft:  #fdeaea;
+  --ds-info:    #1d4ed8;  --ds-info-soft:    #eaf1ff;
+
+  /* Aksen modul (dipakai lewat --ds-accent) */
+  --ds-accent-spt: #2563eb;        --ds-accent-spt-soft: #eef4ff;
+  --ds-accent-accounting: #0f766e; --ds-accent-accounting-soft: #def5f1;
+  --ds-accent-excel: #15803d;      --ds-accent-excel-soft: #eef9f2;
+  --ds-accent-sqlpq: #6d28d9;      --ds-accent-sqlpq-soft: #efe7fd;
+  --ds-accent-gamehub: #b45309;    --ds-accent-gamehub-soft: #fff4e0;
+  --ds-accent: var(--ds-primary);
+  --ds-accent-soft: var(--ds-primary-soft);
+
+  /* Tipografi — satu keluarga (Inter bila ada, jika tidak font sistem) */
+  --ds-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ds-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ds-fs-xs: 0.75rem;  --ds-fs-sm: 0.8125rem; --ds-fs-md: 0.9375rem;
+  --ds-fs-lg: 1.0625rem; --ds-fs-xl: 1.25rem;  --ds-fs-2xl: clamp(1.4rem, 1.1rem + 1.2vw, 1.9rem);
+  --ds-lh: 1.55;
+
+  /* Spasi (skala 4px) */
+  --ds-sp-1: 4px;  --ds-sp-2: 8px;  --ds-sp-3: 12px; --ds-sp-4: 16px;
+  --ds-sp-5: 20px; --ds-sp-6: 24px; --ds-sp-8: 32px; --ds-sp-10: 40px;
+
+  /* Radius & bayangan (halus) */
+  --ds-r-sm: 6px; --ds-r-md: 8px; --ds-r-lg: 12px;
+  --ds-shadow-1: 0 1px 2px rgba(10, 31, 61, 0.06);
+  --ds-shadow-2: 0 2px 8px rgba(10, 31, 61, 0.08);
+  --ds-shadow-3: 0 12px 32px rgba(10, 31, 61, 0.16);
+
+  /* Motion (singkat, tidak mencolok) */
+  --ds-ease: cubic-bezier(0.2, 0, 0, 1);
+  --ds-dur: 140ms;
+
+  /* Ukuran minimal target sentuh */
+  --ds-touch: 44px;
+  --ds-focus: 0 0 0 3px rgba(29, 78, 216, 0.4);
+}
+
+:root[data-theme="dark"],
+:root body[data-theme="dark"] {
+  --ds-primary: #60a5fa;
+  --ds-primary-hover: #93c5fd;
+  --ds-primary-soft: #14284a;
+  --ds-on-primary: #071426;
+  --ds-on-accent: #071426;
+
+  --ds-bg: #0b1220;
+  --ds-surface: #111c30;
+  --ds-surface-2: #0e1829;
+  --ds-border: #24344f;
+  --ds-border-strong: #365072;
+  --ds-text: #e6edf7;
+  --ds-muted: #9db0cb;
+
+  --ds-success: #4ade80;  --ds-success-soft: #0f2c1f;
+  --ds-warning: #fbbf24;  --ds-warning-soft: #3a2c0f;
+  --ds-danger:  #f87171;  --ds-danger-soft:  #3a1815;
+  --ds-info:    #60a5fa;  --ds-info-soft:    #14284a;
+
+  --ds-accent-spt: #60a5fa;        --ds-accent-spt-soft: #14284a;
+  --ds-accent-accounting: #2dd4bf; --ds-accent-accounting-soft: #0f2f2c;
+  --ds-accent-excel: #4ade80;      --ds-accent-excel-soft: #0f2c1f;
+  --ds-accent-sqlpq: #a78bfa;      --ds-accent-sqlpq-soft: #251a46;
+  --ds-accent-gamehub: #fbbf24;    --ds-accent-gamehub-soft: #3a2c0f;
+
+  --ds-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --ds-shadow-2: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --ds-shadow-3: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --ds-focus: 0 0 0 3px rgba(96, 165, 250, 0.5);
+}
+
+/* ── 2. AKSEN MODUL ───────────────────────────────────────────────────── */
+[data-app="spt"],        .ds-mod-spt        { --ds-accent: var(--ds-accent-spt);        --ds-accent-soft: var(--ds-accent-spt-soft); }
+[data-app="accounting"], .ds-mod-accounting { --ds-accent: var(--ds-accent-accounting); --ds-accent-soft: var(--ds-accent-accounting-soft); }
+[data-app="excel"],      .ds-mod-excel      { --ds-accent: var(--ds-accent-excel);      --ds-accent-soft: var(--ds-accent-excel-soft); }
+[data-app="sqlpq"],      .ds-mod-sqlpq      { --ds-accent: var(--ds-accent-sqlpq);      --ds-accent-soft: var(--ds-accent-sqlpq-soft); }
+
+[data-app="gamehub"],    .ds-mod-gamehub    { --ds-accent: var(--ds-accent-gamehub);    --ds-accent-soft: var(--ds-accent-gamehub-soft); }
+
+/* ── 3. BRIDGE KE VARIABEL LAMA ───────────────────────────────────────────
+   Hanya MENGGANTI NILAI variabel yang sudah dipakai modul; tidak ada selector
+   komponen yang diubah di sini. Spesifisitas (0,2,0) > :root modul (0,1,0),
+   jadi urutan <link> tidak berpengaruh.                                      */
+
+/* Simulator SPT — variabel --sp-*; dark dipasang di <html> DAN <body> (lihat applySptTheme di app-main.js) */
+:root[data-app="spt"] {
+  --sp-primary: var(--ds-accent-spt);
+  --sp-primary-hover: #1d4ed8;
+  --sp-primary-soft: var(--ds-accent-spt-soft);
+  --sp-bg: var(--ds-bg); --sp-card: var(--ds-surface);
+  --sp-text: var(--ds-text); --sp-muted: var(--ds-muted); --sp-border: var(--ds-border);
+  --sidebar-bg: var(--ds-navy-900);
+}
+:root[data-app="spt"][data-theme="dark"],
+:root[data-app="spt"] body[data-theme="dark"] {
+  --sp-primary: var(--ds-accent-spt);
+  --sp-primary-hover: #93c5fd;
+  --sp-primary-soft: var(--ds-accent-spt-soft);
+  --sp-bg: var(--ds-bg); --sp-card: var(--ds-surface);
+  --sp-text: var(--ds-text); --sp-muted: var(--ds-muted); --sp-border: var(--ds-border);
+  --sidebar-bg: var(--ds-navy-950);
+}
+
+/* Accounting Simulator — --accent-color, --bg-*, --text-* */
+:root[data-app="accounting"] {
+  --accent-color: var(--ds-accent-accounting);
+  --accent-hover: #115e59;
+  --accent-light: var(--ds-accent-accounting-soft);
+  --bg-primary: var(--ds-bg); --bg-secondary: var(--ds-surface);
+  --bg-sidebar: var(--ds-navy-900);
+  --text-primary: var(--ds-text); --text-secondary: var(--ds-muted);
+  --border-color: var(--ds-border);
+}
+:root[data-app="accounting"][data-theme="dark"] {
+  --accent-color: var(--ds-accent-accounting);
+  --accent-hover: #5eead4;
+  --accent-light: var(--ds-accent-accounting-soft);
+  --bg-primary: var(--ds-bg); --bg-secondary: var(--ds-surface);
+  --bg-sidebar: var(--ds-navy-950);
+  --text-primary: var(--ds-text); --text-secondary: var(--ds-muted);
+  --border-color: var(--ds-border);
+}
+
+/* Excel Formula Practice — hijau tetap jadi aksen modul; netral diselaraskan */
+:root[data-app="excel"] {
+  --efpg-ink-900: var(--ds-text); --efpg-ink-500: var(--ds-muted);
+  --efpg-canvas: var(--ds-bg); --efpg-paper: var(--ds-surface);
+  --efpg-line: var(--ds-border);
+}
+
+/* SQL & Power Query — header tetap navy (shell konsisten); tombol/nav aktif/aksen → ungu modul */
+:root[data-app="sqlpq"] {
+  --sqlpq-blue-900: var(--ds-navy-900);
+  --sqlpq-blue-700: #4c1d95;
+  --sqlpq-blue-600: #5b21b6;
+  --sqlpq-blue-500: var(--ds-accent-sqlpq);
+  --sqlpq-blue-100: var(--ds-accent-sqlpq-soft);
+  --sqlpq-canvas: var(--ds-bg); --sqlpq-line: var(--ds-border);
+}
+/* Dark: blue-700 sengaja TIDAK diubah (dipakai sebagai latar header tabel + teks putih) */
+:root[data-app="sqlpq"][data-theme="dark"] {
+  --sqlpq-blue-900: var(--ds-navy-950);
+  --sqlpq-blue-600: #6d28d9;
+  --sqlpq-blue-500: var(--ds-accent-sqlpq);
+  --sqlpq-blue-100: var(--ds-accent-sqlpq-soft);
+}
+
+/* ── 4. PRIMITIF KOMPONEN ─────────────────────────────────────────────── */
+.ds-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-sp-2);
+  min-height: 40px; padding: 0 var(--ds-sp-4);
+  font: 600 var(--ds-fs-sm)/1 var(--ds-font);
+  border: 1px solid transparent; border-radius: var(--ds-r-md);
+  cursor: pointer; text-decoration: none; white-space: nowrap;
+  transition: background var(--ds-dur) var(--ds-ease), border-color var(--ds-dur) var(--ds-ease), color var(--ds-dur) var(--ds-ease);
+}
+.ds-btn--primary { background: var(--ds-primary); color: var(--ds-on-primary); }
+.ds-btn--primary:hover { background: var(--ds-primary-hover); }
+.ds-btn--secondary { background: var(--ds-surface); color: var(--ds-text); border-color: var(--ds-border-strong); }
+.ds-btn--secondary:hover { background: var(--ds-primary-soft); border-color: var(--ds-primary); color: var(--ds-primary); }
+.ds-btn--ghost { background: transparent; color: var(--ds-muted); }
+.ds-btn--ghost:hover { background: var(--ds-primary-soft); color: var(--ds-primary); }
+.ds-btn[disabled], .ds-btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+
+.ds-card {
+  background: var(--ds-surface); border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r-lg); box-shadow: var(--ds-shadow-1);
+}
+.ds-card--accent { border-top: 3px solid var(--ds-accent); }
+
+.ds-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 2px 10px; border-radius: 999px;
+  font: 600 var(--ds-fs-xs)/1.6 var(--ds-font);
+  background: var(--ds-accent-soft); color: var(--ds-accent);
+}
+.ds-chip--success { background: var(--ds-success-soft); color: var(--ds-success); }
+.ds-chip--warning { background: var(--ds-warning-soft); color: var(--ds-warning); }
+.ds-chip--danger  { background: var(--ds-danger-soft);  color: var(--ds-danger); }
+.ds-chip--neutral { background: var(--ds-surface-2); color: var(--ds-muted); border: 1px solid var(--ds-border); }
+
+.ds-progress { height: 6px; border-radius: 999px; background: var(--ds-border); overflow: hidden; }
+.ds-progress > span { display: block; height: 100%; background: var(--ds-accent); border-radius: inherit; }
+
+/* Tabel: bungkus agar hanya tabelnya yang scroll horizontal, bukan halaman */
+.ds-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; border: 1px solid var(--ds-border); border-radius: var(--ds-r-md); }
+.ds-table { width: 100%; border-collapse: collapse; font-size: var(--ds-fs-sm); }
+.ds-table th { position: sticky; top: 0; background: var(--ds-surface-2); text-align: left; font-weight: 600; color: var(--ds-muted); }
+.ds-table th, .ds-table td { padding: 10px 12px; border-bottom: 1px solid var(--ds-border); }
+.ds-table td.num, .ds-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Dialog: tanpa blur; tidak pernah lebih tinggi dari layar */
+.ds-dialog {
+  position: fixed; inset: 0; z-index: 100; display: none;
+  align-items: center; justify-content: center; padding: var(--ds-sp-4);
+}
+.ds-dialog.show { display: flex; }
+.ds-dialog__backdrop { position: absolute; inset: 0; background: rgba(7, 20, 38, 0.6); }
+.ds-dialog__card {
+  position: relative; width: min(100%, 440px); max-height: calc(100dvh - 32px); overflow-y: auto;
+  background: var(--ds-surface); color: var(--ds-text);
+  border: 1px solid var(--ds-border); border-radius: var(--ds-r-lg); box-shadow: var(--ds-shadow-3);
+  padding: var(--ds-sp-6);
+}
+
+/* ── 5. AKSESIBILITAS GLOBAL ──────────────────────────────────────────── */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--ds-primary); outline-offset: 2px;
+}
+.ds-skip-link {
+  position: absolute; left: var(--ds-sp-3); top: -48px; z-index: 200;
+  background: var(--ds-navy-900); color: #fff; padding: 10px 14px; border-radius: var(--ds-r-md);
+  font: 600 var(--ds-fs-sm)/1 var(--ds-font); text-decoration: none;
+}
+.ds-skip-link:focus { top: var(--ds-sp-3); }
+
+/* Layar sentuh: target minimal 44px untuk kontrol utama */
+@media (pointer: coarse) {
+  .ds-btn { min-height: var(--ds-touch); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* ── Chip profil pengguna (js/shared/user-chip.js) ────────────────────── */
+.ds-profile-chip {
+  display: inline-flex; align-items: center; gap: var(--ds-sp-2);
+  max-width: 240px; padding: 4px 12px 4px 4px;
+  background: var(--ds-surface-2); color: var(--ds-text);
+  border: 1px solid var(--ds-border); border-radius: 999px;
+  font-family: var(--ds-font); line-height: 1.2;
+}
+.ds-profile-chip__avatar {
+  flex: none; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--ds-accent); color: var(--ds-on-accent); font-weight: 700; font-size: var(--ds-fs-sm);
+}
+.ds-profile-chip__text { min-width: 0; }
+.ds-profile-chip__name, .ds-profile-chip__role { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ds-profile-chip__name { font-weight: 600; font-size: var(--ds-fs-sm); }
+.ds-profile-chip__role { color: var(--ds-muted); font-size: var(--ds-fs-xs); }
+@media (max-width: 600px) {
+  /* mobile: hanya avatar supaya header tidak sesak (nama tetap ada di tooltip/title) */
+  .ds-profile-chip { padding: 3px; }
+  .ds-profile-chip__text { display: none; }
+}
+
+/* ── App shell: tautan Portal & tombol tema (js/shared/app-shell.js) ───── */
+.ds-portal-link, .ds-theme-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 36px; padding: 0 12px; flex: none;
+  background: var(--ds-surface-2); color: var(--ds-text);
+  border: 1px solid var(--ds-border); border-radius: 999px;
+  font: 600 var(--ds-fs-sm)/1 var(--ds-font); text-decoration: none; cursor: pointer;
+  transition: background var(--ds-dur) var(--ds-ease), border-color var(--ds-dur) var(--ds-ease);
+}
+.ds-portal-link:hover, .ds-theme-btn:hover { background: var(--ds-primary-soft); border-color: var(--ds-primary); color: var(--ds-primary); }
+.ds-theme-btn { width: 36px; padding: 0; font-size: 1rem; }
+@media (max-width: 600px) {
+  .ds-portal-link__text { display: none; }   /* mobile: cukup panah, nama tetap di aria-label */
+  .ds-portal-link { width: 36px; padding: 0; }
+}
+@media (pointer: coarse) {
+  .ds-portal-link, .ds-theme-btn { min-height: var(--ds-touch); min-width: var(--ds-touch); }
+}
+
+/* ── Excel: mode gelap (sebelumnya tidak ada) — remap token --efpg-* ─────
+   Catatan: --efpg-green-700 dipakai sebagai LATAR tombol (teks putih) sekaligus warna teks;
+   dibiarkan, dan pemakaian sebagai teks dibenahi per-selector di css/ds-modules.css. */
+:root[data-app="excel"][data-theme="dark"] {
+  --efpg-green-900: #bbf7d0;
+  --efpg-green-100: #0f2c1f;
+  --efpg-green-50: #0d2418;
+  --efpg-ink-900: var(--ds-text);
+  --efpg-ink-700: #c5d3e8;
+  --efpg-ink-500: var(--ds-muted);
+  --efpg-ink-300: #7a8fae;
+  --efpg-paper: var(--ds-surface);
+  --efpg-canvas: var(--ds-bg);
+  --efpg-line: var(--ds-border);
+  --efpg-line-strong: var(--ds-border-strong);
+  --efpg-amber-700: #fbbf24;
+  --efpg-amber-100: #3a2c0f;
+  --efpg-red-700: #f87171;
+  --efpg-red-100: #3a1815;
+  --efpg-slate-600: #9db0cb;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+:root[data-app="sqlpq"][data-theme="dark"], :root[data-app="accounting"][data-theme="dark"], :root[data-app="spt"][data-theme="dark"] { color-scheme: dark; }
+
+/* ── Sinkron cloud: bilah pemberitahuan di modul & lencana di chip profil (js/shared/cloud-sync.js) ── */
+.ds-cloud-notice {
+  position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 90;
+  display: flex; align-items: center; gap: var(--ds-sp-3); max-width: calc(100vw - 24px);
+  padding: 10px 14px; border-radius: var(--ds-r-lg); background: var(--ds-navy-900); color: #fff; border: 1px solid var(--ds-navy-700);
+  box-shadow: var(--ds-shadow-3); font: 600 var(--ds-fs-sm)/1.4 var(--ds-font);
+}
+.ds-cloud-notice button { min-height: 36px; padding: 0 12px; border-radius: var(--ds-r-md); border: 1px solid #fff; background: #fff; color: var(--ds-navy-900); font: 700 var(--ds-fs-sm)/1 var(--ds-font); cursor: pointer; }
+.ds-cloud-notice .ds-cloud-notice__close { background: transparent; color: #fff; border-color: transparent; font-size: 1.2rem; min-width: 36px; padding: 0; }
+@media (pointer: coarse) { .ds-cloud-notice button { min-height: var(--ds-touch); } }
+.ds-profile-chip__sync { margin-left: 4px; font-size: var(--ds-fs-xs); }

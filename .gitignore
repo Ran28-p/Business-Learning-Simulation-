@@ -16,3 +16,7 @@ Thumbs.db
 coverage/
 dist/
 .tmp/
+
+# E2E (Playwright)
+e2e/test-results/
+e2e/playwright-report/

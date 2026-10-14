@@ -96,7 +96,32 @@
     banner.classList.add("show");
   }
 
+  // Tema portal (terang/gelap). Saat ditekan, pilihan juga diteruskan ke kunci tema modul (lihat di bawah).
+  function bindTheme() {
+    const btn = $("#btn-theme");
+    const icon = $("#btn-theme-icon");
+    if (!btn) return;
+    const isDark = () => document.documentElement.getAttribute("data-theme") === "dark";
+    const sync = () => {
+      btn.setAttribute("aria-pressed", String(isDark()));
+      if (icon) icon.textContent = isDark() ? "☀️" : "🌙";
+    };
+    btn.addEventListener("click", () => {
+      if (isDark()) document.documentElement.removeAttribute("data-theme");
+      else document.documentElement.setAttribute("data-theme", "dark");
+      try {
+        const v = isDark() ? "dark" : "light";
+        // portal_theme = kunci portal; "theme" dipakai bersama SPT & Accounting; "sqlpq_theme" milik SQL & Power Query.
+        // Excel belum punya tema gelap. Hanya ditulis saat pengguna menekan tombol ini.
+        ["portal_theme", "theme", "sqlpq_theme"].forEach((k) => localStorage.setItem(k, v));
+      } catch (_) { /* abaikan */ }
+      sync();
+    });
+    sync();
+  }
+
   function bindHub() {
+    bindTheme();
     document.querySelectorAll("[data-module]").forEach((card) => {
       card.addEventListener("click", () => openModule(card.getAttribute("data-module"), card));
       card.addEventListener("keydown", (e) => {
@@ -166,6 +191,8 @@
     renderUser(activeUser);
     renderResumeBanner();
     showScreen("hub");
+    if (window.CloudSync) window.CloudSync.refreshSession(); // login/logout → mulai/hentikan sinkron cloud
+    window.dispatchEvent(new Event("portal-auth-change")); // panel lain (mis. Analitik belajar) menyesuaikan nama/email
   }
 
   function boot() {

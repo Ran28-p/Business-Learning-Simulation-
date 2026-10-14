@@ -85,8 +85,102 @@
     return card;
   }
 
+  /* ───────── dashboard: status kartu, aktivitas terbaru, pencapaian ─────────
+     Semua dari PP.summarize(); tidak ada angka karangan. Modul yang belum dimulai
+     ditampilkan apa adanya ("Belum dimulai"). */
+  // Banner Game Hub: level, XP gabungan, dan misi siap klaim — dari mesin yang sama dengan halaman Game Hub.
+  // Hanya MEMBACA (tidak menyimpan state); angka nyata, bukan placeholder.
+  function renderGameHubBanner(sum) {
+    const el = $("#ghBannerStats");
+    if (!el || !window.GameHubEngine || !sum) return;
+    try {
+      const GH = window.GameHubEngine;
+      let state = null;
+      try { state = JSON.parse(localStorage.getItem("gamehub_state_v1") || "null"); } catch (_) { /* abaikan */ }
+      const v = GH.evaluate(state, sum, new Date()).view;
+      const ready = v.missions.filter(function (m) { return m.done && !m.claimed; }).length + (v.weekly.done && !v.weekly.claimed ? 1 : 0);
+      el.textContent = "Level " + v.player.level + " · " + v.totalXp.toLocaleString("id-ID") + " XP gabungan"
+        + (v.streak > 0 ? " · streak " + v.streak + " hari" : "")
+        + (ready > 0 ? " · " + ready + " misi siap diklaim" : "");
+    } catch (_) { /* biarkan teks bawaan */ }
+  }
+
+  function renderDashboard(sum) {
+    document.querySelectorAll("[data-progress-for]").forEach((el) => {
+      const m = sum && sum.modules.find((x) => x.id === el.getAttribute("data-progress-for"));
+      el.classList.toggle("is-started", !!(m && m.started));
+      el.textContent = m && m.started ? m.levelLabel + " " + m.level + " · " + m.xp + " XP" : "Belum dimulai";
+    });
+    renderGameHubBanner(sum);
+    const recent = $("#recentList");
+    const ach = $("#achievementList");
+    if (!recent || !ach) return;
+    recent.textContent = "";
+    ach.textContent = "";
+    const empty = (ul, text) => ul.appendChild(h("li", "empty", text));
+    const started = sum ? sum.modules.filter((m) => m.started) : [];
+    if (!started.length) {
+      empty(recent, "Belum ada aktivitas. Mulai dari salah satu modul di atas.");
+      empty(ach, "Pencapaian akan muncul setelah Anda mengerjakan latihan.");
+      return;
+    }
+    started.slice().sort((a, b) => (b.lastActive || 0) - (a.lastActive || 0)).forEach((m) => {
+      const li = h("li");
+      li.className = "ds-mod-" + m.id;
+      li.appendChild(h("span", "dot"));
+      const body = h("div", "body");
+      body.appendChild(h("strong", "", m.label));
+      body.appendChild(h("span", "", m.activities + " aktivitas · terakhir " + fmtDate(m.lastActive)));
+      li.appendChild(body);
+      recent.appendChild(li);
+    });
+    started.forEach((m) => {
+      const li = h("li");
+      li.className = "ds-mod-" + m.id;
+      li.appendChild(h("span", "dot"));
+      const body = h("div", "body");
+      body.appendChild(h("strong", "", m.label + " — " + m.levelLabel + " " + m.level));
+      body.appendChild(h("span", "", m.highlights.length ? m.highlights.slice(0, 3).join(" · ") : m.xp + " XP terkumpul"));
+      li.appendChild(body);
+      ach.appendChild(li);
+    });
+  }
+
+
+  /* ───────── Sinkron cloud (UI) — logika di js/shared/cloud-sync*.js ───────── */
+  function bindCloud() {
+    const box = $("#cloudBox");
+    if (!box) return;
+    const st = $("#cloudStatus"), btn = $("#btnCloudSync"), choice = $("#cloudChoice"), list = $("#cloudChoiceList");
+    const LABEL = { accounting: "Accounting", excel: "Excel", sqlpq: "SQL & Power Query", gamehub: "Game Hub" };
+    function paint() {
+      const c = window.CloudSync ? window.CloudSync.status() : { state: "off", message: "Sinkron cloud tidak tersedia." };
+      box.setAttribute("data-state", c.state);
+      st.textContent = c.message;
+      btn.disabled = !window.CloudSync || c.state === "off" || c.state === "syncing";
+      const need = c.state === "needs-choice" && Array.isArray(c.pending) && c.pending.length;
+      choice.hidden = !need;
+      list.textContent = "";
+      if (need) c.pending.forEach((p) => {
+        const li = document.createElement("li");
+        li.textContent = (LABEL[p.id] || p.id) + ": perangkat ini " + p.local.xp + " XP / " + p.local.act + " aktivitas · cloud " + p.remote.xp + " XP / " + p.remote.act + " aktivitas";
+        list.appendChild(li);
+      });
+    }
+    btn.addEventListener("click", () => { if (window.CloudSync) window.CloudSync.syncNow(); });
+    [["cloudChoiceMerge", "merge"], ["cloudChoiceCloud", "cloud"], ["cloudChoiceLocal", "local"]].forEach(([id, ch]) => {
+      $("#" + id).addEventListener("click", () => { if (window.CloudSync) window.CloudSync.resolveFirstLink(ch); });
+    });
+    window.addEventListener("portal-cloudsync", (e) => {
+      paint();
+      if (e.detail && e.detail.state === "ok" && e.detail.pulled && e.detail.pulled.length) render();   // data cloud baru → ringkasan ikut berubah
+    });
+    paint();
+  }
+
   function render() {
     const sum = readSummary();
+    renderDashboard(sum);
     els.totals.textContent = "";
     els.grid.textContent = "";
     if (!sum) {
@@ -237,6 +331,7 @@
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); trapTab(e); });
 
   // Segarkan saat kembali dari modul (termasuk dari bfcache), saat tab difokuskan lagi, atau saat tab lain mengubah storage.
+  bindCloud();
   window.addEventListener("pageshow", render);
   window.addEventListener("storage", render);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });

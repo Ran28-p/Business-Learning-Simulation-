@@ -96,7 +96,7 @@ Prinsip utama:
   --warning:          #fbbf24;
   --warning-soft:     #78350f;
   --danger:           #f87171;
-  --danger-soft:      #7f1d1d;
+  --danger-soft:      #7e1d1d;
   --info:             #60a5fa;
   --info-soft:        #1e3a8a;
 
@@ -321,3 +321,93 @@ Radius card: `var(--radius-lg)` (16px)
 ---
 
 *Dokumen ini dibuat untuk menjaga konsistensi visual sambil tetap menghormati fitur dark-mode switcher yang sudah ada di codebase.*
+
+---
+
+## 10. Design System v2 (Redesain UI/UX, Okt 2026)
+
+Redesain ini **hanya mengubah tampilan** — rute, autentikasi, Firebase, perhitungan, generator, ekspor, dan penyimpanan progres tidak disentuh.
+
+### 10.1 Berkas
+| Berkas | Peran |
+|---|---|
+| `css/design-system.css` | Token (`--ds-*`), aksen modul, *bridge* ke variabel lama tiap modul, primitif `.ds-*` (tombol, kartu, chip, progress, tabel, dialog), fokus & reduced-motion. **Dimuat portal + semua modul.** |
+| `css/ds-modules.css` | Penyempurnaan workspace per modul, dibatasi `html[data-app="…"]` (tanpa blur, tanpa overflow, modal tidak melebihi layar, target sentuh 44px). |
+| `css/portal.css` | Hanya dashboard portal. Satu sumber gaya (lapisan "polish" lama yang saling menimpa sudah dihapus). |
+
+Tiap halaman utama modul memakai `<html data-app="spt|accounting|excel|sqlpq">`. Atribut itu memilih aksen modul dan mengaktifkan *bridge* (mis. `--sp-primary`, `--accent-color`, `--sqlpq-blue-*`) tanpa mengubah selector komponen modul. Urutan `<link>` tidak berpengaruh (spesifisitas bridge lebih tinggi).
+
+### 10.2 Palet
+- **Identitas:** navy `--ds-navy-900 #0a1f3d` (header/sidebar), biru `--ds-primary #1d4ed8`.
+- **Netral:** `--ds-bg #f3f6fa`, `--ds-surface #fff`, `--ds-border #dbe3ee`, `--ds-text #0f1b2d`, `--ds-muted #55657d`.
+- **Aksen modul:** SPT biru `#2563eb` · Accounting teal `#0f766e` · Excel hijau `#15803d` · SQL & Power Query ungu `#6d28d9`. Dark mode memakai varian lebih terang (lihat berkas).
+- **Semantik:** success / warning / danger / info, masing-masing punya pasangan `-soft`.
+- Semua pasangan teks/latar utama diperiksa ≥ 4.5:1 (WCAG AA) untuk light dan dark.
+
+### 10.3 Aturan
+- Tipografi satu keluarga (`--ds-font`), skala `--ds-fs-xs … 2xl`; spasi kelipatan 4px (`--ds-sp-*`); radius 6/8/12px; bayangan halus.
+- Tidak ada glassmorphism/blur, gradien dekoratif, atau animasi berlebih; transisi 140ms; `prefers-reduced-motion` dihormati.
+- Fokus keyboard selalu terlihat (`:focus-visible`); layar sentuh (`pointer: coarse`) → kontrol minimal 44px.
+- Tabel: bungkus dengan `.ds-table-wrap`/`.table-responsive` supaya hanya tabel yang scroll horizontal, bukan halaman.
+- Dark mode tetap lewat `data-theme="dark"` (di `<html>`; di `<body>` untuk Simulator SPT). Portal kini punya tombol tema sendiri (kunci `portal_theme`); tiap modul tetap memakai kunci temanya sendiri.
+
+### 10.4 Dashboard portal
+Header navy + profil → ringkasan (XP, modul dimulai, aktivitas) → sesi terakhir → 4 modul beraksen → Aktivitas terbaru & Pencapaian → Progres Saya (ekspor/impor/PDF). **Semua angka berasal dari `PortalProgress.summarize()`** (data localStorage nyata); modul yang belum dimulai tampil "Belum dimulai", tidak ada angka karangan.
+
+### 10.5 Keputusan penting & batasan
+- **Game Hub tidak ada di repo ini** (tidak ada rute, halaman, maupun data misi). Karena aturan "jangan ganti fitur nyata dengan mockup statis / jangan mengarang data", entry point Game Hub **tidak ditambahkan**. Gamifikasi yang nyata (XP, level, badge, streak) ditampilkan di panel Pencapaian. Bila Game Hub akan dibangun, mulailah dari aksen `--ds-accent` baru + tema bergaya berbeda di berkas terpisah.
+- **Tahap 2 (workspace per modul)** — sudah dikerjakan lewat `css/ds-modules.css`, tanpa mengubah markup/logika:
+  - *SPT*: umpan balik validasi (`.feedback.success/.error`) memakai token semantik + ikon ✓/⚠ (tidak hanya warna); sub-halaman `faktur_bupot`, `modul_pajak`, `tax_career` kini memakai `data-app="spt"` + design system.
+  - *Accounting*: `.alert-warning/.alert-danger` memakai token (ikut dark mode) + ikon ⚠; tabel laporan tetap di dalam `.table-responsive` dengan header lengket.
+  - *Excel* (≥1025px): kolom spreadsheet diberi porsi 2fr, tinggi sheet adaptif (`clamp(420px, 66dvh, 760px)`), dan panel samping (instruksi, input rumus, pengecekan, penjelasan) *sticky* dengan scroll sendiri.
+  - *SQL & Power Query* (≥901px): Database Explorer (sumber data) *sticky*, editor lebih tinggi adaptif, panel hasil berlabel "Hasil", kotak soal beraksen ungu.
+- **Sengaja tidak diubah:** `formulir_spt/*.html` (replika formulir resmi 1771 + lampiran) tetap dengan gaya aslinya agar kemiripan dengan formulir asli terjaga. Perombakan lebih jauh (mis. memindah panel di dalam file HTML SPT ±100 KB) tetap butuh pemeriksaan visual di browser.
+- **Tema:** tombol tema portal menulis `portal_theme`, `theme` (dipakai bersama SPT & Accounting), dan `sqlpq_theme` — hanya saat tombol ditekan. Excel belum punya dark mode.
+
+### 10.6 Login & profil pengguna
+- **Login hanya di Portal** (`js/auth.js`, link email). Sesi disimpan di `localStorage["unified_portal_session"]`; logout juga hanya di portal.
+- **Semua modul menampilkan profil dari sesi itu**: Accounting, Excel (+ Pivot & Dashboard), dan SQL & Power Query memakai `js/shared/user-chip.js` (chip avatar + nama + email, `.ds-profile-chip`); Simulator SPT memakai `getPortalIdentity()` di `app-main.js` untuk chip `.profile-chip` miliknya. Belum login → "Tamu".
+- SPT tidak punya alur login sendiri lagi. Link email lama yang masih menuju halaman SPT dialihkan ke portal (query dipertahankan) agar portal yang menyelesaikan sign-in. Progres/XP SPT tetap milik SPT; yang berasal dari portal hanya nama & email. Sinkron cloud SPT tetap memakai sesi Firebase yang sama dengan portal (origin sama).
+- Tema gelap SPT dipasang di `<html>` dan `<body>` (`applySptTheme`) agar alias warna di `:root` ikut berubah.
+
+### 10.7 Uji browser (E2E)
+- Folder `e2e/` (Playwright, gratis/open-source), job CI `e2e`; jalankan lokal: `cd e2e && npm install && npx playwright install chromium && npm test`.
+- Cakupan: tiap halaman × desktop/tablet/mobile × terang/gelap (tanpa error JS, tanpa 404 lokal, tanpa scroll horizontal); tema gelap benar-benar berlaku (termasuk toggle SPT); kontras banner SPT; empat kartu modul; dialog login muat di mobile; target sentuh ≥ 44px; profil dari login portal di semua modul; grafik SPT dari riwayat nyata.
+- Tes dibuktikan "bisa gagal": mengembalikan bug tema SPT (atribut hanya di `<body>`) membuat dua tes gagal.
+- Screenshot dilampirkan ke laporan (belum dibandingkan terhadap baseline gambar — baseline piksel bergantung OS/font; aktifkan bila perlu dengan `toHaveScreenshot` di CI yang sama).
+
+### 10.8 App shell & tema terpusat (poin 2)
+- **`js/shared/theme.js`** (dimuat di `<head>`, sebelum skrip modul): satu preferensi tema untuk portal + semua modul. Menyamakan kunci lama (`theme`, `portal_theme`, `sqlpq_theme`) saat dimuat, memantau `data-theme` sehingga toggle bawaan tiap modul otomatis tersalin ke semua kunci, dan menyinkronkan antar-tab lewat event `storage`. API: `PortalTheme.get/set/toggle`, event `portal-theme-change`.
+- **`js/shared/app-shell.js`** (menggantikan `user-chip.js`): di header tiap modul memasang (1) tautan **← Portal**, (2) tombol tema bila modul belum punya (Excel), (3) chip profil dari login portal. Tombol melayang `back-to-portal.js` dilepas dari modul yang punya header (masih dipakai `spt/tax_career`).
+- **Excel kini punya mode gelap** (remap token `--efpg-*` di `design-system.css` + override teks hijau di `ds-modules.css`), termasuk Pivot & Dashboard.
+- **Perbaikan bug lama:** overlay Modul Pengetahuan (`css/knowledge-base.css`) tidak pernah ikut mode gelap dan judulnya mewarisi warna teks halaman (terang) di atas panel putih → judul hilang di semua modul pada mode gelap. Kini overlay mengikuti `data-theme` di `<html>`/`<body>`.
+- Dicakup E2E: tautan Portal di tiap modul, sinkron tema (kunci bertentangan, toggle tiap modul, antar-tab, dari portal), Excel gelap, kontras overlay pengetahuan di 4 modul × 2 tema. Tes overlay terbukti gagal bila CSS lama dikembalikan.
+
+### 10.9 Game Hub (poin 3)
+Halaman `apps/game-hub/` (aksen amber, gaya "papan skor" — sengaja berbeda dari workspace belajar) + mesin murni `js/shared/gamehub-engine.js` + banner di dashboard portal. **Tidak ada data karangan**; semuanya dari progres nyata modul via `PortalProgress.summarize()`.
+- **Misi harian (3):** *Fokus* (N aktivitas di satu modul), *Kumpulkan XP* (40/60/80 XP), *Jelajah* (2 modul berbeda). Deterministik per tanggal lokal (hash FNV-1a + fmix32), jadi misi sama untuk semua orang pada hari itu dan modul fokus berputar merata.
+- **Cara menghitung:** selisih progres modul sejak Game Hub dibuka hari itu (baseline). Aktivitas sebelum hub dibuka tidak dihitung — ditulis jelas di UI. Bila progres modul turun (reset/impor lama), baseline bergeser agar tidak pernah negatif. Hari berganti → baseline baru, klaim kemarin dibuang.
+- **XP gabungan** = XP semua modul (nyata) + bonus klaim misi. **Level** dari XP gabungan: ambang kumulatif `50·(L−1)·L` (L2=100, L3=300, L5=1000 …).
+- **Klaim** sekali per misi (dijaga juga lintas tab: state dibaca ulang dari penyimpanan sebelum klaim). **Streak** = hari berturut-turut dengan ≥1 klaim (tampil 0 bila terlewat lebih dari sehari). **Misi mingguan:** 5 klaim dalam satu minggu ISO (Senin–Minggu) → +100 XP.
+- **Lencana (9)**, terbuka dari kondisi nyata dan permanen setelah terbuka (mis. Penjelajah = keempat modul benar-benar dimulai).
+- **State** di `localStorage["gamehub_state_v1"]`; dianggap tak tepercaya (`sanitizeState`: tipe, batas, format kunci, anti prototype-pollution).
+- **Batasan:** bonus XP/lencana Game Hub belum ikut Ekspor/Impor Progres di portal (XP modul tetap ikut). Penambahan ke format ekspor perlu perubahan terkoordinasi di `progress-aggregator.js` + testnya.
+- **Ujinya:** `tests/test-gamehub.mjs` (96 pemeriksaan: level, ISO week, misi dari data bentuk asli modul, rollover, progres turun, klaim ganda, streak, mingguan, lencana, input rusak, idempoten, tanpa mutasi argumen) + E2E (klaim end-to-end, naik level, dua tab, pergantian hari dengan jam palsu, state rusak, banner portal). Lint CI kini juga memeriksa integritas CSS (komentar/kurung tak seimbang).
+
+### 10.10 Sinkron cloud lintas modul (poin 4)
+`js/shared/cloud-sync-core.js` (murni, diuji) + `cloud-sync.js` (adapter Firebase RTDB) + panel **Sinkron cloud** di *Progres Saya* portal + bilah "Muat ulang" di modul + lencana ☁ di kartu profil. Detail model data, aturan, dan batasan: lihat `SECURITY.md` (bagian *Sinkron cloud lintas modul*).
+- **Tidak mengubah modul**: sinkron membaca/menulis `localStorage` modul lewat allowlist `progress-aggregator.js` (+ `gamehub_state_v1`). Ringan untuk tamu: tanpa login tidak ada Firebase SDK maupun jaringan. SPT tidak ikut (sinkron sendiri).
+- **Cabang rules baru `portalSync/$uid/$unit`**, terpisah dari `users/$uid`. Perlu **deploy rules** (langkah di `SECURITY.md`); sebelum itu UI menampilkan "Aturan Firebase belum diperbarui" dan progres tetap aman lokal.
+- **Merge tiga arah**, reset ikut merambat, konflik → yang lebih maju menang, tautan pertama/ganti akun → pengguna memilih. Modul menyimpan state di memori, jadi setelah data cloud diterapkan modul menampilkan "Muat ulang" (portal & Game Hub merender ulang sendiri).
+- **Ujinya:** `tests/test-cloudsync.mjs` (110 pemeriksaan: matriks keputusan, dokumen cloud jahat, dua perangkat, reset, konflik, balapan tulis, jaringan gagal, penyimpanan penuh, Game Hub, ganti akun, state bawaan), `scripts/check-firebase-rules.mjs` (kini 133 pemeriksaan, termasuk payload nyata dari `buildRemote`), dan `e2e/cloudsync.spec.mjs` (12 skenario di browser nyata dengan Firebase tiruan bersama untuk beberapa "perangkat").
+
+### 10.11 Analitik belajar & Ruang Pengajar (poin 5)
+**Peserta — panel "Analitik belajar" di portal** (`js/shared/learning-analytics.js`, murni & diuji). Membaca riwayat yang SUDAH dicatat tiap modul tanpa mengubah modul: akurasi per fungsi (Excel), jumlah salah per konsep (SQL & PQ), skor per komponen jurnal (Accounting), skor per simulasi + jalur Tax Career (SPT). Ambang: <70% = perlu diulang, ≥85% dengan ≥3 percobaan = kuat; data terlalu sedikit ditandai "tentatif" (tidak masuk rekap) atau tidak dinilai (Accounting butuh ≥3 percobaan; SPT ≥2 simulasi). Prioritas memberi bobot lebih ke komponen berbobot besar (akun, debit/kredit). Maksimal 5 saran, ≤2 per modul, masing-masing dengan alasan berupa angka nyata, saran tindakan, dan tautan ke modul. Tabel label konsep SQL dan bobot Accounting dijaga test terhadap sumbernya (`question-bank.js`, `scoringEngine.js`).
+
+**Pengajar — tanpa server, tanpa peran akses.** Rancangan sengaja memindahkan keputusan privasi ke peserta:
+- Peserta mengunduh **rekap agregat** (`rekap-belajar-*.json`) dari portal setelah mengisi nama (wajib) dan memilih sendiri apakah email ikut (default tidak). Ada pratinjau persis isi berkas. Tidak memuat jawaban, data perusahaan, NPWP, maupun data SPT; topik tentatif tidak ikut.
+- Pengajar membuka **Ruang Pengajar** (`apps/pengajar/`) dan memuat banyak berkas dari komputernya. Semua diproses di browser: tanpa unggah, tanpa penyimpanan (hilang saat halaman ditutup), tanpa permintaan jaringan (dicek E2E). Hasil: ringkasan kelompok, topik tersulit (dihitung per orang), statistik per modul, tabel peserta (urut/filter/cari), ekspor CSV.
+- **Berkas rekap = input tak tepercaya** (`js/shared/cohort-engine.js`): format & versi wajib, angka dipaksa ke rentang, teks dibatasi, field asing dibuang, ≤100 KB, ≤300 berkas, tanggal masuk akal. Teks dirender dengan `textContent`; CSV menetralkan sel berawalan `= + - @` (CSV injection).
+- Definisi: *aktif* = ada aktivitas ≤7 hari; *perlu perhatian* = skor rata-rata (tertimbang aktivitas) <60% dengan ≥5 aktivitas. Peserta yang sama (nama+email) dihitung sekali, rekap terbaru menang.
+- **Batasan jujur:** rekap dibuat peserta dan dapat diubah, jadi **bukan bukti penilaian resmi**; pengajar tidak melihat progres peserta secara langsung/real-time. Pendekatan berbasis akun/cloud untuk pengajar sengaja tidak dibangun: butuh model peran, persetujuan peserta, dan aturan Firebase yang harus dirancang dan diuji dengan Firebase asli.
+- Uji: `tests/test-analytics.mjs` (130 pemeriksaan) + `e2e/analytics.spec.mjs` (12 skenario, termasuk alur unduh→muat dan serangan nama/CSV).

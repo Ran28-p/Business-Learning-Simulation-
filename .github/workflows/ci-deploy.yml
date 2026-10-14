@@ -3,7 +3,7 @@
 # juga tersedia untuk repo privat sampai kuota bulanan, lalu berhenti,
 # bukan menagih otomatis).
 #
-# CI  : enam job paralel di setiap push & pull request —
+# CI  : tujuh job paralel di setiap push & pull request —
 #       - "test-excel" menjalankan test suite otomatis apps/excel.
 #       - "test-spt" menjalankan test suite otomatis apps/spt (js/shared/tax-engine.js
 #         & js/shared/npwp-utils.js — tanpa dependency luar, jadi tidak perlu npm install).
@@ -15,6 +15,12 @@
 #       - "test-portal" menguji progres lintas modul di portal (js/shared/progress-aggregator.js):
 #         key & skema dibandingkan langsung dengan kode sumber tiap modul, ringkasan dari data
 #         engine asli, ekspor/impor (merge/replace, allowlist, atomik), dan rekap PDF.
+#       - "test-portal" juga menjalankan tests/test-analytics.mjs (analitik & Ruang Pengajar), tests/test-cloudsync.mjs (inti sinkron cloud) dan tests/test-gamehub.mjs (mesin Game Hub: misi harian dari selisih
+#         progres nyata, klaim sekali, streak, misi mingguan, lencana, state tak tepercaya).
+#       - "e2e" (folder e2e/, Playwright + Chromium) membuka portal & keempat modul di browser nyata:
+#         tanpa error/404 lokal, tanpa scroll horizontal di desktop/tablet/mobile (terang & gelap),
+#         tema gelap benar-benar berlaku, kontras banner, profil dari login portal, dan grafik
+#         berbasis data nyata (bukan angka karangan).
 #       - "lint" mengecek SEMUA modul (apps/spt, apps/accounting,
 #         apps/excel, apps/sql-pq, + root): syntax .js/.mjs, validitas
 #         .json, dan link src=/href= statis di HTML yang patah. Tidak
@@ -121,6 +127,45 @@ jobs:
       - name: Run test suite (aggregator progres, ekspor/impor, rekap PDF)
         run: node tests/test-portal-progress.mjs
 
+      - name: Run test suite (mesin Game Hub — misi dari progres nyata, klaim, streak, lencana)
+        run: node tests/test-gamehub.mjs
+
+      - name: Run test suite (inti sinkron cloud — merge tiga arah, dua perangkat, data cloud tak tepercaya)
+        run: node tests/test-cloudsync.mjs
+
+      - name: Run test suite (analitik belajar & Ruang Pengajar — topik lemah, rekap, validasi berkas tak tepercaya, CSV aman)
+        run: node tests/test-analytics.mjs
+
+  e2e:
+    name: E2E (browser - layout, tema, profil, data nyata)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
+      - name: Install Playwright + Chromium
+        working-directory: e2e
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install chromium --with-deps
+
+      - name: Run E2E (halaman x 3 ukuran layar x terang/gelap, tema, profil, data nyata)
+        working-directory: e2e
+        run: npx playwright test
+
+      - name: Upload laporan & screenshot (bila gagal)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          retention-days: 7
+
   lint:
     name: Lint (semua apps)
     runs-on: ubuntu-latest
@@ -160,7 +205,7 @@ jobs:
 
   deploy:
     name: Deploy to GitHub Pages
-    needs: [test-excel, test-spt, test-accounting, test-sql-pq, test-portal, lint]
+    needs: [test-excel, test-spt, test-accounting, test-sql-pq, test-portal, e2e, lint]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:

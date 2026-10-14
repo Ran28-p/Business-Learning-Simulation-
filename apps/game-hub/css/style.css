@@ -1,0 +1,126 @@
+/* Game Hub — gaya khusus ("mission control"): berbeda dari workspace belajar, tetap memakai token design-system. */
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--ds-font); font-size: var(--ds-fs-md); line-height: var(--ds-lh); background: var(--ds-bg); color: var(--ds-text); -webkit-font-smoothing: antialiased; }
+h1, h2, h3, p { margin: 0; overflow-wrap: anywhere; }
+a { color: inherit; text-decoration: none; }
+.gh-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.gh-eyebrow { font: 700 var(--ds-fs-xs)/1 var(--ds-font); text-transform: uppercase; letter-spacing: 0.1em; color: var(--ds-accent); }
+.gh-hint { color: var(--ds-muted); font-size: var(--ds-fs-sm); }
+
+/* Header */
+.gh-header {
+  position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: var(--ds-sp-4);
+  padding: 10px clamp(16px, 4vw, 32px); padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  background: var(--ds-navy-950); color: #fff; border-bottom: 2px solid #fbbf24;
+}
+.gh-brand { display: flex; align-items: center; gap: var(--ds-sp-3); min-width: 0; }
+.gh-brand__mark { width: 40px; height: 40px; border-radius: var(--ds-r-md); background: #fbbf24; color: var(--ds-navy-950); display: grid; place-items: center; font-size: 1.3rem; flex: none; }
+.gh-brand h1 { font-size: var(--ds-fs-lg); line-height: 1.2; }
+.gh-brand p { font-size: var(--ds-fs-xs); color: #a9bbd6; }
+.gh-header__actions { display: flex; align-items: center; gap: var(--ds-sp-2); min-width: 0; }
+.gh-header .ds-portal-link, .gh-header .ds-theme-btn, .gh-header .ds-profile-chip { background: transparent; color: #fff; border-color: #3a5f96; }
+.gh-header .ds-profile-chip__role { color: #a9bbd6; }
+.gh-header .ds-portal-link:hover, .gh-header .ds-theme-btn:hover { background: var(--ds-navy-700); color: #fff; border-color: #6d8fc4; }
+.gh-header :focus-visible { outline-color: #fff; }
+
+/* Layout */
+.gh-main { max-width: 1120px; margin: 0 auto; padding: var(--ds-sp-6) clamp(16px, 4vw, 32px) 64px; display: grid; gap: var(--ds-sp-8); }
+.gh-main:focus { outline: none; }
+.gh-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ds-sp-3); flex-wrap: wrap; margin-bottom: var(--ds-sp-3); }
+.gh-section-head h2, .gh-card h2 { font-size: var(--ds-fs-lg); letter-spacing: -0.01em; }
+
+/* Kartu pemain (selalu navy: identitas "papan skor") */
+.gh-player {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--ds-sp-6); align-items: center;
+  padding: clamp(18px, 3vw, 28px); border-radius: var(--ds-r-lg);
+  background-color: var(--ds-navy-900); color: #fff; border: 1px solid var(--ds-navy-700);
+  background-image: radial-gradient(rgba(251, 191, 36, 0.12) 1px, transparent 1px); background-size: 18px 18px;
+}
+.gh-player .gh-eyebrow { color: #fbbf24; }
+.gh-player__badge { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: #fbbf24; color: var(--ds-navy-950); font: 800 2rem/1 var(--ds-font-mono); box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.25); }
+.gh-player h2 { font-size: var(--ds-fs-xl); margin: 6px 0 var(--ds-sp-3); }
+.gh-xpbar { height: 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.18); overflow: hidden; }
+.gh-xpbar > span { display: block; height: 100%; background: #fbbf24; border-radius: inherit; transition: width 0.4s var(--ds-ease); }
+.gh-xpnote { margin-top: 8px; font-size: var(--ds-fs-sm); color: #c5d3e8; }
+.gh-stats { display: grid; grid-template-columns: repeat(2, minmax(110px, 1fr)); gap: var(--ds-sp-2) var(--ds-sp-5); margin: 0; }
+.gh-stats div { min-width: 0; }
+.gh-stats dt { font-size: var(--ds-fs-xs); color: #a9bbd6; }
+.gh-stats dd { margin: 0; font: 700 var(--ds-fs-xl)/1.2 var(--ds-font-mono); font-variant-numeric: tabular-nums; }
+
+/* Misi */
+.gh-missions { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--ds-sp-4); }
+.gh-mission, .gh-weekly, .gh-tile, .gh-card {
+  background: var(--ds-surface); border: 1px solid var(--ds-border); border-radius: var(--ds-r-lg); box-shadow: var(--ds-shadow-1);
+}
+.gh-mission { display: flex; flex-direction: column; gap: var(--ds-sp-2); padding: var(--ds-sp-5); border-left: 4px solid var(--ds-accent); }
+.gh-mission.is-done { background: var(--ds-accent-soft); }
+.gh-mission.is-claimed { opacity: 0.72; }
+.gh-mission__top { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-sp-2); }
+.gh-mission h3, .gh-tile h3, .gh-weekly h3 { font-size: var(--ds-fs-lg); line-height: 1.3; }
+.gh-mission__desc { color: var(--ds-muted); font-size: var(--ds-fs-sm); flex: 1; }
+.gh-chip { display: inline-flex; padding: 2px 10px; border-radius: 999px; background: var(--ds-accent-soft); color: var(--ds-accent); font: 700 var(--ds-fs-xs)/1.6 var(--ds-font-mono); }
+.gh-state { font: 600 var(--ds-fs-xs)/1.4 var(--ds-font); color: var(--ds-muted); }
+.gh-progress { height: 8px; border-radius: 999px; background: var(--ds-border); overflow: hidden; }
+.gh-progress > span { display: block; height: 100%; background: var(--ds-accent); border-radius: inherit; transition: width 0.4s var(--ds-ease); }
+
+.gh-btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--ds-sp-4); margin-top: var(--ds-sp-2);
+  font: 700 var(--ds-fs-sm)/1.2 var(--ds-font); border-radius: var(--ds-r-md); border: 1px solid transparent; cursor: pointer; text-align: center;
+}
+.gh-btn--go { background: var(--ds-surface); color: var(--ds-text); border-color: var(--ds-border-strong); }
+.gh-btn--go:hover { border-color: var(--ds-accent); color: var(--ds-accent); }
+.gh-btn--claim { background: var(--ds-accent); color: var(--ds-on-accent); }
+.gh-btn--claim:hover { filter: brightness(1.08); }
+.gh-btn--ghost { background: transparent; color: var(--ds-muted); border-color: var(--ds-border); cursor: default; }
+
+.gh-weekly { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-sp-5); flex-wrap: wrap; padding: var(--ds-sp-5); border-left: 4px solid var(--ds-accent-gamehub); }
+.gh-weekly.is-done { background: var(--ds-accent-gamehub-soft); }
+.gh-weekly__text { flex: 1 1 320px; min-width: 0; display: grid; gap: 6px; }
+.gh-weekly .gh-eyebrow { color: var(--ds-accent-gamehub); }
+
+/* Arena */
+.gh-arena { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--ds-sp-4); }
+.gh-tile { display: flex; flex-direction: column; gap: var(--ds-sp-2); padding: var(--ds-sp-5); border-top: 3px solid var(--ds-accent); transition: box-shadow var(--ds-dur) var(--ds-ease), border-color var(--ds-dur) var(--ds-ease); }
+.gh-tile:hover { box-shadow: var(--ds-shadow-2); border-color: var(--ds-accent); }
+.gh-tile__head { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-sp-2); }
+.gh-tile__icon { width: 40px; height: 40px; border-radius: var(--ds-r-md); background: var(--ds-accent-soft); display: grid; place-items: center; font-size: 1.2rem; }
+.gh-tile__meta { color: var(--ds-muted); font: var(--ds-fs-sm)/1.4 var(--ds-font-mono); }
+.gh-tile__go { margin-top: auto; padding-top: var(--ds-sp-2); font-weight: 700; font-size: var(--ds-fs-sm); color: var(--ds-accent); }
+
+/* Lencana */
+.gh-badges { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--ds-sp-3); }
+.gh-badge { display: flex; align-items: center; gap: var(--ds-sp-3); padding: var(--ds-sp-3) var(--ds-sp-4); border: 1px dashed var(--ds-border-strong); border-radius: var(--ds-r-md); background: var(--ds-surface-2); color: var(--ds-muted); }
+.gh-badge.is-on { border-style: solid; border-color: var(--ds-accent-gamehub); background: var(--ds-accent-gamehub-soft); color: var(--ds-text); }
+.gh-badge__icon { flex: none; width: 40px; height: 40px; display: grid; place-items: center; font-size: 1.4rem; border-radius: 50%; background: var(--ds-surface); border: 1px solid var(--ds-border); }
+.gh-badge__text { display: grid; min-width: 0; font-size: var(--ds-fs-xs); }
+.gh-badge__text strong { font-size: var(--ds-fs-sm); }
+
+/* Riwayat */
+.gh-card { padding: var(--ds-sp-5); }
+.gh-log { list-style: none; margin: var(--ds-sp-3) 0 0; padding: 0; display: grid; gap: 6px; font-size: var(--ds-fs-sm); }
+.gh-log li { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: var(--ds-sp-3); padding: 8px 12px; border: 1px solid var(--ds-border); border-radius: var(--ds-r-md); background: var(--ds-surface-2); }
+.gh-log li strong { font-family: var(--ds-font-mono); color: var(--ds-accent-gamehub); }
+.gh-log .gh-log__empty { display: block; color: var(--ds-muted); border-style: dashed; background: transparent; }
+.gh-footnote { font-size: var(--ds-fs-xs); color: var(--ds-muted); text-align: center; }
+
+/* Toast */
+.gh-toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 24px); z-index: 60; max-width: calc(100vw - 32px); padding: 12px 18px; border-radius: 999px; background: var(--ds-navy-950); color: #fff; border: 1px solid #fbbf24; font-weight: 700; font-size: var(--ds-fs-sm); opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; }
+.gh-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+/* Responsif */
+@media (max-width: 900px) {
+  .gh-player { grid-template-columns: auto minmax(0, 1fr); }
+  .gh-stats { grid-column: 1 / -1; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .gh-brand p { display: none; }
+  .gh-main { gap: var(--ds-sp-6); padding-top: var(--ds-sp-4); }
+  .gh-player { grid-template-columns: 1fr; text-align: left; }
+  .gh-player__badge { width: 64px; height: 64px; font-size: 1.5rem; }
+  .gh-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gh-log li { grid-template-columns: 1fr auto; }
+  .gh-log li span:first-child { grid-column: 1 / -1; font-size: var(--ds-fs-xs); color: var(--ds-muted); }
+  .gh-weekly .gh-btn { width: 100%; }
+}
+@media (pointer: coarse) { .gh-btn { min-height: var(--ds-touch); } }

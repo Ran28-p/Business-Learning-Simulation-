@@ -2,13 +2,11 @@
   "rules": {
     ".read": false,
     ".write": false,
-
     "users": {
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
         ".write": "auth != null && auth.uid === $uid",
         ".validate": "newData.hasChildren(['xp', 'level'])",
-
         "xp": {
           ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10000000"
         },
@@ -27,15 +25,61 @@
         "history": {
           "$index": {
             ".validate": "$index.matches(/^[0-9]{1,4}$/) && newData.hasChildren(['date', 'score'])",
-            "date":   { ".validate": "newData.isString() && newData.val().length <= 40" },
-            "module": { ".validate": "newData.isString() && newData.val().length <= 100" },
-            "mode":   { ".validate": "newData.isString() && newData.val().length <= 50" },
-            "score":  { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000" },
-            "$other": { ".validate": false }
+            "date": {
+              ".validate": "newData.isString() && newData.val().length <= 40"
+            },
+            "module": {
+              ".validate": "newData.isString() && newData.val().length <= 100"
+            },
+            "mode": {
+              ".validate": "newData.isString() && newData.val().length <= 50"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000"
+            },
+            "$other": {
+              ".validate": false
+            }
           }
         },
-
-        "$other": { ".validate": false }
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "portalSync": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        "$unit": {
+          ".validate": "$unit.matches(/^(accounting|excel|sqlpq|gamehub)$/) && newData.hasChildren(['rev', 'updatedAt', 'hash'])",
+          "rev": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000"
+          },
+          "updatedAt": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 4102444800000"
+          },
+          "device": {
+            ".validate": "newData.isString() && newData.val().length <= 64"
+          },
+          "hash": {
+            ".validate": "newData.isString() && newData.val().length <= 32"
+          },
+          "xp": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000"
+          },
+          "act": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000"
+          },
+          "data": {
+            "$key": {
+              ".validate": "newData.isString() && newData.val().length <= 2000000 && (($unit == 'accounting' && $key.matches(/^ACT_MASTER_(STATE|PROGRESS|TAX_STATE)$/)) || ($unit == 'excel' && $key == 'efpg%3Aprogress') || ($unit == 'sqlpq' && $key.matches(/^sqlpq_(progress_v1|dataset_history_v1)$/)) || ($unit == 'gamehub' && $key == 'gamehub_state_v1'))"
+            }
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
       }
     }
   }

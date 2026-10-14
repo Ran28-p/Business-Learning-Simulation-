@@ -4,7 +4,7 @@
 // ikut tercache otomatis begitu dipakai pertama kali, jadi kunjungan
 // berikutnya tidak perlu network untuk mengaktifkan SQL engine-nya.
 
-const CACHE_NAME = 'sim-sqlpq-shell-v9-fase3'; // bumped: Fase 3 — pembahasan berlapis Simulator SQL (sql-pembahasan.js)
+const CACHE_NAME = 'sim-sqlpq-shell-v12d-cloudsync'; // bumped: redesign UI (design-system.css, ds-modules.css)
 
 const APP_SHELL_LOCAL = [
     './',

@@ -10,7 +10,7 @@ serius: **Firebase Realtime Database**.
 
 | Aset | Di mana | Risiko utama | Pengendali |
 |---|---|---|---|
-| Progres belajar (XP, level, riwayat) | `localStorage` per modul; `apps/spt` juga sinkron ke Firebase `users/{uid}` | Data orang lain terbaca/tertimpa; database dipenuhi data sampah sampai kuota habis | Firebase Security Rules (`database.rules.json`) |
+| Progres belajar (XP, level, riwayat) | `localStorage` per modul; `apps/spt` sinkron ke Firebase `users/{uid}`; Accounting/Excel/SQL/Game Hub ke `portalSync/{uid}` | Data orang lain terbaca/tertimpa; database dipenuhi data sampah sampai kuota habis | Firebase Security Rules (`database.rules.json`) |
 | Email & nama tampilan peserta | Firebase Auth + `users/{uid}` | Kebocoran data pribadi | Rules: hanya pemilik uid yang bisa membaca |
 | Kode aplikasi | GitHub Pages | Library pihak ketiga disusupi; XSS dari input pengguna | Library divendor lokal; input Power Query/SQL tidak dieksekusi sebagai JS (lihat di bawah) |
 | Kuota/biaya Firebase | Proyek Firebase | Tagihan tak terduga | Tetap di paket **Spark** (tidak bisa menagih) |
@@ -149,6 +149,49 @@ diisi di formulir SPT, serta email dan nama tampilan di data SPT bila pernah log
 sendiri di perangkat sendiri, tetapi berkasnya sebaiknya diperlakukan seperti dokumen pribadi.
 Seperti seluruh data progres, isinya juga bisa diedit pengguna, jadi tidak boleh dipakai sebagai bukti
 formal (lihat bagian "Batasan").
+
+## Sinkron cloud lintas modul (`portalSync`)
+
+Progres **Accounting, Excel, SQL & Power Query, dan Game Hub** disinkronkan ke Firebase Realtime Database
+untuk pengguna yang login di Portal (`js/shared/cloud-sync*.js`). Simulator SPT **tidak** ikut: ia sudah
+punya sinkron sendiri ke `users/{uid}` dengan skema dan aturan berbeda.
+
+**WAJIB: deploy rules baru sebelum sinkron bisa bekerja.** Cabang `portalSync` ada di `database.rules.json`
+tetapi baru berlaku setelah di-deploy (lihat langkah di atas). Sebelum itu, setiap tulis/baca ditolak
+(`PERMISSION_DENIED`): aplikasi menampilkan "Aturan Firebase belum diperbarui" di panel *Sinkron cloud* portal
+dan progres tetap aman di perangkat. Cabang ini sengaja **terpisah** dari `users/$uid`, jadi men-deploy-nya tidak
+mengubah perilaku sinkron SPT.
+
+Uji di **Rules Playground** setelah deploy (gratis):
+- *read* `/portalSync/uid-orang-lain` dengan auth uid berbeda → harus **ditolak**; tanpa auth → **ditolak**.
+- *write* `/portalSync/uid-sendiri/sqlpq` dengan `{"rev":1,"updatedAt":1,"hash":"abc"}` dan auth uid sendiri → **diizinkan**.
+- *write* `/portalSync/uid-sendiri/spt` (unit di luar daftar) → **ditolak**.
+- *write* `/portalSync/uid-sendiri/sqlpq/data/spt_simulator_data` → **ditolak** (kunci di luar allowlist unit).
+
+Model data: `portalSync/{uid}/{unit}` = `{ rev, updatedAt, device, hash, xp, act, data: { <kunci ter-encode>: "<teks JSON>" } }`.
+Aturan membatasi: unit hanya `accounting|excel|sqlpq|gamehub`; kunci `data` harus ada di allowlist **unit itu**
+(daftar kunci dijaga CI agar sama dengan `progress-aggregator.js`; kunci SPT tidak boleh muncul); nilai berupa
+teks ≤ 2.000.000 karakter; field lain ditolak. Aplikasi **tidak mempercayai** data cloud: kunci, ukuran, dan
+bentuk JSON diperiksa ulang sebelum menyentuh `localStorage`, hash dihitung ulang, dan penulisan lokal atomik.
+
+Perilaku sinkron (tiga arah lokal ↔ cloud ↔ keadaan sinkron terakhir):
+- hanya lokal berubah → kirim (termasuk **reset** progres, yang ikut berlaku di perangkat lain);
+  hanya cloud berubah → tarik; dua-duanya berubah → yang lebih maju (XP, lalu aktivitas) menang, tidak ada XP hilang;
+- penulisan memakai transaksi + nomor revisi, jadi dua perangkat tidak saling menimpa diam-diam;
+- **tautan pertama** dengan kemajuan berbeda di dua sisi, dan **ganti akun di perangkat yang sama**, selalu meminta
+  pilihan pengguna (gabungkan / pakai cloud / pakai perangkat ini) — tidak ada yang diubah sebelum dipilih.
+  Ini mencegah data lokal milik orang lain terunggah ke akun baru di komputer bersama;
+- data "bawaan" yang ditulis modul saat dimuat (XP 0, 0 aktivitas) tidak dihitung sebagai kemajuan.
+
+Batasan yang jujur:
+- Data yang dikirim adalah isi `localStorage` modul **apa adanya**. Di Accounting ini mencakup data perusahaan
+  yang diisi di pengaturan (termasuk NPWP/alamat bila pengguna menuliskannya, dan data contoh bawaan). Hanya
+  pemilik akun yang bisa membacanya (rules), tetapi jangan mengisi data perusahaan sungguhan di aplikasi edukasi.
+- Pengguna bisa mengubah datanya sendiri, jadi data ini bukan bukti formal.
+- Kuota: batas per kunci 2 MB, per unit paling banyak beberapa MB; satu akun tidak bisa menulis di luar `portalSync/{uidnya}`.
+- Pemeriksa rules di CI adalah simulasi pendekatan; uji akhir tetap Rules Playground.
+- Uji otomatis memakai Firebase **tiruan**; verifikasi dengan Firebase asli (dua perangkat, login email) tetap perlu
+  dilakukan manual setelah deploy rules.
 
 ## Melaporkan masalah keamanan
 

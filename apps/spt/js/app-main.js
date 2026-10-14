@@ -554,10 +554,9 @@
             
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
-                if (savedTheme === 'dark') document.body.setAttribute('data-theme', 'dark');
-                else document.body.removeAttribute('data-theme');
+                applySptTheme(savedTheme === 'dark');
             } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.body.setAttribute('data-theme', 'dark');
+                applySptTheme(true);
             }
 
             const themeToggle = document.getElementById('theme-toggle');
@@ -571,7 +570,61 @@
         // sebelumnya ada 2 definisi saveData() dan yang ini selalu ketimpa oleh versi
         // berbasis Firebase di bawah (dekat baris "DEKLARASI FIREBASE"), jadi dead code.
 
+        // Identitas pengguna (nama/email) HANYA berasal dari login Portal — sama seperti modul lain.
+        // Sesi ditulis js/auth.js ke localStorage "unified_portal_session" (origin sama dengan modul).
+        // Progres/XP tetap milik SPT; yang disinkronkan dari portal hanya nama & email.
+        function getPortalIdentity() {
+            try {
+                const s = JSON.parse(localStorage.getItem('unified_portal_session') || 'null');
+                if (s && (s.email || s.isGuest)) {
+                    const email = s.email || '';
+                    return { email: email, displayName: s.displayName || (email ? email.split('@')[0] : '') };
+                }
+            } catch (_) { /* sesi rusak → anggap belum login */ }
+            return { email: '', displayName: '' };
+        }
+
+        function applyPortalIdentity() {
+            const id = getPortalIdentity();
+            appState.user.email = id.email;
+            appState.user.displayName = id.displayName;
+        }
+
+        // Login/logout di tab portal → profil di SPT ikut berubah tanpa reload.
+        window.addEventListener('storage', function (e) {
+            if (e.key === 'unified_portal_session') updateProfileUI();
+        });
+        window.addEventListener('focus', function () { updateProfileUI(); });
+
+        // Grafik "Perkembangan Progres": jumlah latihan per minggu dari riwayat NYATA (appState.user.history).
+        // Entri riwayat hanya menyimpan tanggal (format id-ID "d/M/yyyy"). Tidak ada data → batang kosong.
+        function renderProgressChart() {
+            const box = document.getElementById('progress-chart-bars');
+            if (!box) return;
+            const DAY = 86400000;
+            const startOfToday = new Date(); startOfToday.setHours(0, 0, 0, 0);
+            const counts = [0, 0, 0, 0, 0]; // indeks 4 = 7 hari terakhir (minggu ini), 0 = 4 minggu sebelumnya
+            (appState.user.history || []).forEach(function (h) {
+                const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(String(h && h.date || ''));
+                if (!m) return;
+                const d = new Date(+m[3], +m[2] - 1, +m[1]);
+                const daysAgo = Math.floor((startOfToday.getTime() - d.getTime()) / DAY);
+                if (daysAgo < 0 || daysAgo > 34) return;
+                counts[4 - Math.floor(daysAgo / 7)]++;
+            });
+            const max = Math.max.apply(null, counts);
+            box.querySelectorAll('.chart-bar').forEach(function (bar, i) {
+                const rect = bar.querySelector('.chart-rect');
+                rect.style.height = (max ? Math.round(counts[i] / max * 100) : 0) + '%';
+                rect.title = counts[i] + ' latihan';
+            });
+            box.setAttribute('aria-label', 'Jumlah latihan per minggu, 5 minggu terakhir: ' + counts.join(', '));
+            const cap = document.getElementById('progress-chart-caption');
+            if (cap) cap.textContent = max ? 'Latihan per minggu · 5 minggu terakhir' : 'Belum ada latihan tercatat';
+        }
+
         function updateProfileUI() {
+            applyPortalIdentity();
             const xpText = document.getElementById('ui-xp-text');
             if (xpText) xpText.innerText = `XP: ${appState.user.xp} / 1000`;
             
@@ -590,6 +643,8 @@
 
             const profileRole = document.getElementById('profile-role');
             if(profileRole) profileRole.innerText = appState.user.email ? appState.user.email : 'Pelajar Pajak';
+
+            renderProgressChart();
 
         }
 // --- DEKLARASI FIREBASE (aman kalau SDK gagal dimuat, misal saat offline) ---
@@ -657,13 +712,8 @@ function registerAuthListener() {
     auth.onAuthStateChanged(function(user) {
         if (user) {
             currentUid = user.uid;
-            // Kalau ini akun email asli (bukan anonim), pastikan status email di UI ikut update
-            if (!user.isAnonymous && user.email) {
-                appState.user.email = user.email;
-                const pendingName = localStorage.getItem('spt_pending_name');
-                if (pendingName) appState.user.displayName = pendingName;
-                else if (!appState.user.displayName) appState.user.displayName = user.email.split('@')[0];
-            }
+            // Identitas (nama/email) ditampilkan dari sesi Portal — lihat getPortalIdentity().
+            // Firebase di sini hanya dipakai untuk sinkron progres (sesi Firebase dibagi dengan portal).
             db.ref('users/' + currentUid).once('value')
                 .then(snapshot => {
                     if (snapshot.exists()) {
@@ -689,75 +739,12 @@ function registerAuthListener() {
     });
 }
 
-// --- LOGIN PASSWORDLESS: kirim link ke email, selesaikan sign-in saat link diklik ---
-function getAuthActionUrl() {
-    // Balik ke halaman app ini sendiri (tanpa query string lama), dimanapun di-hosting.
-    return window.location.origin + window.location.pathname;
-}
-
-function showAuthStatus(message, type) {
-    const el = document.getElementById('auth-status');
-    if (!el) return;
-    el.textContent = message;
-    el.className = 'feedback ' + type;
-    el.style.display = 'block';
-}
-
-function sendLoginLink() {
-    // Form login SPT sudah dihapus. Arahkan ke Portal untuk kirim magic link.
-    openAuthModal();
-}
-
-
+// --- LOGIN: hanya di Portal ---
+// Link login lama (email) yang masih mengarah ke halaman SPT dialihkan ke Portal dengan query yang
+// sama, supaya Portal yang menyelesaikan sign-in (satu-satunya tempat login).
 function completeEmailLinkSignIn() {
     if (!auth || !auth.isSignInWithEmailLink(window.location.href)) return;
-
-    let email = localStorage.getItem('spt_pending_email');
-    if (!email) {
-        // Link dibuka di browser/perangkat berbeda dari saat "Kirim Link" ditekan.
-        email = window.prompt('Masukkan kembali email yang Anda gunakan untuk login:');
-    }
-    if (!email) return;
-
-    const credential = firebase.auth.EmailAuthProvider.credentialWithLink(email, window.location.href);
-
-    const finishUp = (result) => {
-        localStorage.removeItem('spt_pending_email');
-        const pendingName = localStorage.getItem('spt_pending_name');
-        localStorage.removeItem('spt_pending_name');
-
-        appState.user.email = result.user.email || email;
-        if (pendingName) appState.user.displayName = pendingName;
-
-        // Bersihkan query string login dari URL biar link tidak terpakai ulang saat refresh
-        history.replaceState(null, '', getAuthActionUrl());
-
-        updateProfileUI();
-        saveData();
-        alert('✅ Login berhasil! Progres Anda sekarang terhubung dengan ' + appState.user.email + '.');
-    };
-
-    // Kalau saat ini masih anonim, "link"-kan akun anonim ke email ini supaya
-    // progres yang sudah dibuat sebelum login tidak hilang.
-    if (auth.currentUser && auth.currentUser.isAnonymous) {
-        auth.currentUser.linkWithCredential(credential).then(finishUp).catch(err => {
-            if (err.code === 'auth/credential-already-in-use') {
-                // Email itu sudah pernah dipakai login sebelumnya -> masuk ke akun lama itu saja
-                auth.signInWithCredential(err.credential).then(finishUp).catch(e2 => {
-                    console.error('Gagal masuk dengan link:', e2);
-                    alert('❌ Link login tidak valid atau sudah kedaluwarsa. Silakan minta link baru.');
-                });
-            } else {
-                console.error('Gagal menghubungkan akun:', err);
-                alert('❌ Link login tidak valid atau sudah kedaluwarsa. Silakan minta link baru.');
-            }
-        });
-    } else {
-        auth.signInWithCredential(credential).then(finishUp).catch(err => {
-            console.error('Gagal masuk dengan link:', err);
-            alert('❌ Link login tidak valid atau sudah kedaluwarsa. Silakan minta link baru.');
-        });
-    }
+    window.location.replace('../../index.html' + window.location.search);
 }
 
 // --- FUNGSI UI MODAL ---
@@ -775,13 +762,8 @@ function closeAuthModal() {
 }
 
 function toggleAuth() {
-    // Logout tetap di sini (bersihkan sesi Firebase + UI lokal).
-    // Login diarahkan ke Portal agar tidak ada double login page.
-    if(appState.user.email) {
-        logoutUser();
-    } else {
-        openAuthModal(); // redirect ke portal
-    }
+    // Login & logout dikelola di Portal.
+    openAuthModal();
 }
 
 // --- SIMPAN DATA: localStorage dulu (selalu berhasil, jalan offline), baru coba sinkron ke cloud ---
@@ -832,18 +814,6 @@ window.addEventListener('online', function() {
         syncToFirebase();
     }
 });
-
-function logoutUser() {
-    // Reset status login lokal (progres XP/riwayat TIDAK dihapus, tetap ada di localStorage)
-    appState.user.email = '';
-    appState.user.displayName = '';
-    saveData();
-    updateProfileUI();
-
-    if (auth) {
-        auth.signOut().catch(err => console.error('Logout error:', err));
-    }
-}
 
 // CATATAN: initFirebaseServices() SENGAJA dipanggil dari window.onload (setelah loadData()),
 // bukan di sini langsung -- supaya appState.user sudah terisi data lokal (termasuk updatedAt)
@@ -1006,17 +976,24 @@ function logoutUser() {
         function downloadForm1770PDF() { downloadFormPDF('view-form1770', 'f1770', 5, '1770'); }
         function downloadForm1771PDF() { downloadFormPDF('view-form1771', 'f1771', 6, '1771'); }
 
+        // FIX tema gelap: alias warna (--bg-body, --bg-card, --text-main, dst.) didefinisikan di :root
+        // sebagai var(--sp-*). Nilainya sudah "terkunci" terang di <html>, jadi kalau data-theme="dark"
+        // hanya dipasang di <body>, hanya elemen yang punya aturan [data-theme="dark"] sendiri (topbar)
+        // yang ikut berubah. Dengan memasang atribut di <html> DAN <body>, alias di :root ikut dihitung ulang.
+        function applySptTheme(dark) {
+            [document.documentElement, document.body].forEach(function (el) {
+                if (!el) return;
+                if (dark) el.setAttribute('data-theme', 'dark');
+                else el.removeAttribute('data-theme');
+            });
+        }
+
         function toggleTheme() {
-            const body = document.body;
-            if(body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-            }
+            const dark = document.body.getAttribute('data-theme') !== 'dark';
+            applySptTheme(dark);
+            localStorage.setItem('theme', dark ? 'dark' : 'light');
             const themeToggle = document.getElementById('theme-toggle');
-            if(themeToggle) themeToggle.checked = document.body.getAttribute('data-theme') === 'dark';
+            if(themeToggle) themeToggle.checked = dark;
         }
 
         function toggleSidebar() {

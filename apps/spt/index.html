@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-app="spt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -25,6 +25,9 @@
     <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="../../css/responsive-foundation.css">
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/ds-modules.css">
+  <script src="../../js/shared/theme.js"></script>
 </head>
 <body>
     <div class="app-shell">
@@ -154,14 +157,14 @@
                     <div class="chart-card">
                         <div class="section-heading">
                             <h3>Perkembangan Progres</h3>
-                            <span>5 minggu terakhir</span>
+                            <span id="progress-chart-caption">Latihan per minggu · 5 minggu terakhir</span>
                         </div>
-                        <div class="chart-bars">
-                            <div class="chart-bar"><div class="chart-rect" style="height: 56%"></div><div class="chart-label">Mgg 1</div></div>
-                            <div class="chart-bar"><div class="chart-rect" style="height: 72%"></div><div class="chart-label">Mgg 2</div></div>
-                            <div class="chart-bar"><div class="chart-rect" style="height: 88%"></div><div class="chart-label">Mgg 3</div></div>
-                            <div class="chart-bar"><div class="chart-rect" style="height: 63%"></div><div class="chart-label">Mgg 4</div></div>
-                            <div class="chart-bar"><div class="chart-rect" style="height: 95%"></div><div class="chart-label">Mgg 5</div></div>
+                        <div class="chart-bars" id="progress-chart-bars" role="img" aria-label="Jumlah latihan per minggu, 5 minggu terakhir">
+                            <div class="chart-bar"><div class="chart-rect" style="height: 0%"></div><div class="chart-label">-4 mgg</div></div>
+                            <div class="chart-bar"><div class="chart-rect" style="height: 0%"></div><div class="chart-label">-3 mgg</div></div>
+                            <div class="chart-bar"><div class="chart-rect" style="height: 0%"></div><div class="chart-label">-2 mgg</div></div>
+                            <div class="chart-bar"><div class="chart-rect" style="height: 0%"></div><div class="chart-label">-1 mgg</div></div>
+                            <div class="chart-bar"><div class="chart-rect" style="height: 0%"></div><div class="chart-label">Minggu ini</div></div>
                         </div>
                     </div>
                 </div>
@@ -1428,11 +1431,11 @@
     <script src="js/sw-register.js"></script>
 
     <!-- Shared portal helpers -->
-    <script src="../../js/back-to-portal.js"></script>
     <script src="../../js/shared/paper-config.js"></script>
     <script src="../../js/knowledge-base.js"></script>
     <script src="../../js/shared/pdf-export.js"></script>
     <script src="data/knowledge-spt.js"></script>
     <script src="js/knowledge-init.js"></script>
+  <script src="../../js/shared/app-shell.js"></script>
 </body>
 </html>

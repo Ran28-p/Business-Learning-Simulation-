@@ -4,7 +4,7 @@
 // diambil dari pivot-dashboard/ dan dari ../../vendor/hyperformula di root
 // portal — keduanya tetap same-origin jadi otomatis tercakup).
 
-const CACHE_NAME = 'sim-excel-shell-v12-fase3'; // bumped: Fase 3 — bab Pembahasan Fungsi (versi Excel, kesalahan umum)
+const CACHE_NAME = 'sim-excel-shell-v15d-cloudsync'; // bumped: redesign UI (design-system.css, ds-modules.css)
 
 const APP_SHELL_LOCAL = [
     './',

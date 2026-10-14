@@ -1,22 +1,19 @@
-// Service Worker — Portal Belajar (root hub)
-// Tujuan: hub (login + pemilihan modul) tetap bisa dibuka offline setelah
-// kunjungan pertama. Mengikuti pola yang sama dengan apps/spt/sw.js.
-//
-// SENGAJA TIDAK disentuh:
-// 1. Firebase Auth (identitytoolkit/googleapis) & SDK di gstatic.com →
-//    harus selalu real-time supaya login email-link tidak gagal.
-// 2. Apapun di bawah ./apps/ → tiap modul punya service worker sendiri
-//    dengan scope masing-masing; root SW ini hanya menjaga shell hub.
-
-const CACHE_NAME = 'portal-shell-v7-kb-sources'; // bumped: Knowledge Base kini menampilkan sumber & lencana tinjau (js/knowledge-base.js, css/knowledge-base.css)
+const CACHE_NAME = 'portal-shell-v12-analytics'; // bumped: dashboard redesign (css/design-system.css, css/portal.css, index.html)
 
 const APP_SHELL_LOCAL = [
     './',
     './index.html',
+    './css/design-system.css',
     './css/portal.css',
     './css/knowledge-base.css',
     './css/responsive-foundation.css',
     './js/shared/firebase-config.js',
+    './js/shared/theme.js',
+    './js/shared/gamehub-engine.js',
+    './js/shared/cloud-sync-core.js',
+    './js/shared/cloud-sync.js',
+    './js/shared/learning-analytics.js',
+    './js/portal-analytics.js',
     './js/auth.js',
     './js/portal.js',
     './js/back-to-portal.js',

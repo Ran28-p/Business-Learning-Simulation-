@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id" data-app="pengajar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ruang Pengajar — Portal Belajar</title>
+<meta name="description" content="Rangkum rekap progres peserta pelatihan langsung di browser: skor, aktivitas, topik tersulit, dan ekspor CSV. Tidak ada data yang diunggah.">
+<link rel="stylesheet" href="../../css/design-system.css">
+<link rel="stylesheet" href="../../css/ds-modules.css">
+<link rel="stylesheet" href="./css/style.css">
+<script src="../../js/shared/theme.js"></script>
+</head>
+<body>
+  <a class="ds-skip-link" href="#tr-main">Lewati ke konten utama</a>
+
+  <header class="tr-header">
+    <div class="tr-brand">
+      <span class="tr-brand__mark" aria-hidden="true">👩‍🏫</span>
+      <div>
+        <h1>Ruang Pengajar</h1>
+        <p>Rangkuman rekap peserta pelatihan</p>
+      </div>
+    </div>
+    <div class="tr-header__actions"></div>
+  </header>
+
+  <main class="tr-main" id="tr-main" tabindex="-1">
+
+    <section class="tr-privacy" aria-labelledby="tr-privacy-title">
+      <h2 id="tr-privacy-title">🔒 Diproses di browser ini saja</h2>
+      <ul>
+        <li>Berkas rekap dibaca langsung di komputer Anda. <strong>Tidak ada yang diunggah</strong> dan tidak ada yang disimpan; semua hilang saat halaman ditutup atau disegarkan.</li>
+        <li>Rekap dibuat dan diserahkan sendiri oleh peserta (dari Portal → Analitik belajar). Isinya bisa diubah peserta, jadi <strong>bukan bukti penilaian resmi</strong>.</li>
+        <li>Rekap hanya memuat angka ringkasan: tanpa jawaban, data perusahaan, atau NPWP. Email hanya ada bila peserta memilihnya.</li>
+      </ul>
+    </section>
+
+    <section class="tr-card" aria-labelledby="tr-load-title">
+      <h2 id="tr-load-title">1. Muat rekap peserta</h2>
+      <div class="tr-drop" id="tr-drop">
+        <p>Seret berkas <code>rekap-belajar-….json</code> ke sini, atau</p>
+        <label class="tr-btn tr-btn--primary" for="tr-file">Pilih berkas rekap</label>
+        <input type="file" id="tr-file" accept="application/json,.json" multiple hidden>
+        <p class="tr-hint">Bisa memilih banyak berkas sekaligus (maks. 300 berkas, 100 KB per berkas). Peserta yang sama (nama dan email) hanya dihitung sekali: rekap terbaru menang.</p>
+      </div>
+      <div class="tr-status" id="tr-status" role="status" aria-live="polite"></div>
+      <ul class="tr-rejected" id="tr-rejected"></ul>
+    </section>
+
+    <div id="tr-results" hidden>
+      <section aria-labelledby="tr-sum-title">
+        <h2 id="tr-sum-title">2. Ringkasan kelompok</h2>
+        <div class="tr-cards" id="tr-cards"></div>
+      </section>
+
+      <div class="tr-two">
+        <section class="tr-card" aria-labelledby="tr-weak-title">
+          <h2 id="tr-weak-title">Topik tersulit di kelompok</h2>
+          <p class="tr-hint">Diurutkan menurut jumlah peserta yang topiknya tercatat lemah (rata-rata prioritas di kanan). Cocok untuk bahan pengulangan di kelas.</p>
+          <ol class="tr-weak" id="tr-weak"></ol>
+        </section>
+        <section class="tr-card" aria-labelledby="tr-mod-title">
+          <h2 id="tr-mod-title">Per modul</h2>
+          <div class="tr-table-wrap">
+            <table class="tr-table" id="tr-modules"><thead><tr><th scope="col">Modul</th><th scope="col" class="num">Peserta mulai</th><th scope="col" class="num">Rata-rata skor</th><th scope="col" class="num">Rata-rata XP</th></tr></thead><tbody></tbody></table>
+          </div>
+        </section>
+      </div>
+
+      <section class="tr-card" aria-labelledby="tr-list-title">
+        <div class="tr-list-head">
+          <h2 id="tr-list-title">3. Daftar peserta</h2>
+          <div class="tr-tools">
+            <label class="tr-search"><span class="tr-visually-hidden">Cari nama</span><input type="search" id="tr-search" placeholder="Cari nama…" autocomplete="off"></label>
+            <div class="tr-filter" role="group" aria-label="Filter status" id="tr-filter">
+              <button type="button" data-filter="all" aria-pressed="true">Semua</button>
+              <button type="button" data-filter="active" aria-pressed="false">Aktif</button>
+              <button type="button" data-filter="inactive" aria-pressed="false">Tidak aktif</button>
+              <button type="button" data-filter="struggling" aria-pressed="false">Perlu perhatian</button>
+            </div>
+          </div>
+        </div>
+        <p class="tr-hint">Aktif = ada aktivitas dalam 7 hari terakhir. Perlu perhatian = skor rata-rata di bawah 60% dengan minimal 5 aktivitas. Klik judul kolom untuk mengurutkan.</p>
+        <div class="tr-table-wrap">
+          <table class="tr-table" id="tr-table">
+            <thead><tr>
+              <th scope="col"><button type="button" class="tr-sort" data-sort="name">Nama</button></th>
+              <th scope="col" class="num"><button type="button" class="tr-sort" data-sort="totalXp">Total XP</button></th>
+              <th scope="col" class="num"><button type="button" class="tr-sort" data-sort="startedModules">Modul</button></th>
+              <th scope="col" class="num"><button type="button" class="tr-sort" data-sort="activities">Aktivitas</button></th>
+              <th scope="col" class="num"><button type="button" class="tr-sort" data-sort="avgScore">Skor</button></th>
+              <th scope="col"><button type="button" class="tr-sort" data-sort="lastActive">Terakhir aktif</button></th>
+              <th scope="col">Status</th>
+              <th scope="col">Topik terlemah</th>
+            </tr></thead>
+            <tbody id="tr-body"></tbody>
+          </table>
+        </div>
+        <div class="tr-actions">
+          <button type="button" class="tr-btn tr-btn--primary" id="tr-csv">Unduh CSV</button>
+          <button type="button" class="tr-btn" id="tr-clear">Hapus semua data dari halaman ini</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="../../js/shared/cohort-engine.js"></script>
+  <script src="./js/app.js"></script>
+  <script src="../../js/shared/app-shell.js"></script>
+</body>
+</html>

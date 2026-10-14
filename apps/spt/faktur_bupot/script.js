@@ -585,6 +585,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ikut tema gelap/terang milik shell utama (dibaca dari localStorage yang sama)
   try {
     const theme = localStorage.getItem('theme');
-    if (theme === 'dark') document.body.setAttribute('data-theme', 'dark');
+    if (theme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.body.setAttribute('data-theme', 'dark'); }
   } catch (e) {}
 });

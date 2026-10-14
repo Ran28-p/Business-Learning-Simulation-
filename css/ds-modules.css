@@ -1,0 +1,132 @@
+/* ==========================================================================
+   Portal Belajar — penyempurnaan workspace per modul (di atas design-system.css)
+   Hanya aturan tambahan, dibatasi lewat <html data-app="…">. Tidak mengubah logika,
+   markup, atau ID. Tujuan: konsisten, tanpa blur/glass, tanpa overflow, target sentuh.
+   ========================================================================== */
+
+/* ── Umum untuk semua modul ───────────────────────────────────────────── */
+[data-app] img, [data-app] svg, [data-app] video, [data-app] canvas { max-width: 100%; }
+[data-app] table { font-variant-numeric: tabular-nums; }
+[data-app] :where(h1, h2, h3, p, li) { overflow-wrap: anywhere; }
+/* tanpa glassmorphism */
+[data-app] .app-header, [data-app] .topbar, [data-app] .modal-overlay {
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+
+/* ── Accounting: workspace bisnis (jurnal, buku besar, laporan) ────────── */
+[data-app="accounting"] .content-body { padding: clamp(14px, 3vw, 32px); min-width: 0; }
+[data-app="accounting"] .page-view, [data-app="accounting"] .card { min-width: 0; }
+[data-app="accounting"] .card { overflow-x: auto; border-top: 2px solid var(--ds-accent-accounting); }
+[data-app="accounting"] .table-responsive { border: 1px solid var(--ds-border); border-radius: var(--ds-r-md); }
+[data-app="accounting"] .table-responsive thead th { position: sticky; top: 0; z-index: 1; background: var(--ds-surface-2); }
+[data-app="accounting"] .modal-overlay { background: rgba(7, 20, 38, 0.6); }
+[data-app="accounting"] .modal-content { max-height: calc(100dvh - 32px); overflow-y: auto; max-width: calc(100vw - 24px); }
+
+/* ── Simulator SPT: ruang kerja formulir & validasi ───────────────────── */
+[data-app="spt"] .main-content { min-width: 0; padding-left: clamp(14px, 3vw, 32px); padding-right: clamp(14px, 3vw, 32px); }
+[data-app="spt"] .topbar { background: var(--ds-bg); border-bottom: 1px solid var(--ds-border); }
+[data-app="spt"] .card { min-width: 0; overflow-x: auto; }
+[data-app="spt"] .dashboard-grid > *, [data-app="spt"] .calc-panel > * { min-width: 0; }
+
+/* ── Excel: area data diprioritaskan, panel di sekitarnya tidak melebar ── */
+[data-app="excel"] .app-header { background: var(--ds-surface); border-bottom: 1px solid var(--ds-border); }
+[data-app="excel"] .app-body > *, [data-app="excel"] .main-content > * { min-width: 0; }
+[data-app="excel"] .panel { overflow-x: auto; }
+
+/* ── SQL & Power Query: pemisahan sumber data / editor / hasil ─────────── */
+[data-app="sqlpq"] .sql-lab > *, [data-app="sqlpq"] .pq-layout > * { min-width: 0; }
+[data-app="sqlpq"] .result-panel { overflow-x: auto; max-width: 100%; }
+[data-app="sqlpq"] .modal-box { max-height: calc(100dvh - 40px); overflow-y: auto; }
+[data-app="sqlpq"] table.data-table th { background: var(--sqlpq-blue-700); }
+
+/* ── Layar sentuh: kontrol utama minimal 44px (tanpa mengubah desktop) ─── */
+@media (pointer: coarse) {
+  [data-app] button:not(.icon-only), [data-app] .btn, [data-app] [role="button"], [data-app] select {
+    min-height: 44px;
+  }
+  [data-app] input:not([type="checkbox"]):not([type="radio"]) { min-height: 44px; }
+}
+
+/* ── Mobile: tidak ada scroll horizontal halaman ───────────────────────── */
+@media (max-width: 600px) {
+  [data-app] body { overflow-x: hidden; }
+  [data-app="accounting"] .card, [data-app="spt"] .card { padding: 16px; }
+}
+
+/* ==========================================================================
+   Tahap 2 — workspace per modul (tata letak, status, label panel)
+   ========================================================================== */
+
+/* ── Status & validasi yang konsisten (tidak hanya bergantung pada warna) ── */
+[data-app="spt"] .feedback.success { background: var(--ds-success-soft); color: var(--ds-success); border: 1px solid var(--ds-success); border-left-width: 4px; }
+[data-app="spt"] .feedback.error   { background: var(--ds-danger-soft);  color: var(--ds-danger);  border: 1px solid var(--ds-danger);  border-left-width: 4px; }
+[data-app="spt"] .feedback.success::before { content: "✓ "; font-weight: 700; }
+[data-app="spt"] .feedback.error::before   { content: "⚠ "; font-weight: 700; }
+[data-app="spt"] .checklist li { border: 1px solid var(--ds-border); }
+
+[data-app="accounting"] .alert-box { border-left-width: 4px; }
+[data-app="accounting"] .alert-warning { background: var(--ds-warning-soft); color: var(--ds-warning); border-color: var(--ds-warning); }
+[data-app="accounting"] .alert-danger  { background: var(--ds-danger-soft);  color: var(--ds-danger);  border-color: var(--ds-danger); }
+[data-app="accounting"] .alert-info    { border-color: var(--ds-accent-accounting); }
+[data-app="accounting"][data-theme="dark"] .alert-info { color: var(--ds-accent-accounting); }
+[data-app="accounting"] .alert-warning::before { content: "⚠ "; font-weight: 700; }
+[data-app="accounting"] .alert-danger::before  { content: "⚠ "; font-weight: 700; }
+
+/* ── Excel: area spreadsheet diprioritaskan; panel soal tetap terjangkau ── */
+@media (min-width: 1025px) {
+  [data-app="excel"] .workspace-grid { grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); }
+  [data-app="excel"] .spreadsheet-scroll { max-height: clamp(420px, 66dvh, 760px); }
+  /* instruksi, input rumus, pengecekan & penjelasan ikut terlihat saat sheet di-scroll */
+  [data-app="excel"] .side-column {
+    position: sticky; top: 76px;
+    max-height: calc(100dvh - 92px); overflow-y: auto; overscroll-behavior: contain;
+  }
+}
+
+/* ── SQL & Power Query: sumber data | instruksi | editor | hasil ───────── */
+[data-app="sqlpq"] .question-box { border-left: 4px solid var(--ds-accent-sqlpq); }
+[data-app="sqlpq"] .result-panel::before {
+  content: "Hasil"; display: block; margin-bottom: 6px;
+  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--sqlpq-ink-500);
+}
+@media (min-width: 901px) {
+  [data-app="sqlpq"] .db-explorer { position: sticky; top: 76px; align-self: start; max-height: calc(100dvh - 92px); overflow-y: auto; }
+  [data-app="sqlpq"] .sql-editor { min-height: clamp(150px, 24dvh, 280px); }
+}
+
+/* SPT dark: banner hero memakai biru terang (--sp-primary dark) dengan teks putih → kontras rendah.
+   Pakai navy solid supaya teks putih terbaca (ditemukan lewat uji browser nyata). */
+:root[data-app="spt"][data-theme="dark"] .hero-card { background: var(--ds-navy-800); border: 1px solid var(--ds-navy-700); }
+
+/* ── Excel dark: teks yang tadinya hijau tua (--efpg-green-700/600) → hijau terang agar terbaca ──
+   Dibuat otomatis dari semua aturan "color: var(--efpg-green-700|600)" di style.css & pivot-dashboard.
+   :where() menjaga spesifisitas rendah supaya aturan state (mis. .badge-pill[data-state="ready"]) tetap menang. */
+:where(:root[data-app="excel"][data-theme="dark"]) .badge-pill,
+:where(:root[data-app="excel"][data-theme="dark"]) .level-path__item .level-node,
+:where(:root[data-app="excel"][data-theme="dark"]) .progress-stat__value,
+:where(:root[data-app="excel"][data-theme="dark"]) .question-queue__number,
+:where(:root[data-app="excel"][data-theme="dark"]) .setup-note strong,
+:where(:root[data-app="excel"][data-theme="dark"]) .formula-bar__namebox,
+:where(:root[data-app="excel"][data-theme="dark"]) .sheet-tab,
+:where(:root[data-app="excel"][data-theme="dark"]) .chip--level,
+:where(:root[data-app="excel"][data-theme="dark"]) .cell-link,
+:where(:root[data-app="excel"][data-theme="dark"]) .result-panel[data-status="correct"] .result-status,
+:where(:root[data-app="excel"][data-theme="dark"]) .explanation-panel h4,
+:where(:root[data-app="excel"][data-theme="dark"]) .fx-popup__name,
+:where(:root[data-app="excel"][data-theme="dark"]) .fx-hint__fn,
+:where(:root[data-app="excel"][data-theme="dark"]) .dataset-nav__item:not([disabled]):hover,
+:where(:root[data-app="excel"][data-theme="dark"]) .level-path__item:not([disabled]):hover,
+:where(:root[data-app="excel"][data-theme="dark"]) .pd-header h1,
+:where(:root[data-app="excel"][data-theme="dark"]) .pd-engine-status.pd-engine-status--ready,
+:where(:root[data-app="excel"][data-theme="dark"]) .pd-tab:hover,
+:where(:root[data-app="excel"][data-theme="dark"]) .pd-tab--active,
+:where(:root[data-app="excel"][data-theme="dark"]) .btn--ghost,
+:where(:root[data-app="excel"][data-theme="dark"]) table.pd-data-table th,
+:where(:root[data-app="excel"][data-theme="dark"]) table.pd-pivot-table th { color: var(--ds-accent-excel); }
+
+/* Avatar/teks di atas warna aksen: terang → teks putih; gelap (dark mode, aksen terang) → teks gelap */
+
+/* Excel dark: kontrol pivot yang latarnya di-hardcode putih (#fff) */
+:root[data-app="excel"][data-theme="dark"] .pd-field-label select { background: var(--efpg-paper); color: var(--efpg-ink-900); }
+:root[data-app="excel"][data-theme="dark"] .pd-shell .btn:not(.btn--primary):not(.btn--ghost) { background: var(--efpg-paper); color: var(--efpg-ink-900); }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-app="accounting">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,11 +20,14 @@
          (grep -r "confetti" js/ nihil) — dihapus, bukan sekadar dioptimalkan, karena itu
          request jaringan + parse JS yang murni sia-sia di setiap load halaman. -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+    <link rel="stylesheet" href="../../css/design-system.css">
+    <link rel="stylesheet" href="../../css/ds-modules.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
 
     <!-- PDF engine: loads html2pdf from local vendor first (offline-safe),
          falls back to CDN only if the local file is missing. See js/shared/pdf-export.js -->
     <script src="../../js/shared/pdf-export.js"></script>
+  <script src="../../js/shared/theme.js"></script>
 </head>
 <body>
 
@@ -774,7 +777,6 @@
 
     <!-- Application entry point (ES Module) -->
     <script type="module" src="js/main.js"></script>
-  <script src="../../js/back-to-portal.js"></script>
 
   <!-- Modul Pengetahuan (e-book) -->
   <script src="../../js/shared/paper-config.js"></script>
@@ -799,5 +801,7 @@
         });
     }
   </script>
+  <script src="../../js/shared/app-shell.js"></script>
+  <script src="../../js/shared/cloud-sync.js"></script>
 </body>
 </html>

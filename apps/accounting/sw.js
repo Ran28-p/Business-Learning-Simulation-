@@ -4,7 +4,7 @@
 // lain yang diminta (css/js/data) — jadi tidak perlu daftar file manual yang
 // gampang basi tiap kali ada file baru ditambahkan.
 
-const CACHE_NAME = 'sim-accounting-shell-v10-fase3'; // bumped: Fase 3 — kesalahan klasik baru di AI Tutor (prive, penyusutan, uang muka, sewa, utang gaji, PPN)
+const CACHE_NAME = 'sim-accounting-shell-v13d-cloudsync'; // bumped: redesign UI (design-system.css, ds-modules.css)
 
 const APP_SHELL_LOCAL = [
     './',
