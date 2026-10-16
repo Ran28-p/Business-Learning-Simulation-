@@ -1,5 +1,5 @@
 /**
- * Konten Modul Pengetahuan — Accounting (ActMaster Pro).
+ * Konten Modul Pengetahuan — Accounting (Accounting).
  * Dipakai oleh js/knowledge-base.js lewat: KnowledgeBase.open(window.KNOWLEDGE_CONTENT_ACCOUNTING)
  *
  * Semua contoh laporan keuangan pada bab 2 memakai SATU perusahaan fiktif yang sama
@@ -10,7 +10,7 @@
  */
 window.KNOWLEDGE_CONTENT_ACCOUNTING = {
   title: 'Dasar Akuntansi & Laporan Keuangan',
-  subtitle: 'Modul Pengetahuan — ActMaster Pro',
+  subtitle: 'Modul Pengetahuan — Accounting',
   appAccent: '#2563eb',
   disclaimer: 'Materi ini untuk pembelajaran dasar dengan contoh yang disederhanakan. Penyusunan laporan keuangan entitas nyata mengikuti SAK yang berlaku bagi entitas tersebut (SAK Umum/PSAK, SAK EP, atau SAK EMKM). Nomor PSAK memakai penomoran baru yang efektif sejak 1 Januari 2024.',
   chapters: [

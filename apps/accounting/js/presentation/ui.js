@@ -410,7 +410,7 @@ function runOnboarding() {
         steps: [
           {
             title: 'Selamat Datang! 👋',
-            intro: 'Ini adalah ActMaster Pro, simulator siklus akuntansi interaktif Anda.'
+            intro: 'Ini adalah Accounting, simulator siklus akuntansi interaktif Anda.'
           },
           {
             element: document.querySelector('.sidebar'),

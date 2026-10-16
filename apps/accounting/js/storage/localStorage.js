@@ -134,7 +134,7 @@ export function loadTaxState() {
  * one portable JSON object the user can download and restore later.
  */
 export function exportAllData() {
-  const bundle = { __app: 'ActMaster Pro', __version: 1, exportedAt: new Date().toISOString(), data: {} };
+  const bundle = { __app: 'Accounting', __version: 1, exportedAt: new Date().toISOString(), data: {} };
   Object.values(STORAGE_KEYS).forEach(key => {
     try {
       const raw = localStorage.getItem(key);

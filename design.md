@@ -96,7 +96,7 @@ Prinsip utama:
   --warning:          #fbbf24;
   --warning-soft:     #78350f;
   --danger:           #f87171;
-  --danger-soft:      #7e1d1d;
+  --danger-soft:      #7f1d1d;
   --info:             #60a5fa;
   --info-soft:        #1e3a8a;
 
@@ -411,3 +411,12 @@ Halaman `apps/game-hub/` (aksen amber, gaya "papan skor" — sengaja berbeda dar
 - Definisi: *aktif* = ada aktivitas ≤7 hari; *perlu perhatian* = skor rata-rata (tertimbang aktivitas) <60% dengan ≥5 aktivitas. Peserta yang sama (nama+email) dihitung sekali, rekap terbaru menang.
 - **Batasan jujur:** rekap dibuat peserta dan dapat diubah, jadi **bukan bukti penilaian resmi**; pengajar tidak melihat progres peserta secara langsung/real-time. Pendekatan berbasis akun/cloud untuk pengajar sengaja tidak dibangun: butuh model peran, persetujuan peserta, dan aturan Firebase yang harus dirancang dan diuji dengan Firebase asli.
 - Uji: `tests/test-analytics.mjs` (130 pemeriksaan) + `e2e/analytics.spec.mjs` (12 skenario, termasuk alur unduh→muat dan serangan nama/CSV).
+
+### 10.12 Konten baru: "Penggajian & PPh 21 (TER)" (poin 6)
+Materi ke-7 di **Generator Excel** (3 level) + **bab 11** di Modul Pengetahuan Excel. Dipilih karena PPh 21 sudah ada sebagai kalkulator/soal konseptual di SPT, tetapi latihan hitung penggajian yang akurat belum ada (materi "Karyawan" lama menyebut dirinya "disederhanakan, BUKAN metode TER resmi").
+- **Level** (mengikuti kontrak kurikulum yang dijaga tes modul): *Beginner* (datar, tanpa lookup): bruto bulanan (premi JKK/JKM/kesehatan dibayar perusahaan **termasuk**), kategori TER lewat `IF/OR`, PTKP lewat `LEFT/RIGHT/VALUE` (54 jt + 4,5 jt kawin + 4,5 jt × tanggungan). *Profesional* (`VLOOKUP`): kategori, tarif TER lewat `SUMIFS` ke tabel resmi, PPh bulanan `ROUNDDOWN`, penerimaan bersih. *Expert* (`XLOOKUP`+`IFERROR`): masa pajak terakhir — bruto setahun, biaya jabatan (5%, maks 6 jt), neto, PKP (ke bawah ribuan), Pasal 17 progresif dengan `SUMPRODUCT` + kolom selisih tarif, PPh Desember = setahun − Jan–Nov (hasil negatif **tidak** dipotong; ada di simulasi resmi DJP).
+- **Sumber tunggal data:** `apps/excel/data/payroll-ter.js` dibangkitkan dari `apps/spt/js/shared/tax-engine.js` oleh `scripts/gen-excel-payroll-data.mjs` (tabel TER tidak diketik ulang).
+- **Pembuktian (tests/test-payroll-ter.mjs, 134 pemeriksaan):** (1) 125 lapisan TER A/B/C + Pasal 17 + PTKP + kategori dicocokkan baris demi baris dengan **slide resmi DJP "PMK 168 Tahun 2023 tentang PPh Pasal 21 TER"** (pajak.go.id) dan dengan mesin SPT; (2) **contoh hitung resmi** (simulasi 9 baris termasuk Desember negatif, Tuan R, Tuan A, F, H, B, D, P) dijalankan lewat rumus Excel yang dibangkitkan, dievaluasi **HyperFormula** (`vendor/`); (3) 120 spesifikasi acak (2.460 baris karyawan) dibandingkan dengan implementasi referensi independen; (4) kontrak level. Uji E2E: `e2e/payroll.spec.mjs` (UI → .xlsx yang diunduh → bab 11).
+- **Temuan saat verifikasi:** (a) ingatan saya sendiri keliru pada 3 lapisan TER kategori C; tabel di repo ternyata benar — itu sebabnya verifikasi memakai dokumen resmi, bukan ingatan. (b) `tax-engine.js hitungTER` memakai `Math.round`, sedangkan latihan memakai pembulatan ke bawah (SE-22/PJ.24/1990): selisih Rp1 pada ±1,6% nilai uji (kasus pecahan tepat .5). **Belum diselaraskan**: aturan pembulatan TER spesifik di Coretax belum terverifikasi; keputusan ada pada pemilik materi. (c) Per 11 Okt 2026 **PTKP baru diwacanakan naik (rencana 2027, besaran belum ditetapkan)**; materi memakai nilai berlaku (PMK 101/PMK.010/2016) dan peringatan dicatat di bab 11.6 dan `scripts/regulasi-terpantau.json`.
+- **Saat PTKP/TER berubah:** ubah nilai di `tax-engine.js` → `node scripts/gen-excel-payroll-data.mjs` → perbarui bab 11 dan tabel contoh resmi di `tests/test-payroll-ter.mjs` (vektor resmi sengaja dikunci ke dokumen DJP; ia akan gagal dan memaksa tinjauan).
+- **Dimodelkan:** pegawai tetap, gaji tetap sepanjang tahun, TER Jan–Nov, Desember. **Tidak dicakup:** pegawai tidak tetap, pesangon, pensiunan, gross-up, pindah kerja tengah tahun, THR/bonus di bulan selain Desember, iuran BPJS Kesehatan karyawan 1% pada penerimaan bersih. Premi perusahaan dan iuran JHT+JP karyawan diberikan sebagai data (tarif/batas upah BPJS berubah-ubah).

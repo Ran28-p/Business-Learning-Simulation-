@@ -14,6 +14,7 @@ const NOW = new Date(Date.UTC(2026, 9, 15)); // Okt 2026
 const refs = extractRefs('Sesuai PMK 131/2024, PMK-02/PMK.03/2010, PP 20/2026, UU 7/2021, SE-02/PJ/2024 dan PSAK 201 (dahulu PSAK 1).');
 for (const r of ['PMK 131/2024', 'PMK 02/PMK.03/2010', 'PP 20/2026', 'UU 7/2021', 'SE-02/PJ/2024', 'PSAK 201', 'PSAK 1']) t(refs.includes(r), 'ekstraksi ' + r);
 t(extractRefs('tidak ada rujukan di sini 12/2024 saja').length === 0, 'angka biasa bukan rujukan');
+t(extractRefs('SE-22/PJ.24/1990 dan SE-02/PJ/2024').join() === 'SE-22/PJ.24/1990,SE-02/PJ/2024', 'SE bernomor PJ.24 (format lama) dan format baru sama-sama dikenali');
 t(normalize('PMK-02/PMK.03/2010') === 'PMK 02/PMK.03/2010', 'normalisasi PMK-');
 t(extractRefs('PMK 18/PMK.03/2021').includes('PMK 18/PMK.03/2021') && !extractRefs('PMK 18/PMK.03/2021').includes('PMK 18/PMK'), 'pola PMK panjang tidak terpotong');
 

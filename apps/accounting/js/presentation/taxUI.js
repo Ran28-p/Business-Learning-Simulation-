@@ -631,7 +631,7 @@ function handlePrintInvoice() {
   if (window.PDFExport && window.PDFExport.printElement) {
     var paper = _resolvePaperSize();
     window.PDFExport.printElement(source, {
-      title: 'Invoice — ActMaster Pro',
+      title: 'Invoice — Accounting',
       extraCss: '@page{size:' + paper.css + ';margin:10mm 12mm;} body{font-size:12px;color:#0f172a;background:#fff;} table{width:100%;border-collapse:collapse;font-size:11px;} th{background:#0f172a;color:#fff;padding:7px 10px;border:1px solid #0f172a;text-align:left;} td{padding:6px 10px;border:1px solid #e2e8f0;}'
     });
     return;
@@ -649,7 +649,7 @@ function handlePrintReport() {
   if (window.PDFExport && window.PDFExport.printElement) {
     var paper = _resolvePaperSize();
     window.PDFExport.printElement(source, {
-      title: 'Laporan Keuangan — ActMaster Pro',
+      title: 'Laporan Keuangan — Accounting',
       extraCss: '@page{size:' + paper.css + ';margin:10mm 12mm;} body{font-size:12px;color:#0f172a;background:#fff;} h2{font-size:16px;font-weight:800;color:#0f172a;border-bottom:2px solid #0f172a;padding-bottom:6px;margin-bottom:12px;} table{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0 14px;} th{background:#0f172a;color:#fff;padding:7px 10px;text-align:left;font-weight:700;border:1px solid #0f172a;} td{padding:6px 10px;border:1px solid #e2e8f0;vertical-align:top;}'
     });
     return;

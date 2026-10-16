@@ -598,6 +598,128 @@ window.KNOWLEDGE_CONTENT_EXCEL = {
           ]
         }
       ]
+    },
+    {
+      id: 'penggajian-pph21',
+      title: '11. Penggajian & PPh 21 (TER)',
+      sections: [
+        {
+          id: 'alur-ter-desember',
+          heading: '11.1 Dua cara menghitung: Januari–November dan Desember',
+          body: `
+<p class="kb-lead">PPh 21 pegawai tetap dipotong dengan dua cara berbeda dalam satu tahun. Latihan "Penggajian &amp; PPh 21 (TER)" di Generator mengikuti keduanya.</p>
+<div class="kb-table-wrap"><table class="kb-table">
+<thead><tr><th>Masa pajak</th><th>Cara menghitung</th><th>Pengurang &amp; PTKP</th></tr></thead>
+<tbody>
+<tr><td>Januari–November</td><td><code>PPh 21 = penghasilan bruto bulan itu × tarif TER</code></td><td>Tidak dikurangkan; sudah tercermin dalam tarif TER</td></tr>
+<tr><td>Desember (masa pajak terakhir)</td><td><code>PPh 21 setahun (tarif Pasal 17 atas PKP) − PPh 21 yang sudah dipotong Jan–Nov</code></td><td>Biaya jabatan, iuran JHT/JP karyawan, dan PTKP dihitung di sini</td></tr>
+</tbody></table></div>
+<div class="kb-tip"><span class="kb-callout-title">💡 Kenapa dua cara?</span>TER hanya perkiraan agar pemotongan bulanan sederhana. Selisihnya dengan pajak yang sebenarnya dibereskan di Desember — itu sebabnya hasil Desember bisa kurang bayar, bisa juga negatif (lihat 11.5).</div>`,
+          sources: [ { type: 'pmk', ref: 'PMK 168/2023 (PPh Pasal 21 — TER)', note: 'dibaca lewat slide resmi DJP "PMK 168 Tahun 2023 tentang PPh Pasal 21 TER": tabel TER, contoh hitung, dan simulasi dicocokkan satu per satu (12 Okt 2026)', url: 'https://pajak.go.id/sites/default/files/2024-02/PMK%20168%20Tahun%202023%20Tentang%20PPh%20Pasal%2021%20TER.pdf' }, { type: 'pp', ref: 'PP 58/2023 (tarif PPh Pasal 21 atas penghasilan dengan nama dan dalam bentuk apa pun)', note: 'dasar TER; isi diverifikasi melalui slide DJP di atas' } ],
+          reviewed: '2026-10'
+        },
+        {
+          id: 'penghasilan-bruto-payroll',
+          heading: '11.2 Apa yang termasuk penghasilan bruto',
+          body: `
+<p class="kb-lead">Dasar TER adalah penghasilan bruto <strong>sebulan</strong>, bukan gaji pokok saja.</p>
+<div class="kb-table-wrap"><table class="kb-table">
+<thead><tr><th>Komponen</th><th>Masuk bruto PPh 21?</th></tr></thead>
+<tbody>
+<tr><td>Gaji pokok, tunjangan tetap, tunjangan tidak tetap, lembur</td><td>Ya</td></tr>
+<tr><td>THR / bonus yang dibayar pada bulan itu</td><td>Ya — dijumlahkan dengan bruto bulan tersebut</td></tr>
+<tr><td>Premi JKK, JKM, dan kesehatan yang dibayar <strong>pemberi kerja</strong></td><td>Ya — menambah bruto walau tidak diterima tunai</td></tr>
+<tr><td>Iuran JHT dan JP bagian <strong>pemberi kerja</strong></td><td>Tidak</td></tr>
+<tr><td>Iuran JHT dan JP bagian <strong>karyawan</strong></td><td>Tidak dikurangkan dari dasar TER; menjadi pengurang pada perhitungan Desember</td></tr>
+</tbody></table></div>
+<div class="kb-example"><span class="kb-callout-title">Contoh resmi DJP</span>Gaji Rp10.000.000 + tunjangan Rp20.000.000 + premi JKK/JKM yang dibayar perusahaan Rp80.000 = bruto <strong>Rp30.080.000</strong>. Status K/0 (kategori A), tarif TER 13% → PPh 21 Januari <strong>Rp3.910.400</strong>.</div>
+<div class="kb-warning"><span class="kb-callout-title">⚠️ Waspadai perbedaan panduan</span>Sebagian panduan pihak ketiga mengurangi iuran JHT/JP karyawan dari dasar TER. Contoh dan ketentuan resmi DJP mengalikan TER dengan penghasilan bruto tanpa pengurang. Ikuti ketentuan resmi, lalu periksa pengaturan aplikasi payroll Anda.</div>`,
+          sources: [ { type: 'pmk', ref: 'PMK 168/2023 (PPh Pasal 21 — TER)', note: 'dibaca lewat slide resmi DJP "PMK 168 Tahun 2023 tentang PPh Pasal 21 TER": tabel TER, contoh hitung, dan simulasi dicocokkan satu per satu (12 Okt 2026)', url: 'https://pajak.go.id/sites/default/files/2024-02/PMK%20168%20Tahun%202023%20Tentang%20PPh%20Pasal%2021%20TER.pdf' }, { type: 'pp', ref: 'PP 58/2023 (tarif PPh Pasal 21 atas penghasilan dengan nama dan dalam bentuk apa pun)', note: 'dasar TER; isi diverifikasi melalui slide DJP di atas' } ],
+          reviewed: '2026-10'
+        },
+        {
+          id: 'tarif-ter-excel',
+          heading: '11.3 Mencari tarif TER di Excel',
+          body: `
+<p class="kb-lead">Tarif ditentukan dua langkah: status PTKP menentukan <strong>kategori</strong>, lalu bruto menentukan <strong>lapisan</strong> pada tabel kategori itu.</p>
+<div class="kb-table-wrap"><table class="kb-table">
+<thead><tr><th>Kategori</th><th>Status PTKP</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>TK/0, TK/1, K/0</td></tr>
+<tr><td>B</td><td>TK/2, TK/3, K/1, K/2</td></tr>
+<tr><td>C</td><td>K/3</td></tr>
+</tbody></table></div>
+<p>Tabel TER resmi berisi 44 lapisan (A), 40 (B), dan 41 (C). Simpan sebagai satu tabel dengan kolom <em>Kategori, Batas Bawah, Batas Atas, Tarif</em>, lalu:</p>
+<div class="kb-formula"><code>Kategori:  =VLOOKUP(status, tabel_PTKP, 3, FALSE)</code><br><code>Tarif:     =SUMIFS(tarif, kategori, kat, batas_bawah, "&lt;="&amp;bruto, batas_atas, "&gt;="&amp;bruto)</code></div>
+<p>Rentang tiap kategori tidak tumpang tindih, jadi hanya satu baris yang cocok dan SUMIFS mengembalikan tarif baris itu. Batas bawah sebuah lapisan = batas atas lapisan sebelumnya + 1, dan lapisan terakhir ("lebih dari") diberi batas atas sangat besar.</p>
+<div class="kb-tip"><span class="kb-callout-title">💡 Pembulatan</span>PPh 21 bulanan = <code>ROUNDDOWN(bruto × tarif, 0)</code>: dibulatkan <strong>ke bawah</strong> ke rupiah penuh.</div>`,
+          sources: [ { type: 'pmk', ref: 'PMK 168/2023 (PPh Pasal 21 — TER)', note: 'dibaca lewat slide resmi DJP "PMK 168 Tahun 2023 tentang PPh Pasal 21 TER": tabel TER, contoh hitung, dan simulasi dicocokkan satu per satu (12 Okt 2026)', url: 'https://pajak.go.id/sites/default/files/2024-02/PMK%20168%20Tahun%202023%20Tentang%20PPh%20Pasal%2021%20TER.pdf' } ],
+          reviewed: '2026-10'
+        },
+        {
+          id: 'desember-langkah',
+          heading: '11.4 Perhitungan Desember langkah demi langkah',
+          body: `
+<p class="kb-lead">Contoh resmi DJP: pegawai K/0 dengan gaji tetap Rp10.000.000 sebulan sepanjang tahun, iuran pensiun/JHT/JP karyawan Rp100.000 sebulan, tanpa THR/bonus. TER kategori A pada bruto Rp10.000.000 adalah 2%.</p>
+<div class="kb-table-wrap"><table class="kb-table">
+<thead><tr><th>Langkah</th><th>Rumus Excel</th><th>Hasil</th></tr></thead>
+<tbody>
+<tr><td>Bruto setahun</td><td><code>=bruto*12 + bonus</code></td><td>Rp120.000.000</td></tr>
+<tr><td>Biaya jabatan (5%, maks Rp6.000.000)</td><td><code>=MIN(5%*bruto_tahun, 6000000)</code></td><td>Rp6.000.000</td></tr>
+<tr><td>Iuran JHT/JP karyawan setahun</td><td><code>=iuran*12</code></td><td>Rp1.200.000</td></tr>
+<tr><td>Penghasilan neto</td><td><code>=bruto_tahun − biaya_jabatan − iuran_tahun</code></td><td>Rp112.800.000</td></tr>
+<tr><td>PTKP (K/0)</td><td><code>=VLOOKUP(status, tabel_PTKP, 2, FALSE)</code></td><td>Rp58.500.000</td></tr>
+<tr><td>PKP (dibulatkan ke bawah ribuan)</td><td><code>=MAX(0, ROUNDDOWN(neto − PTKP, -3))</code></td><td>Rp54.300.000</td></tr>
+<tr><td>PPh 21 setahun (Pasal 17)</td><td>lihat di bawah</td><td>Rp2.715.000</td></tr>
+<tr><td>PPh 21 Januari–November</td><td><code>=ROUNDDOWN(10000000*2%, 0) * 11</code></td><td>Rp2.200.000</td></tr>
+<tr><td><strong>PPh 21 Desember</strong></td><td><code>=PPh_setahun − PPh_Jan_Nov</code></td><td><strong>Rp515.000</strong></td></tr>
+</tbody></table></div>
+<p>Tarif Pasal 17 bersifat progresif: 5% sampai Rp60 juta, 15% sampai Rp250 juta, 25% sampai Rp500 juta, 30% sampai Rp5 miliar, dan 35% di atasnya. Agar bisa ditulis satu rumus, tambahkan kolom <em>Selisih Tarif</em> (tarif lapisan − tarif lapisan sebelumnya):</p>
+<div class="kb-formula"><code>=ROUNDDOWN(SUMPRODUCT((PKP&gt;batas_bawah)*(PKP-batas_bawah)*selisih_tarif), 0)</code></div>
+<p>Untuk PKP Rp54.300.000 hanya lapisan pertama yang aktif: 54.300.000 × 5% = Rp2.715.000.</p>`,
+          sources: [ { type: 'pmk', ref: 'PMK 168/2023 (PPh Pasal 21 — TER)', note: 'dibaca lewat slide resmi DJP "PMK 168 Tahun 2023 tentang PPh Pasal 21 TER": tabel TER, contoh hitung, dan simulasi dicocokkan satu per satu (12 Okt 2026)', url: 'https://pajak.go.id/sites/default/files/2024-02/PMK%20168%20Tahun%202023%20Tentang%20PPh%20Pasal%2021%20TER.pdf' }, { type: 'uu', ref: 'UU 7/2021 (HPP) — tarif Pasal 17 ayat (1) huruf a UU PPh', note: 'lima lapisan 5/15/25/30/35%; dicocokkan dengan slide resmi DJP' } ],
+          reviewed: '2026-10'
+        },
+        {
+          id: 'hasil-negatif-pembulatan',
+          heading: '11.5 Hasil Desember negatif dan simulasi resmi',
+          body: `
+<p class="kb-lead">Hasil Desember tidak selalu positif. Pada gaji yang masih di lapisan TER rendah, pemotongan Januari–November bisa lebih besar daripada PPh setahun yang sebenarnya.</p>
+<p>Simulasi resmi DJP (K/0, iuran pensiun Rp100.000 sebulan, gaji tetap, tanpa THR/bonus):</p>
+<div class="kb-table-wrap"><table class="kb-table">
+<thead><tr><th>Bruto/bulan</th><th>TER</th><th>PPh Jan–Nov (per bulan)</th><th>PPh Desember</th><th>PPh setahun</th></tr></thead>
+<tbody>
+<tr><td>5.250.000</td><td>0%</td><td>0</td><td>7.500</td><td>7.500</td></tr>
+<tr><td>5.500.000</td><td>0,25%</td><td>13.750</td><td>(1.250)</td><td>150.000</td></tr>
+<tr><td>5.750.000</td><td>0,5%</td><td>28.750</td><td>(23.750)</td><td>292.500</td></tr>
+<tr><td>6.000.000</td><td>0,75%</td><td>45.000</td><td>(60.000)</td><td>435.000</td></tr>
+<tr><td>6.500.000</td><td>1%</td><td>65.000</td><td>5.000</td><td>720.000</td></tr>
+<tr><td>7.000.000</td><td>1,25%</td><td>87.500</td><td>42.500</td><td>1.005.000</td></tr>
+<tr><td>8.000.000</td><td>1,5%</td><td>120.000</td><td>255.000</td><td>1.575.000</td></tr>
+<tr><td>9.000.000</td><td>1,75%</td><td>157.500</td><td>412.500</td><td>2.145.000</td></tr>
+<tr><td>10.000.000</td><td>2%</td><td>200.000</td><td>515.000</td><td>2.715.000</td></tr>
+</tbody></table></div>
+<p>Angka dalam tanda kurung bermakna negatif (kelebihan potong). Latihan Expert sengaja tidak memotong hasil negatif dengan <code>MAX(0, …)</code>; penanganan kelebihan potong mengikuti ketentuan yang berlaku dan di luar cakupan latihan.</p>
+<div class="kb-warning"><span class="kb-callout-title">⚠️ Dua pembulatan berbeda</span>PKP dibulatkan ke bawah hingga <strong>ribuan</strong> rupiah; jumlah PPh dibulatkan ke bawah ke <strong>rupiah penuh</strong>. Aplikasi yang membulatkan ke terdekat dapat berbeda Rp1 pada sebagian kasus.</div>`,
+          sources: [ { type: 'pmk', ref: 'PMK 168/2023 (PPh Pasal 21 — TER)', note: 'dibaca lewat slide resmi DJP "PMK 168 Tahun 2023 tentang PPh Pasal 21 TER": tabel TER, contoh hitung, dan simulasi dicocokkan satu per satu (12 Okt 2026)', url: 'https://pajak.go.id/sites/default/files/2024-02/PMK%20168%20Tahun%202023%20Tentang%20PPh%20Pasal%2021%20TER.pdf' }, { type: 'se', ref: 'SE-22/PJ.24/1990 (pembulatan ke bawah jumlah pajak dalam rupiah penuh)', note: 'diverifikasi lewat ringkasan DJP/DDTC, bukan naskah SE; berlaku umum untuk PPh terutang' } ],
+          reviewed: '2026-10'
+        },
+        {
+          id: 'catatan-regulasi-batas-latihan',
+          heading: '11.6 Catatan regulasi dan batas latihan',
+          body: `
+<div class="kb-warning"><span class="kb-callout-title">⚠️ PTKP sedang dibahas</span>Nilai PTKP yang dipakai latihan (TK/0 Rp54.000.000; tambahan Rp4.500.000 untuk status kawin dan tiap tanggungan, maksimal 3) adalah nilai <strong>yang berlaku</strong> berdasarkan PMK 101/PMK.010/2016. Pada awal Oktober 2026 pemerintah menyatakan sedang menghitung penyesuaian PTKP (rencana 2027); besaran dan tanggal berlaku <strong>belum ditetapkan</strong>. Bila aturan baru terbit, perbarui materi ini.</div>
+<p><strong>Yang dimodelkan:</strong> pegawai tetap dengan gaji dan tunjangan tetap sepanjang tahun, TER Januari–November, perhitungan Desember.</p>
+<p><strong>Disederhanakan atau tidak dicakup:</strong></p>
+<ul>
+<li>Premi yang dibayar perusahaan dan iuran JHT+JP karyawan diberikan sebagai <em>data</em>, bukan dihitung dari tarif BPJS (tarif dan batas upah BPJS berubah-ubah).</li>
+<li>Iuran BPJS Kesehatan 1% karyawan tidak dimodelkan pada penerimaan bersih.</li>
+<li>Tidak dicakup: pegawai tidak tetap, pesangon, pensiunan, pajak yang ditanggung pemberi kerja (gross-up), pindah kerja di tengah tahun, dan THR/bonus pada bulan selain Desember.</li>
+</ul>`,
+          sources: [ { type: 'pmk', ref: 'PMK 101/PMK.010/2016 (PTKP)', note: 'nilai PTKP berlaku saat ini' }, { type: 'lain', ref: 'Bisnis.com — Wacana Kenaikan Batas PTKP (6 Okt 2026)', note: 'penyesuaian PTKP masih wacana; belum ada besaran/tanggal berlaku', url: 'https://ekonomi.bisnis.com/read/20261006/259/2009928/wacana-kenaikan-batas-ptkp-bersakit-sakit-dahulu-bersenang-senang-kemudian' } ],
+          reviewed: '2026-10'
+        }
+      ]
     }
   ]
 };

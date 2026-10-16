@@ -198,7 +198,8 @@
       "verifikasi": "sumber-sekunder",
       "terakhirDicek": "2026-10",
       "topik": [
-        "SPT"
+        "SPT",
+        "Excel"
       ]
     },
     {
@@ -276,8 +277,10 @@
       "verifikasi": "sumber-sekunder",
       "terakhirDicek": "2026-10",
       "topik": [
-        "SPT"
-      ]
+        "SPT",
+        "Excel"
+      ],
+      "catatan": "Tabel TER A/B/C (44/40/41 lapisan), tarif Pasal 17, biaya jabatan, dan contoh hitung dicocokkan baris demi baris dengan slide resmi DJP \"PMK 168 Tahun 2023 tentang PPh Pasal 21 TER\" (pajak.go.id) pada 12 Okt 2026 — bukan dengan naskah PMK; tests/test-payroll-ter.mjs menjaga kecocokan. Latihan Penggajian di generator Excel bergantung pada ini."
     },
     {
       "id": "PMK 111/2025",
@@ -322,9 +325,10 @@
       "verifikasi": "sumber-sekunder",
       "terakhirDicek": "2026-10",
       "topik": [
-        "SPT"
+        "SPT",
+        "Excel"
       ],
-      "catatan": "Belum ditemukan PMK pengganti untuk Tahun Pajak 2026 (rujukan sekunder)."
+      "catatan": "WASPADA: per 11 Okt 2026 pemerintah menyatakan akan menyesuaikan PTKP (rencana 2027; besaran dan tanggal berlaku BELUM ditetapkan; belum ada PMK pengganti). Saat aturan baru terbit: ubah PTKP di apps/spt/js/shared/tax-engine.js, jalankan scripts/gen-excel-payroll-data.mjs, perbarui bab 11.6 Modul Pengetahuan Excel dan contoh bernilai PTKP di materi lain."
     },
     {
       "id": "PMK 141/PMK.03/2015",
@@ -570,6 +574,17 @@
       ],
       "digantiOleh": "PSAK 109",
       "catatan": "Hanya dirujuk dalam bentuk \"dahulu PSAK 71\"."
+    },
+    {
+      "id": "SE-22/PJ.24/1990",
+      "judul": "Pembulatan jumlah pajak ke bawah dalam rupiah penuh (PPh 21)",
+      "status": "berlaku",
+      "verifikasi": "sumber-sekunder",
+      "terakhirDicek": "2026-10",
+      "topik": [
+        "Excel"
+      ],
+      "catatan": "Dasar ROUNDDOWN pada latihan Penggajian; diverifikasi lewat ringkasan DJP/DDTC, bukan naskah SE. Catatan: mesin SPT (tax-engine.js hitungTER) memakai Math.round — selisih Rp1 pada kasus pecahan tepat .5 (±1,6% nilai uji); belum diselaraskan karena aturan pembulatan TER spesifik di Coretax belum terverifikasi."
     }
   ]
 }

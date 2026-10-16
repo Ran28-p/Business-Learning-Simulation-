@@ -298,6 +298,7 @@
         row.forEach((val, i) => {
           const cell = ws.getCell(`${colLetter(m.startCol + i)}${m.dataStartRow + r}`);
           cell.value = val;
+          if (m.table.columnTypes && m.table.columnTypes[i] === 'percent') cell.numFmt = '0.00%';   // kolom tarif (TER, Pasal 17)
           dataCellStyle(cell);
         });
       });
@@ -384,7 +385,8 @@
 
     const mainLastCol = 1 + dataset.headers.length;
     const extraTables = [];
-    if (dataset.meta && dataset.meta.masterTable) extraTables.push(dataset.meta.masterTable);
+    if (dataset.meta && dataset.meta.masterTables) extraTables.push(...dataset.meta.masterTables);   // materi dengan >1 tabel referensi (Penggajian)
+    else if (dataset.meta && dataset.meta.masterTable) extraTables.push(dataset.meta.masterTable);
     if (dataset.meta && dataset.meta.supplierTable) extraTables.push(dataset.meta.supplierTable);
 
     let cursorCol = mainLastCol + 3;
@@ -424,6 +426,7 @@
         row.forEach((val, i) => {
           const cell = ws.getCell(`${colLetter(rg.startCol + i)}${7 + r}`);
           cell.value = val;
+          if (rg.table.columnTypes && rg.table.columnTypes[i] === 'percent') cell.numFmt = '0.00%';
           dataCellStyle(cell);
         });
       });

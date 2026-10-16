@@ -15,6 +15,7 @@
  */
 
 import { dateToSerial } from './spreadsheet-engine.js';
+import { TER_TABEL, PTKP_SETAHUN, KATEGORI_TER, PASAL17, BATAS_TERBUKA } from '../data/payroll-ter.js';
 
 /**
  * PRNG sederhana (mulberry32) agar dataset dapat dibuat ulang persis sama
@@ -1048,6 +1049,78 @@ export const EXPERIMENTAL_DATASET_GENERATORS = {
   },
 };
 
+
+// ---------------------------------------------------------------------------
+// Penggajian & PPh 21 (TER) — data karyawan + tabel referensi resmi
+// ---------------------------------------------------------------------------
+
+const PTKP_STATUS_BOBOT = [['TK/0', 34], ['K/0', 20], ['K/1', 20], ['K/2', 10], ['TK/1', 7], ['K/3', 3], ['TK/2', 3], ['TK/3', 3]];
+
+function pickWeighted(rng, weighted) {
+  const total = weighted.reduce((a, [, w]) => a + w, 0);
+  let r = rng() * total;
+  for (const [v, w] of weighted) { r -= w; if (r < 0) return v; }
+  return weighted[weighted.length - 1][0];
+}
+
+/**
+ * Dataset penggajian untuk latihan PPh 21 TER. Kolom uang dibuat wajar (kelipatan Rp50.000); premi asuransi yang
+ * dibayar perusahaan dan iuran JHT+JP karyawan diberikan SEBAGAI DATA (bukan dihitung dari tarif BPJS), supaya latihan
+ * tidak bergantung pada tarif/batas upah BPJS yang berubah tiap tahun.
+ * meta.masterTables = [Referensi PTKP, Tabel TER, Tarif Pasal 17]; meta.masterTable = Referensi PTKP (untuk ekspor dataset).
+ */
+export function generatePayrollTerDataset(options = {}) {
+  const count = Math.max(1, Math.min(5000, Math.floor(options.count || 25)));
+  const rawSeed = options.seed ?? Date.now();
+  const seedNumber = typeof rawSeed === 'number' ? rawSeed >>> 0 : hashSeed(rawSeed);
+  const rng = mulberry32(seedNumber);
+
+  const headers = ['No', 'ID Karyawan', 'Nama', 'Status PTKP', 'Gaji Pokok', 'Tunjangan Tetap', 'Tunjangan Tidak Tetap',
+    'Premi Asuransi Dibayar Perusahaan', 'Iuran JHT+JP Karyawan', 'Bonus/THR Desember'];
+  const columnTypes = ['number', 'text', 'text', 'text', 'number', 'number', 'number', 'number', 'number', 'number'];
+
+  const rows = [];
+  const usedNames = new Set();
+  for (let i = 0; i < count; i++) {
+    let nama;
+    do { nama = `${pick(rng, NAMA_DEPAN)} ${pick(rng, NAMA_BELAKANG)}`; } while (usedNames.has(nama) && usedNames.size < 400);
+    usedNames.add(nama);
+    const status = pickWeighted(rng, PTKP_STATUS_BOBOT);
+    // gaji pokok: sebagian besar di rentang menengah, sebagian kecil tinggi → memunculkan beragam lapisan TER
+    const band = rng();
+    const gaji = band < 0.2 ? randInt(rng, 90, 130) * 50000 : band < 0.7 ? randInt(rng, 130, 360) * 50000 : band < 0.93 ? randInt(rng, 360, 800) * 50000 : randInt(rng, 800, 1500) * 50000;
+    const tunjTetap = roundToNearest(gaji * (0.1 + rng() * 0.15), 50000);
+    const tunjTidakTetap = rng() < 0.3 ? 0 : roundToNearest(gaji * rng() * 0.15, 50000);
+    // premi JKK+JKM+kesehatan yang ditanggung perusahaan & iuran JHT+JP karyawan: nilai wajar, kelipatan Rp100
+    const premi = roundToNearest(gaji * 0.0054 + Math.min(gaji, 12000000) * 0.04, 100);
+    const iuran = roundToNearest(gaji * 0.02 + Math.min(gaji, 10500000) * 0.01, 100);
+    const bonus = rng() < 0.4 ? 0 : roundToNearest(gaji * (1 + rng()), 50000);
+    rows.push([i + 1, 'EMP' + String(1000 + i), nama, status, gaji, tunjTetap, tunjTidakTetap, premi, iuran, bonus]);
+  }
+
+  const refPtkp = {
+    title: 'Referensi PTKP & Kategori TER',
+    headers: ['Status PTKP', 'PTKP Setahun', 'Kategori TER'],
+    columnTypes: ['text', 'number', 'text'],
+    rows: Object.keys(PTKP_SETAHUN).sort((a, b) => (a < b ? -1 : 1)).map((st) => [st, PTKP_SETAHUN[st], KATEGORI_TER[st]]),
+  };
+  const terRows = [];
+  for (const kat of ['A', 'B', 'C']) {
+    let lower = 0;
+    for (const [max, rate] of TER_TABEL[kat]) { terRows.push([kat, lower, max, rate]); lower = max + 1; }
+  }
+  const refTer = { title: 'Tabel TER Bulanan (PMK 168/2023)', headers: ['Kategori', 'Batas Bawah', 'Batas Atas', 'Tarif TER'], columnTypes: ['text', 'number', 'number', 'percent'], rows: terRows };
+  let prev = 0, lower = 0;
+  const refPasal17 = {
+    title: 'Tarif Pasal 17 (UU HPP)',
+    headers: ['Lapisan', 'Batas Bawah PKP', 'Batas Atas PKP', 'Tarif', 'Selisih Tarif'],
+    columnTypes: ['number', 'number', 'number', 'percent', 'percent'],
+    rows: PASAL17.map(([max, rate], i) => { const row = [i + 1, lower, max, rate, Math.round((rate - prev) * 1e6) / 1e6]; prev = rate; lower = max; return row; }),
+  };
+
+  return { headers, columnTypes, rows, meta: { masterTable: refPtkp, masterTables: [refPtkp, refTer, refPasal17] } };
+}
+
 /**
  * Peta khusus dipakai oleh js/exercise-generator.js (engine Exercise
  * Generator baru — lihat dokumen spesifikasi "2 engine terpisah"): satu
@@ -1061,4 +1134,5 @@ export const EXERCISE_MATERI_GENERATORS = {
   akuntansi: { label: 'Akuntansi & Pajak Korporat', generate: generateAccountingRelationalDataset },
   'admin-pajak': { label: 'Administrasi Perpajakan', generate: generateTaxAdminRelationalDataset },
   'financial-modeling': { label: 'Financial Modeling & Proyeksi Bisnis', generate: generateFinancialModelRelationalDataset },
+  penggajian: { label: 'Penggajian & PPh 21 (TER)', generate: generatePayrollTerDataset },
 };

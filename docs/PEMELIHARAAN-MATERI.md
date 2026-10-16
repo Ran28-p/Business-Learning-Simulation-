@@ -1,6 +1,7 @@
 # Pemeliharaan Materi
 
-Panduan menjaga materi Portal Belajar tetap akurat dan tepercaya, Materi pajak paling cepat usang, jadi proses ini sengaja dibuat ringan dan otomatis.
+Panduan menjaga materi Portal Belajar tetap akurat dan tepercaya setelah Fase 0–4.
+Materi pajak paling cepat usang, jadi proses ini sengaja dibuat ringan dan otomatis.
 
 ## Alat yang sudah ada
 

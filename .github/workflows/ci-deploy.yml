@@ -15,7 +15,7 @@
 #       - "test-portal" menguji progres lintas modul di portal (js/shared/progress-aggregator.js):
 #         key & skema dibandingkan langsung dengan kode sumber tiap modul, ringkasan dari data
 #         engine asli, ekspor/impor (merge/replace, allowlist, atomik), dan rekap PDF.
-#       - "test-portal" juga menjalankan tests/test-analytics.mjs (analitik & Ruang Pengajar), tests/test-cloudsync.mjs (inti sinkron cloud) dan tests/test-gamehub.mjs (mesin Game Hub: misi harian dari selisih
+#       - "test-portal" juga menjalankan tests/test-payroll-ter.mjs (angka materi penggajian vs tabel & contoh resmi DJP), tests/test-analytics.mjs (analitik & Ruang Pengajar), tests/test-cloudsync.mjs (inti sinkron cloud) dan tests/test-gamehub.mjs (mesin Game Hub: misi harian dari selisih
 #         progres nyata, klaim sekali, streak, misi mingguan, lencana, state tak tepercaya).
 #       - "e2e" (folder e2e/, Playwright + Chromium) membuka portal & keempat modul di browser nyata:
 #         tanpa error/404 lokal, tanpa scroll horizontal di desktop/tablet/mobile (terang & gelap),
@@ -135,6 +135,9 @@ jobs:
 
       - name: Run test suite (analitik belajar & Ruang Pengajar — topik lemah, rekap, validasi berkas tak tepercaya, CSV aman)
         run: node tests/test-analytics.mjs
+
+      - name: Run test suite (materi Penggajian & PPh 21 TER — tabel resmi DJP, contoh hitung resmi, rumus Excel dievaluasi HyperFormula)
+        run: node tests/test-payroll-ter.mjs
 
   e2e:
     name: E2E (browser - layout, tema, profil, data nyata)
