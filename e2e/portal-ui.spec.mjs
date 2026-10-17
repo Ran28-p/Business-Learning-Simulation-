@@ -19,6 +19,9 @@ const isExternal = (url) => !/^http:\/\/127\.0\.0\.1/.test(url);
 
 async function open(page, path, { theme = 'light', session = null, extra = {} } = {}) {
   await page.addInitScript(([theme, session, extra]) => {
+    // Lewati tur intro.js accounting: overlay-nya (.introjs-overlay) menutup layar & memblokir klik di uji.
+    // Idempoten, jadi di luar guard "sekali per tab". Kunci = STORAGE_KEYS.ONBOARDING di apps/accounting/js/utils/constants.js.
+    try { localStorage.setItem('hasVisited_ActMasterPro', 'true'); } catch (e) { /* abaikan */ }
     // Seed hanya SEKALI per tab: navigasi berikutnya (mis. hub → portal) tidak boleh mengembalikan data ke nilai awal.
     if (sessionStorage.getItem('__e2e_seeded')) return;
     sessionStorage.setItem('__e2e_seeded', '1');
@@ -59,7 +62,7 @@ test.describe('Tema gelap benar-benar berlaku', () => {
       await open(page, pg.path, { theme: 'dark' });
       const bg = await page.evaluate(() => {
         const g = (s) => { const e = document.querySelector(s); return e ? getComputedStyle(e).backgroundColor : null; };
-        return { body: g('body'), card: g('.card') || g('.module-card') || g('.stat-card') || g('.gh-mission') || g('.tr-card') };
+        return { body: g('body'), card: g('.card') || g('.module-card') || g('.stat-card') || g('.lq-role') || g('.tr-card') };
       });
       expect(lum(bg.body)).toBeLessThan(0.1);
       if (bg.card) expect(lum(bg.card)).toBeLessThan(0.15);
@@ -277,15 +280,7 @@ test.describe('Modul Pengetahuan (overlay) terbaca di kedua tema', () => {
   }
 });
 
-// ───────────────────────── Poin 3: Game Hub ─────────────────────────
-const HUB = '/apps/game-hub/index.html';
-const sqlP = (xp, n) => ({ sqlpq_progress_v1: { xp, totalAnswered: n, totalCorrect: Math.floor(n * 0.8), completedLessons: {}, history: [] } });
-const setProgress = (page, obj) => page.evaluate((o) => { for (const [k, v] of Object.entries(o)) localStorage.setItem(k, JSON.stringify(v)); window.dispatchEvent(new Event('focus')); }, obj);
-const xpMission = (page) => page.locator('.gh-mission[data-mission="xp"]');
-const targetOf = async (page) => Number(await xpMission(page).locator('[role=progressbar]').getAttribute('aria-valuemax'));
-const rewardOf = async (page) => Number((await xpMission(page).locator('.gh-chip').innerText()).replace(/\D/g, ''));
-const bonus = async (page) => Number((await page.locator('#gh-xp-bonus').innerText()).replace(/\D/g, ''));
-
+// ───────────────────────── Poin 3: tampilan portal ─────────────────────────
 test.describe('Gaya komponen utuh (bukan sekadar struktur)', () => {
   test('portal: kartu modul & banner Game Hub benar-benar bergaya', async ({ page }) => {
     await open(page, '/index.html');
@@ -296,116 +291,5 @@ test.describe('Gaya komponen utuh (bukan sekadar struktur)', () => {
     });
     expect(r.cardBorder).toBe('3px'); expect(r.cardPad).toBeGreaterThanOrEqual(16); expect(r.cardRadius).toBeGreaterThanOrEqual(8);
     expect(lum(r.bannerBg)).toBeLessThan(0.1); expect(r.bannerDisplay).toBe('flex');
-  });
-});
-
-test.describe('Game Hub', () => {
-  test('pengguna baru: 3 misi nol, level 1, tanpa lencana palsu', async ({ page }) => {
-    await open(page, HUB);
-    await expect(page.locator('.gh-mission')).toHaveCount(3);
-    await expect(page.locator('#gh-level-num')).toHaveText('1');
-    await expect(page.locator('#gh-xp-total')).toHaveText('0');
-    await expect(page.locator('#gh-streak')).toHaveText('0 hari');
-    for (const bar of await page.locator('.gh-mission [role=progressbar]').all()) expect(await bar.getAttribute('aria-valuenow')).toBe('0');
-    await expect(page.locator('.gh-badge.is-on')).toHaveCount(0);
-    await expect(page.locator('#gh-ach-count')).toHaveText('0 dari 9 terbuka');
-    await expect(page.locator('#gh-log')).toContainText('Belum ada klaim');
-  });
-
-  test('progres lama sebelum hub dibuka tidak dihitung; XP gabungan memuat XP modul nyata', async ({ page }) => {
-    await open(page, HUB, { extra: sqlP(300, 20) });
-    await expect(page.locator('#gh-xp-module')).toHaveText('300');
-    await expect(page.locator('#gh-xp-total')).toHaveText('300');
-    for (const bar of await page.locator('.gh-mission [role=progressbar]').all()) expect(await bar.getAttribute('aria-valuenow')).toBe('0');
-    await expect(page.locator('#gh-level-num')).toHaveText('3'); // 300 XP = level 3
-  });
-
-  test('berlatih → misi selesai → klaim sekali → bonus XP, tersimpan, tak bisa diklaim ulang', async ({ page }) => {
-    await open(page, HUB, { extra: sqlP(10, 1) });
-    const tgt = await targetOf(page), reward = await rewardOf(page);
-    await setProgress(page, sqlP(10 + tgt, 1 + Math.ceil(tgt / 15)));            // berlatih di SQL (modul nyata)
-    await expect(xpMission(page)).toHaveClass(/is-done/);
-    const claim = xpMission(page).locator('.gh-claim');
-    await expect(claim).toHaveText(`Klaim +${reward} XP`);
-    await claim.click();
-    await expect(page.locator('#gh-toast')).toContainText(`+${reward} XP`);
-    await expect(page.locator('#gh-xp-bonus')).toHaveText(String(reward));
-    await expect(page.locator('#gh-xp-total')).toHaveText(String(10 + tgt + reward));
-    await expect(page.locator('#gh-streak')).toHaveText('1 hari');
-    await expect(xpMission(page).locator('button')).toBeDisabled();
-    await expect(page.locator('.gh-badge.is-on[data-achievement="mission_1"]')).toHaveCount(1);
-    await expect(page.locator('.gh-badge.is-on[data-achievement="first_step"]')).toHaveCount(1);
-    await expect(page.locator('#gh-log li').first()).toContainText(`+${reward} XP`);
-    await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.locator('#gh-xp-bonus')).toHaveText(String(reward));          // persisten
-    await expect(xpMission(page)).toHaveClass(/is-claimed/);
-  });
-
-  test('klaim yang melewati batas level menampilkan pemberitahuan naik level', async ({ page }) => {
-    await open(page, HUB, { extra: sqlP(0, 0) });
-    await setProgress(page, sqlP(99, 7));                  // total 99 XP = masih level 1; bonus klaim (≥20) melewati 100
-    await expect(page.locator('#gh-level-num')).toHaveText('1');
-    await xpMission(page).locator('.gh-claim').click();
-    await expect(page.locator('#gh-toast')).toContainText('Naik ke Level 2');
-    await expect(page.locator('#gh-level-num')).toHaveText('2');
-  });
-
-  test('dua tab Game Hub: klaim ganda lintas tab tidak menggandakan XP', async ({ context }) => {
-    const a = await context.newPage(); const b = await context.newPage();
-    await open(a, HUB, { extra: sqlP(10, 1) });
-    await b.goto(HUB, { waitUntil: 'domcontentloaded' }); await b.waitForTimeout(500);
-    const tgt = await targetOf(a), reward = await rewardOf(a);
-    await setProgress(a, sqlP(10 + tgt, 1 + Math.ceil(tgt / 15)));
-    await b.evaluate(() => window.dispatchEvent(new Event('focus')));
-    await expect(xpMission(a)).toHaveClass(/is-done/); await expect(xpMission(b)).toHaveClass(/is-done/);
-    await xpMission(a).locator('.gh-claim').click();
-    await xpMission(b).locator('.gh-claim, button').first().click({ force: true }).catch(() => {});
-    await b.waitForTimeout(400);
-    expect(await bonus(a)).toBe(reward);
-    await b.reload({ waitUntil: 'domcontentloaded' });
-    expect(await bonus(b)).toBe(reward);
-  });
-
-  test('pergantian hari: misi mulai ulang dari 0, klaim kemarin tidak ikut, streak bertahan', async ({ page }) => {
-    await page.clock.install({ time: new Date(2026, 9, 12, 9, 0, 0) });
-    await open(page, HUB, { extra: sqlP(10, 1) });
-    const tgt = await targetOf(page);
-    await setProgress(page, sqlP(10 + tgt, 1 + Math.ceil(tgt / 15)));
-    await xpMission(page).locator('.gh-claim').click();
-    await expect(page.locator('#gh-streak')).toHaveText('1 hari');
-    await page.clock.setFixedTime(new Date(2026, 9, 13, 9, 0, 0));
-    await page.evaluate(() => window.dispatchEvent(new Event('focus')));
-    await expect(page.locator('#gh-streak')).toHaveText('1 hari');                  // klaim kemarin → streak masih berlaku
-    for (const bar of await page.locator('.gh-mission [role=progressbar]').all()) expect(await bar.getAttribute('aria-valuenow')).toBe('0');
-    await expect(page.locator('.gh-mission.is-claimed')).toHaveCount(0);
-    await page.clock.setFixedTime(new Date(2026, 9, 15, 9, 0, 0));                 // lompat 2 hari
-    await page.evaluate(() => window.dispatchEvent(new Event('focus')));
-    await expect(page.locator('#gh-streak')).toHaveText('0 hari');                  // putus
-  });
-
-  test('data state rusak di localStorage tidak merusak halaman', async ({ page }) => {
-    const errs = []; page.on('pageerror', (e) => errs.push(e.message));
-    await open(page, HUB, { extra: { gamehub_state_v1: '{"bonusXp":"jahat","claimed":{"x":1},"log":[1,null],"__proto__":{"polluted":1}}' } });
-    await expect(page.locator('.gh-mission')).toHaveCount(3);
-    await expect(page.locator('#gh-xp-bonus')).toHaveText('0');
-    expect(errs).toEqual([]);
-    expect(await page.evaluate(() => ({}).polluted)).toBeUndefined();
-  });
-
-  test('portal: banner Game Hub memuat angka nyata & menuju hub', async ({ page }) => {
-    await open(page, '/index.html', { extra: sqlP(300, 20) });
-    await expect(page.locator('#ghBannerStats')).toContainText('Level 3');
-    await expect(page.locator('#ghBannerStats')).toContainText('300 XP gabungan');
-    await page.locator('#ghBanner').click();
-    await expect(page).toHaveURL(/\/apps\/game-hub\/index\.html$/);
-    await expect(page.locator('#gh-xp-total')).toHaveText('300');
-  });
-
-  test('portal: banner menyebut misi siap klaim setelah berlatih', async ({ page }) => {
-    await open(page, HUB, { extra: sqlP(10, 1) });
-    const tgt = await targetOf(page);
-    await setProgress(page, sqlP(10 + tgt, 1 + Math.ceil(tgt / 15)));
-    await page.goto('/index.html', { waitUntil: 'domcontentloaded' }); await page.waitForTimeout(600);
-    await expect(page.locator('#ghBannerStats')).toContainText('siap diklaim');
   });
 });

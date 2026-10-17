@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id" data-app="gamehub">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kuis Langsung — Game Hub</title>
+<meta name="description" content="Kuis real-time ala Quizizz: guru memilih tema, soal dibuat otomatis, siswa masuk dengan kode ruang, papan peringkat berdasarkan ketepatan dan kecepatan.">
+<link rel="stylesheet" href="../../../css/design-system.css">
+<link rel="stylesheet" href="../../../css/ds-modules.css">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="./css/live.css">
+<script src="../../../js/shared/theme.js"></script>
+</head>
+<body>
+  <a class="ds-skip-link" href="#lq-main">Lewati ke konten utama</a>
+  <header class="gh-header">
+    <div class="gh-brand">
+      <span class="gh-brand__mark" aria-hidden="true">⚡</span>
+      <div><h1>Kuis Langsung</h1><p>Kuis real-time: tema → soal otomatis → papan peringkat</p></div>
+    </div>
+    <div class="gh-header__actions"><a class="lq-back" href="../index.html">← Game Hub</a></div>
+  </header>
+
+  <main class="lq-main" id="lq-main" tabindex="-1">
+    <p class="lq-banner" id="lq-banner" role="alert" hidden></p>
+
+    <!-- 1. Pilih peran -->
+    <section id="v-start" class="lq-view" aria-labelledby="lq-start-title">
+      <h2 id="lq-start-title" class="lq-title">Mau main sebagai apa?</h2>
+      <div class="lq-roles">
+        <button type="button" class="lq-role" id="btn-role-teacher"><span aria-hidden="true">🧑‍🏫</span><strong>Guru</strong><small>Pilih tema, atur soal &amp; timer, bagikan kode ruang</small></button>
+        <button type="button" class="lq-role" id="btn-role-student"><span aria-hidden="true">🎒</span><strong>Siswa</strong><small>Masuk dengan kode ruang dari guru</small></button>
+      </div>
+      <p class="lq-resume" id="lq-resume" hidden><span>Ruang <b id="lq-resume-code"></b> masih tersimpan di perangkat ini.</span> <button type="button" class="lq-btn" id="btn-resume">Lanjutkan ruang</button> <button type="button" class="lq-btn lq-btn--ghost" id="btn-resume-drop">Buang</button></p>
+      <label class="lq-mode"><input type="checkbox" id="chk-local"> Mode lokal (uji coba: guru &amp; siswa harus di browser/perangkat yang sama, tanpa internet)</label>
+      <p class="gh-hint">Mode normal memakai Firebase gratis (login anonim, tanpa akun). Soal berasal dari bank materi Portal Belajar + generator soal berangka yang selalu dihitung ulang.</p>
+    </section>
+
+    <!-- 2. Siswa: masuk -->
+    <section id="v-join" class="lq-view" hidden aria-labelledby="lq-join-title">
+      <h2 id="lq-join-title" class="lq-title">Masuk ke ruang kuis</h2>
+      <div class="lq-card lq-form">
+        <label>Kode ruang<input id="in-code" class="lq-code-in" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC234"></label>
+        <label>Nama panggilan<input id="in-name" maxlength="24" autocomplete="nickname" placeholder="Nama Anda"></label>
+        <button type="button" class="lq-btn lq-btn--primary" id="btn-join">Masuk</button>
+        <button type="button" class="lq-btn lq-btn--ghost" id="btn-join-back">Kembali</button>
+      </div>
+    </section>
+
+    <!-- 3. Siswa: bermain -->
+    <section id="v-play" class="lq-view" hidden aria-live="polite"></section>
+
+    <!-- 4. Guru: atur kuis -->
+    <section id="v-setup" class="lq-view" hidden aria-labelledby="lq-setup-title">
+      <div class="lq-roombar">
+        <div><p class="gh-eyebrow">Kode ruang — bagikan ke siswa</p><p class="lq-roomcode" id="lq-roomcode" aria-label="Kode ruang">······</p></div>
+        <div class="lq-roombar__side">
+          <button type="button" class="lq-btn" id="btn-copy-link">Salin tautan siswa</button>
+          <p class="lq-joined"><b id="lq-count">0</b> siswa di lobi</p>
+        </div>
+      </div>
+      <ul class="lq-chips" id="lq-lobby" aria-label="Siswa yang sudah masuk"></ul>
+
+      <h2 class="lq-title" id="lq-setup-title">1. Pilih tema</h2>
+      <div class="lq-themes" id="lq-themes" role="radiogroup" aria-label="Tema kuis"></div>
+
+      <h2 class="lq-title">2. Pengaturan</h2>
+      <div class="lq-card lq-settings">
+        <label>Judul kuis (opsional)<input id="in-title" maxlength="100" placeholder="mis. Kuis PPh Pasal 21"></label>
+        <label>Jumlah soal<input id="in-count" type="number" min="5" max="50" value="20" inputmode="numeric"></label>
+        <label>Waktu per soal
+          <span class="lq-inline"><input id="in-timer" type="number" min="5" max="300" value="20" inputmode="numeric"><select id="in-unit" aria-label="Satuan waktu"><option value="s">detik</option><option value="m">menit</option></select></span>
+        </label>
+        <p class="gh-hint lq-settings__note" id="lq-timer-note">Poin: benar = 500–1000, makin cepat makin tinggi. Salah / lewat waktu = 0.</p>
+      </div>
+
+      <div class="lq-section-head"><h2 class="lq-title">3. Periksa &amp; edit soal <span class="lq-badge" id="lq-qcount">0</span></h2>
+        <div class="lq-actions"><button type="button" class="lq-btn" id="btn-regen-all">🎲 Generate ulang semua</button><button type="button" class="lq-btn" id="btn-add">＋ Tambah soal</button></div></div>
+      <p class="gh-hint" id="lq-errors" role="status"></p>
+      <ol class="lq-editor" id="lq-editor"></ol>
+
+      <div class="lq-startbar"><button type="button" class="lq-btn lq-btn--primary lq-btn--big" id="btn-start" disabled>▶ Mulai kuis</button><button type="button" class="lq-btn lq-btn--ghost" id="btn-cancel-room">Batalkan &amp; hapus ruang</button></div>
+    </section>
+
+    <!-- 5. Guru: kuis berjalan -->
+    <section id="v-host" class="lq-view" hidden aria-live="polite"></section>
+  </main>
+
+  <script src="../../../js/shared/livequiz-engine.js"></script>
+  <script src="../../../js/shared/livequiz-room.js"></script>
+  <script src="../../../js/shared/firebase-config.js"></script>
+  <script src="../../spt/tax_career/data/questions.js"></script>
+  <script src="./js/live-app.js"></script>
+  <script src="../../../js/shared/app-shell.js"></script>
+</body>
+</html>

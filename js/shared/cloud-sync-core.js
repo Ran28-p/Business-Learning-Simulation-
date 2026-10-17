@@ -2,7 +2,7 @@
  * cloud-sync-core.js — Inti sinkron progres ke cloud (Portal Belajar). MURNI & bisa diuji di Node:
  * tanpa DOM, tanpa Firebase, tanpa jaringan. Penyimpanan lokal dan "remote" disuntikkan.
  *
- * Yang disinkronkan (satu "unit" = satu dokumen di cloud): accounting, excel, sqlpq, gamehub.
+ * Yang disinkronkan (satu "unit" = satu dokumen di cloud): accounting, excel, sqlpq.
  * SPT TIDAK termasuk: Simulator SPT sudah punya sinkron cloud sendiri di users/$uid (skema & aturan berbeda).
  *
  * KEBIJAKAN MERGE — tiga arah (lokal ↔ cloud ↔ "base" = keadaan saat sinkron terakhir):
@@ -26,8 +26,7 @@
   'use strict';
   if (global.CloudSyncCore) return;
 
-  var SYNC_UNIT_IDS = ['accounting', 'excel', 'sqlpq', 'gamehub'];
-  var GAMEHUB_KEY = 'gamehub_state_v1';
+  var SYNC_UNIT_IDS = ['accounting', 'excel', 'sqlpq'];
   var MAX_METRIC = 100000000;
 
   function isObj(x) { return x !== null && typeof x === 'object' && !Array.isArray(x); }
@@ -64,21 +63,16 @@
       var m = PP.MODULES.filter(function (x) { return x.id === id; })[0];
       if (m) units.push({ id: id, label: m.label, keys: m.keys.slice(), kind: 'module' });
     });
-    units.push({ id: 'gamehub', label: 'Game Hub', keys: [GAMEHUB_KEY], kind: 'gamehub' });
     return units;
   }
 
   function create(deps) {
-    var PP = deps.PP, GH = deps.GH || null, storage = deps.storage;
+    var PP = deps.PP, storage = deps.storage;
     var now = deps.now || function () { return Date.now(); };
     var units = buildUnits(PP);
     var LIM = PP.LIMITS;
 
     function metricOf(unit, data) {
-      if (unit.kind === 'gamehub') {
-        var st = null; try { st = JSON.parse(data[GAMEHUB_KEY] || 'null'); } catch (_) { st = null; }
-        return isObj(st) ? { xp: clampInt(st.bonusXp), act: clampInt(st.totalClaims) } : { xp: 0, act: 0 };
-      }
       var sum = PP.summarizeWith(function (k) { return Object.prototype.hasOwnProperty.call(data, k) ? data[k] : null; });
       var m = sum.modules.filter(function (x) { return x.id === unit.id; })[0];
       return m ? { xp: clampInt(m.xp), act: clampInt(m.activities) } : { xp: 0, act: 0 };
@@ -110,7 +104,7 @@
         if (v.length > LIM.perKeyChars) return { ok: false, error: 'nilai terlalu besar: ' + k };
         total += v.length;
         if (total > LIM.totalChars) return { ok: false, error: 'total data terlalu besar' };
-        var shape = k === GAMEHUB_KEY ? 'object' : PP.JSON_SHAPES[k];
+        var shape = PP.JSON_SHAPES[k];
         if (shape) {
           var parsed; try { parsed = JSON.parse(v); } catch (_) { return { ok: false, error: 'bukan JSON valid: ' + k }; }
           if (shape === 'array' && !Array.isArray(parsed)) return { ok: false, error: 'bentuk data salah: ' + k };
@@ -175,16 +169,11 @@
     /** Tulis data cloud (tervalidasi) ke penyimpanan lokal secara atomik: gagal di tengah → dikembalikan. */
     function writeLocal(unit, remote) {
       var data = remote.data;
-      if (unit.kind === 'gamehub' && GH) {
-        var s = data[GAMEHUB_KEY];
-        if (s !== undefined) data = (function () { var o = {}; o[GAMEHUB_KEY] = JSON.stringify(GH.sanitizeState(JSON.parse(s))); return o; })();
-      } else {
-        // pemeriksaan ulang lewat jalur impor yang sudah teruji (allowlist, ukuran, bentuk)
-        var probe = { version: PP.VERSION, data: data }; probe[PP.FORMAT] = true;
-        var insp = PP.inspectImport(probe);
-        if (Object.keys(data).length && (!insp.ok || (insp.rejectedKeys && insp.rejectedKeys.length))) {
-          return { ok: false, error: 'data cloud ditolak pemeriksaan impor' };
-        }
+      // pemeriksaan ulang lewat jalur impor yang sudah teruji (allowlist, ukuran, bentuk)
+      var probe = { version: PP.VERSION, data: data }; probe[PP.FORMAT] = true;
+      var insp = PP.inspectImport(probe);
+      if (Object.keys(data).length && (!insp.ok || (insp.rejectedKeys && insp.rejectedKeys.length))) {
+        return { ok: false, error: 'data cloud ditolak pemeriksaan impor' };
       }
       var previous = {};
       try {
@@ -255,7 +244,7 @@
   }
 
   global.CloudSyncCore = {
-    SYNC_UNIT_IDS: SYNC_UNIT_IDS, GAMEHUB_KEY: GAMEHUB_KEY,
+    SYNC_UNIT_IDS: SYNC_UNIT_IDS,
     encodeKey: encodeKey, decodeKey: decodeKey, hashStr: hashStr, hashData: hashData, create: create
   };
 })(typeof window !== 'undefined' ? window : globalThis);

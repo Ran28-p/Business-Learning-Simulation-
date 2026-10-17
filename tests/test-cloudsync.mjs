@@ -1,7 +1,7 @@
 // Test inti sinkron cloud (js/shared/cloud-sync-core.js) — tanpa Firebase, tanpa jaringan.
 // "Cloud" diganti server palsu di memori yang meniru kontrak adapter (get / push dengan expectedRev),
 // dan beberapa "perangkat" = beberapa storage terpisah.
-//   A. UTIL & UNIT     — hash deterministik, encode kunci, unit hanya accounting/excel/sqlpq/gamehub (tanpa SPT)
+//   A. UTIL & UNIT     — hash deterministik, encode kunci, unit hanya accounting/excel/sqlpq (tanpa SPT)
 //   B. PLAN            — matriks keputusan tiga arah
 //   C. VALIDASI REMOTE — dokumen cloud = tak tepercaya
 //   D. SKENARIO NYATA  — dua perangkat: pindah perangkat, reset, konflik, balapan tulis, pilihan tautan pertama,
@@ -20,8 +20,8 @@ const section = (t) => console.log('\n=== ' + t + ' ===');
 const src = (rel) => readFileSync(join(ROOT, rel), 'utf8');
 
 globalThis.window = globalThis;
-for (const f of ['js/shared/progress-aggregator.js', 'js/shared/gamehub-engine.js', 'js/shared/cloud-sync-core.js']) vm.runInThisContext(src(f), { filename: f });
-const PP = globalThis.PortalProgress, GH = globalThis.GameHubEngine, CS = globalThis.CloudSyncCore;
+for (const f of ['js/shared/progress-aggregator.js', 'js/shared/cloud-sync-core.js']) vm.runInThisContext(src(f), { filename: f });
+const PP = globalThis.PortalProgress, CS = globalThis.CloudSyncCore;
 
 function makeStorage(initial = {}, opts = {}) {
   const m = new Map(Object.entries(initial));
@@ -53,7 +53,7 @@ const xlP = (xp, n) => JSON.stringify({ xp, soalDikerjakan: n, jawabanBenar: Mat
 let clock = 1_800_000_000_000;
 function device(initial = {}, opts = {}) {
   const storage = makeStorage(initial, opts);
-  const core = CS.create({ PP, GH, storage, now: () => (clock += 1000) });
+  const core = CS.create({ PP, storage, now: () => (clock += 1000) });
   const state = { units: {} };
   const unit = (id) => core.units.find((u) => u.id === id);
   return { storage, core, state, unit,
@@ -69,8 +69,8 @@ section('A. Util & definisi unit');
   check(CS.hashData({}) === CS.hashData({}), 'hash data kosong stabil');
   eq(CS.decodeKey(CS.encodeKey('efpg:progress')), 'efpg:progress', 'encode/decode kunci bolak-balik');
   check(!/[.$#\[\]\/]/.test(CS.encodeKey('a.b$c#d[e]f/g')), 'kunci ter-encode tak memuat karakter terlarang RTDB');
-  const core = CS.create({ PP, GH, storage: makeStorage() });
-  eq(core.units.map((u) => u.id), ['accounting', 'excel', 'sqlpq', 'gamehub'], 'unit sinkron = accounting, excel, sqlpq, gamehub');
+  const core = CS.create({ PP, storage: makeStorage() });
+  eq(core.units.map((u) => u.id), ['accounting', 'excel', 'sqlpq'], 'unit sinkron = accounting, excel, sqlpq (Game Hub tidak lagi punya data yang disinkronkan)');
   check(!core.units.some((u) => u.id === 'spt'), 'SPT TIDAK disinkronkan di sini (punya sinkron sendiri)');
   const sptKeys = PP.MODULES.find((m) => m.id === 'spt').keys;
   check(core.units.every((u) => u.keys.every((k) => !sptKeys.includes(k))), 'tidak ada kunci SPT di unit mana pun');
@@ -82,7 +82,7 @@ section('A. Util & definisi unit');
 /* ============ B. PLAN ============ */
 section('B. Matriks keputusan');
 {
-  const core = CS.create({ PP, GH, storage: makeStorage() });
+  const core = CS.create({ PP, storage: makeStorage() });
   const L = (hash, xp = 0, act = 0, empty = false) => ({ hash, xp, act, empty, pristine: xp === 0 && act === 0, data: {} });
   const R = (hash, xp = 0, act = 0) => ({ hash, xp, act, pristine: xp === 0 && act === 0, rev: 1 });
   const base = { localHash: 'B', remoteHash: 'B' };
@@ -120,8 +120,8 @@ section('B. Matriks keputusan');
 /* ============ C. VALIDASI REMOTE ============ */
 section('C. Dokumen cloud tak tepercaya');
 {
-  const core = CS.create({ PP, GH, storage: makeStorage() });
-  const sql = core.units.find((u) => u.id === 'sqlpq'), gh = core.units.find((u) => u.id === 'gamehub');
+  const core = CS.create({ PP, storage: makeStorage() });
+  const sql = core.units.find((u) => u.id === 'sqlpq');
   const v = (u, raw) => core.validateRemote(u, raw);
   eq(v(sql, null).doc, null, 'null = belum ada dokumen');
   const good = { rev: 3, updatedAt: 5, device: 'x', hash: 'PALSU', data: { sqlpq_progress_v1: sqlP(100, 5) } };
@@ -137,7 +137,7 @@ section('C. Dokumen cloud tak tepercaya');
   bad('JSON rusak', { rev: 1, data: { sqlpq_progress_v1: '{rusak' } });
   bad('bentuk salah (array, diharapkan objek)', { rev: 1, data: { sqlpq_progress_v1: '[1,2]' } });
   bad('nilai terlalu besar', { rev: 1, data: { sqlpq_progress_v1: '{"a":"' + 'x'.repeat(PP.LIMITS.perKeyChars) + '"}' } });
-  bad('state Game Hub bukan objek', { rev: 1, data: { gamehub_state_v1: '[1]' } }, gh);
+  bad('kunci Game Hub lama (unit dihapus)', { rev: 1, data: { gamehub_state_v1: '{}' } });
   bad('kunci ter-encode palsu', { rev: 1, data: { '%E0%A4%A': '1' } });
   check(v(sql, { rev: 0 }).ok, 'tanpa data = dokumen kosong yang valid (hasil reset)');
   const proto = JSON.parse('{"rev":1,"data":{"__proto__":"x"}}'); bad('__proto__ sebagai kunci data', proto);
@@ -151,7 +151,7 @@ section('D. Skenario nyata');
   const cloud = makeCloud();
   const A = device({ sqlpq_progress_v1: sqlP(300, 20), 'efpg:progress': xlP(90, 6) });
   let r = await A.sync(cloud, { name: 'A' });
-  eq([r.sqlpq.action, r.excel.action, r.accounting.action, r.gamehub.action], ['push', 'push', 'noop', 'noop'], 'perangkat A: push yang berisi, noop yang kosong');
+  eq([r.sqlpq.action, r.excel.action, r.accounting.action], ['push', 'push', 'noop'], 'perangkat A: push yang berisi, noop yang kosong');
   eq(cloud.docs.size, 2, 'cloud hanya menyimpan unit yang berisi');
   const B = device();
   r = await B.sync(cloud, { name: 'B' });
@@ -267,24 +267,10 @@ section('D. Skenario nyata');
   c6.docs.set('sqlpq', JSON.stringify({ rev: 2, updatedAt: 9, device: 'z', hash: 'x', data: { sqlpq_progress_v1: sqlP(120, 11), sqlpq_dataset_history_v1: '[1]' } }));
   const full = device({ sqlpq_progress_v1: sqlP(99, 9) }); full.state.units.sqlpq = { localHash: full.core.readLocal(full.unit('sqlpq')).hash, remoteHash: 'lama', rev: 1 };
   const failing = makeStorage({ sqlpq_progress_v1: sqlP(99, 9) }, { failOn: (k) => k === 'sqlpq_dataset_history_v1' });
-  const fcore = CS.create({ PP, GH, storage: failing, now: () => 1 }); const fstate = { units: { sqlpq: { localHash: fcore.readLocal(fcore.units[2]).hash, remoteHash: 'lama', rev: 1 } } };
+  const fcore = CS.create({ PP, storage: failing, now: () => 1 }); const fstate = { units: { sqlpq: { localHash: fcore.readLocal(fcore.units[2]).hash, remoteHash: 'lama', rev: 1 } } };
   r = await fcore.syncUnit(fcore.units[2], c6.api, fstate, {});
   eq([r.action, r.code], ['error', 'local-write'], 'penyimpanan penuh → error terkendali');
   eq(failing.getItem('sqlpq_progress_v1'), sqlP(99, 9), 'rollback: nilai lama dikembalikan');
-
-  // 10. Game Hub (bonus XP & lencana ikut pindah perangkat)
-  const c7 = makeCloud();
-  const ghState = GH.sanitizeState({ day: '2026-10-12', bonusXp: 130, totalClaims: 4, streak: { count: 2, last: '2026-10-12', best: 3 }, unlocked: { first_step: '2026-10-10' } });
-  const G1 = device({ gamehub_state_v1: JSON.stringify(ghState) }); r = await G1.sync(c7, { name: 'G1' });
-  eq(r.gamehub.action, 'push', 'state Game Hub dikirim');
-  eq([JSON.parse(c7.docs.get('gamehub')).xp, JSON.parse(c7.docs.get('gamehub')).act], [130, 4], 'metrik Game Hub = bonus XP & jumlah klaim');
-  const G2 = device(); await G2.sync(c7, { name: 'G2' });
-  const got = JSON.parse(G2.storage.getItem('gamehub_state_v1'));
-  eq([got.bonusXp, got.totalClaims, got.streak.best, Object.keys(got.unlocked)], [130, 4, 3, ['first_step']], 'bonus XP, streak, dan lencana pindah ke perangkat baru');
-  c7.docs.set('gamehub', JSON.stringify({ rev: 9, data: { gamehub_state_v1: JSON.stringify({ bonusXp: 1e30, claimed: { x: 1 }, log: [1], unlocked: { '<img>': '2026-10-10' } }) } }));
-  await G2.sync(c7, { name: 'G2' });
-  const cleaned = JSON.parse(G2.storage.getItem('gamehub_state_v1'));
-  check(cleaned.bonusXp <= 100000000 && !('claimed' in cleaned && Object.keys(cleaned.claimed).length) && Object.keys(cleaned.unlocked).length === 0, 'state Game Hub dari cloud disanitasi sebelum disimpan');
 }
 
 console.log(`\n========== test-cloudsync: ${passed} lolos, ${failed} gagal ==========`);

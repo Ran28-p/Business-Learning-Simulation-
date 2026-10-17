@@ -15,8 +15,7 @@
 #       - "test-portal" menguji progres lintas modul di portal (js/shared/progress-aggregator.js):
 #         key & skema dibandingkan langsung dengan kode sumber tiap modul, ringkasan dari data
 #         engine asli, ekspor/impor (merge/replace, allowlist, atomik), dan rekap PDF.
-#       - "test-portal" juga menjalankan tests/test-payroll-ter.mjs (angka materi penggajian vs tabel & contoh resmi DJP), tests/test-analytics.mjs (analitik & Ruang Pengajar), tests/test-cloudsync.mjs (inti sinkron cloud) dan tests/test-gamehub.mjs (mesin Game Hub: misi harian dari selisih
-#         progres nyata, klaim sekali, streak, misi mingguan, lencana, state tak tepercaya).
+#       - "test-portal" juga menjalankan tests/test-payroll-ter.mjs (angka materi penggajian vs tabel & contoh resmi DJP), tests/test-analytics.mjs (analitik & Ruang Pengajar), tests/test-cloudsync.mjs (inti sinkron cloud) dan tests/test-livequiz.mjs + tests/test-livequiz-ui.mjs (Kuis Langsung: soal, skor, alur ruang, UI).
 #       - "e2e" (folder e2e/, Playwright + Chromium) membuka portal & keempat modul di browser nyata:
 #         tanpa error/404 lokal, tanpa scroll horizontal di desktop/tablet/mobile (terang & gelap),
 #         tema gelap benar-benar berlaku, kontras banner, profil dari login portal, dan grafik
@@ -127,8 +126,11 @@ jobs:
       - name: Run test suite (aggregator progres, ekspor/impor, rekap PDF)
         run: node tests/test-portal-progress.mjs
 
-      - name: Run test suite (mesin Game Hub — misi dari progres nyata, klaim, streak, lencana)
-        run: node tests/test-gamehub.mjs
+      - name: Run test suite (Kuis Langsung — soal dihitung ulang independen, skor, alur guru+siswa, kunci tak bocor)
+        run: node tests/test-livequiz.mjs
+
+      - name: Run test suite (UI Kuis Langsung di jsdom — guru & siswa dua jendela, mode lokal)
+        run: npm install --no-save jsdom && node tests/test-livequiz-ui.mjs
 
       - name: Run test suite (inti sinkron cloud — merge tiga arah, dua perangkat, data cloud tak tepercaya)
         run: node tests/test-cloudsync.mjs

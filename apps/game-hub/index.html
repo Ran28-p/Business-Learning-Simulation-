@@ -3,96 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Game Hub — Portal Belajar</title>
-<meta name="description" content="Misi harian, XP gabungan, level, streak, dan lencana dari progres belajar nyata di SPT, Accounting, Excel, serta SQL & Power Query.">
+<title>Game Hub — Kuis Langsung</title>
+<meta name="description" content="Kuis real-time ala Quizizz: guru memilih tema, soal dibuat otomatis, siswa masuk dengan kode ruang, papan peringkat berdasarkan ketepatan dan kecepatan.">
 <link rel="stylesheet" href="../../css/design-system.css">
 <link rel="stylesheet" href="../../css/ds-modules.css">
-<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="./css/live.css">
 <script src="../../js/shared/theme.js"></script>
 </head>
 <body>
-  <a class="ds-skip-link" href="#gh-main">Lewati ke konten utama</a>
-
+  <a class="ds-skip-link" href="#lq-main">Lewati ke konten utama</a>
   <header class="gh-header">
     <div class="gh-brand">
       <span class="gh-brand__mark" aria-hidden="true">🎮</span>
-      <div>
-        <h1>Game Hub</h1>
-        <p>Misi, XP gabungan &amp; lencana dari progres nyata</p>
-      </div>
+      <div><h1>Game Hub</h1><p>Kuis langsung: tema → soal otomatis → papan peringkat real-time</p></div>
     </div>
     <div class="gh-header__actions"></div>
   </header>
 
-  <main class="gh-main" id="gh-main" tabindex="-1">
+  <main class="lq-main" id="lq-main" tabindex="-1">
+    <p class="lq-banner" id="lq-banner" role="alert" hidden></p>
 
-    <!-- Kartu pemain -->
-    <section class="gh-player" aria-labelledby="gh-player-title">
-      <div class="gh-player__badge" aria-hidden="true"><span id="gh-level-num">1</span></div>
-      <div class="gh-player__info">
-        <p class="gh-eyebrow">Peringkat pemain</p>
-        <h2 id="gh-player-title"><span id="gh-level-title">Pemula</span> · Level <span id="gh-level-label">1</span></h2>
-        <div class="gh-xpbar" role="progressbar" aria-label="Kemajuan menuju level berikutnya" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="gh-xpbar">
-          <span id="gh-xpbar-fill" style="width:0%"></span>
+    <!-- 1. Pilih peran -->
+    <section id="v-start" class="lq-view" aria-labelledby="lq-start-title">
+      <h2 id="lq-start-title" class="lq-title">Mau main sebagai apa?</h2>
+      <div class="lq-roles">
+        <button type="button" class="lq-role" id="btn-role-teacher"><span aria-hidden="true">🧑‍🏫</span><strong>Guru</strong><small>Pilih tema, atur soal &amp; timer, bagikan kode ruang</small></button>
+        <button type="button" class="lq-role" id="btn-role-student"><span aria-hidden="true">🎒</span><strong>Siswa</strong><small>Masuk dengan kode ruang dari guru</small></button>
+      </div>
+      <p class="lq-resume" id="lq-resume" hidden><span>Ruang <b id="lq-resume-code"></b> masih tersimpan di perangkat ini.</span> <button type="button" class="lq-btn" id="btn-resume">Lanjutkan ruang</button> <button type="button" class="lq-btn lq-btn--ghost" id="btn-resume-drop">Buang</button></p>
+      <label class="lq-mode"><input type="checkbox" id="chk-local"> Mode lokal (uji coba: guru &amp; siswa harus di browser/perangkat yang sama, tanpa internet)</label>
+      <p class="gh-hint">Mode normal memakai Firebase gratis (login anonim, tanpa akun). Soal berasal dari bank materi Portal Belajar + generator soal berangka yang selalu dihitung ulang.</p>
+    </section>
+
+    <!-- 2. Siswa: masuk -->
+    <section id="v-join" class="lq-view" hidden aria-labelledby="lq-join-title">
+      <h2 id="lq-join-title" class="lq-title">Masuk ke ruang kuis</h2>
+      <div class="lq-card lq-form">
+        <label>Kode ruang<input id="in-code" class="lq-code-in" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC234"></label>
+        <label>Nama panggilan<input id="in-name" maxlength="24" autocomplete="nickname" placeholder="Nama Anda"></label>
+        <button type="button" class="lq-btn lq-btn--primary" id="btn-join">Masuk</button>
+        <button type="button" class="lq-btn lq-btn--ghost" id="btn-join-back">Kembali</button>
+      </div>
+    </section>
+
+    <!-- 3. Siswa: bermain -->
+    <section id="v-play" class="lq-view" hidden aria-live="polite"></section>
+
+    <!-- 4. Guru: atur kuis -->
+    <section id="v-setup" class="lq-view" hidden aria-labelledby="lq-setup-title">
+      <div class="lq-roombar">
+        <div><p class="gh-eyebrow">Kode ruang — bagikan ke siswa</p><p class="lq-roomcode" id="lq-roomcode" aria-label="Kode ruang">······</p></div>
+        <div class="lq-roombar__side">
+          <button type="button" class="lq-btn" id="btn-copy-link">Salin tautan siswa</button>
+          <p class="lq-joined"><b id="lq-count">0</b> siswa di lobi</p>
         </div>
-        <p class="gh-xpnote" id="gh-xpnote">Memuat…</p>
       </div>
-      <dl class="gh-stats">
-        <div><dt>XP gabungan</dt><dd id="gh-xp-total">0</dd></div>
-        <div><dt>XP modul</dt><dd id="gh-xp-module">0</dd></div>
-        <div><dt>Bonus misi</dt><dd id="gh-xp-bonus">0</dd></div>
-        <div><dt>Streak</dt><dd id="gh-streak">0 hari</dd></div>
-      </dl>
-    </section>
+      <ul class="lq-chips" id="lq-lobby" aria-label="Siswa yang sudah masuk"></ul>
 
-    <!-- Misi harian -->
-    <section aria-labelledby="gh-missions-title">
-      <div class="gh-section-head">
-        <h2 id="gh-missions-title">Misi hari ini</h2>
-        <p class="gh-hint">Dihitung dari aktivitas nyata di modul sejak Anda membuka Game Hub hari ini. Klaim sebelum hari berganti.</p>
+      <h2 class="lq-title" id="lq-setup-title">1. Pilih tema</h2>
+      <div class="lq-themes" id="lq-themes" role="radiogroup" aria-label="Tema kuis"></div>
+
+      <h2 class="lq-title">2. Pengaturan</h2>
+      <div class="lq-card lq-settings">
+        <label>Judul kuis (opsional)<input id="in-title" maxlength="100" placeholder="mis. Kuis PPh Pasal 21"></label>
+        <label>Jumlah soal<input id="in-count" type="number" min="5" max="50" value="20" inputmode="numeric"></label>
+        <label>Waktu per soal
+          <span class="lq-inline"><input id="in-timer" type="number" min="5" max="300" value="20" inputmode="numeric"><select id="in-unit" aria-label="Satuan waktu"><option value="s">detik</option><option value="m">menit</option></select></span>
+        </label>
+        <p class="gh-hint lq-settings__note" id="lq-timer-note">Poin: benar = 500–1000, makin cepat makin tinggi. Salah / lewat waktu = 0.</p>
       </div>
-      <div class="gh-missions" id="gh-missions"></div>
+
+      <div class="lq-section-head"><h2 class="lq-title">3. Periksa &amp; edit soal <span class="lq-badge" id="lq-qcount">0</span></h2>
+        <div class="lq-actions"><button type="button" class="lq-btn" id="btn-regen-all">🎲 Generate ulang semua</button><button type="button" class="lq-btn" id="btn-add">＋ Tambah soal</button></div></div>
+      <p class="gh-hint" id="lq-errors" role="status"></p>
+      <ol class="lq-editor" id="lq-editor"></ol>
+
+      <div class="lq-startbar"><button type="button" class="lq-btn lq-btn--primary lq-btn--big" id="btn-start" disabled>▶ Mulai kuis</button><button type="button" class="lq-btn lq-btn--ghost" id="btn-cancel-room">Batalkan &amp; hapus ruang</button></div>
     </section>
 
-    <!-- Misi mingguan -->
-    <section aria-labelledby="gh-weekly-title">
-      <h2 class="gh-visually-hidden" id="gh-weekly-title">Misi mingguan</h2>
-      <div class="gh-weekly" id="gh-weekly"></div>
-    </section>
-
-    <!-- Arena modul -->
-    <section aria-labelledby="gh-arena-title" id="gh-arena">
-      <div class="gh-section-head">
-        <h2 id="gh-arena-title">Pilih arena</h2>
-        <p class="gh-hint">Setiap modul punya XP dan level sendiri; semuanya dijumlahkan ke XP gabungan.</p>
-      </div>
-      <div class="gh-arena" id="gh-modules"></div>
-    </section>
-
-    <!-- Lencana -->
-    <section aria-labelledby="gh-ach-title">
-      <div class="gh-section-head">
-        <h2 id="gh-ach-title">Lencana</h2>
-        <p class="gh-hint" id="gh-ach-count"></p>
-      </div>
-      <ul class="gh-badges" id="gh-achievements"></ul>
-    </section>
-
-    <!-- Riwayat -->
-    <section class="gh-card" aria-labelledby="gh-log-title">
-      <h2 id="gh-log-title">Riwayat klaim</h2>
-      <ul class="gh-log" id="gh-log"></ul>
-    </section>
-
-    <p class="gh-footnote">Data Game Hub tersimpan di perangkat ini. XP modul tetap milik masing-masing modul dan ikut Ekspor Progres di portal; bonus misi dan lencana Game Hub belum termasuk dalam berkas ekspor.</p>
+    <!-- 5. Guru: kuis berjalan -->
+    <section id="v-host" class="lq-view" hidden aria-live="polite"></section>
   </main>
 
-  <div class="gh-toast" id="gh-toast" role="status" aria-live="polite"></div>
-
-  <script src="../../js/shared/progress-aggregator.js"></script>
-  <script src="../../js/shared/gamehub-engine.js"></script>
-  <script src="./js/app.js"></script>
+  <script src="../../js/shared/livequiz-engine.js"></script>
+  <script src="../../js/shared/livequiz-room.js"></script>
+  <script src="../../js/shared/firebase-config.js"></script>
+  <script src="../spt/tax_career/data/questions.js"></script>
+  <script src="./js/live-app.js"></script>
   <script src="../../js/shared/app-shell.js"></script>
-  <script src="../../js/shared/cloud-sync.js"></script>
 </body>
 </html>

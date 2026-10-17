@@ -11,15 +11,6 @@
   var read = function (k) { try { return localStorage.getItem(k); } catch (_) { return null; } };
 
   function session() { try { var s = JSON.parse(read("unified_portal_session") || "null"); return s && !s.isGuest ? s : null; } catch (_) { return null; } }
-  function hubView(summary) {
-    try {
-      if (!window.GameHubEngine) return null;
-      var st = null; try { st = JSON.parse(read("gamehub_state_v1") || "null"); } catch (_) { /* abaikan */ }
-      var v = window.GameHubEngine.evaluate(st, summary, new Date()).view;
-      return { level: v.player.level, totalXp: v.totalXp, streak: v.streak };
-    } catch (_) { return null; }
-  }
-
   function renderRec(r) {
     var li = h("li", "rec-item ds-mod-" + r.moduleId);
     var top = h("div", "rec-item__top");
@@ -65,7 +56,7 @@
   function buildRecap() {
     var sum = PP.summarize(localStorage);
     var em = $("recapEmail");
-    return LA.buildRecap({ summary: sum, analysis: lastAnalysis || LA.analyze(read), hub: hubView(sum), name: $("recapName").value,
+    return LA.buildRecap({ summary: sum, analysis: lastAnalysis || LA.analyze(read), hub: null, name: $("recapName").value,
       email: session() && session().email, includeEmail: em.checked && !em.disabled, now: new Date() });
   }
   function updateRecap() {

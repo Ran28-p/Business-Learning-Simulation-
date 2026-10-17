@@ -160,24 +160,6 @@ test.describe('Sinkron cloud', () => {
     await d.ctx.close();
   });
 
-  test('Game Hub: bonus XP & lencana ikut pindah perangkat', async ({ browser }) => {
-    const HUB = '/apps/game-hub/index.html';
-    const a = await device(browser, { user: U1, path: HUB, local: { sqlpq_progress_v1: sql(0, 0) } });
-    await waitState(a.page, 'ok');
-    const target = Number(await a.page.locator('.gh-mission[data-mission="xp"] [role=progressbar]').getAttribute('aria-valuemax'));
-    const reward = Math.round(target / 2);
-    await a.page.evaluate((x) => { localStorage.setItem('sqlpq_progress_v1', JSON.stringify({ xp: x, totalAnswered: 9, totalCorrect: 7, completedLessons: {}, history: [] })); window.dispatchEvent(new Event('focus')); }, target + 1);
-    await a.page.locator('.gh-mission[data-mission="xp"] .gh-claim').click();
-    await expect(a.page.locator('#gh-xp-bonus')).toHaveText(String(reward));
-    await a.page.evaluate(() => window.CloudSync.syncNow());
-    await expect.poll(() => db.get('portalSync/u1/gamehub')?.xp).toBe(reward);
-    const b = await device(browser, { user: U1, path: HUB });
-    await waitState(b.page, 'ok');
-    await expect(b.page.locator('#gh-xp-bonus')).toHaveText(String(reward));      // hub merender ulang setelah sinkron
-    await expect(b.page.locator('.gh-badge.is-on[data-achievement="mission_1"]')).toHaveCount(1);
-    await a.ctx.close(); await b.ctx.close();
-  });
-
   test('SPT tidak memuat sinkron portalSync (punya sinkron sendiri)', async ({ browser }) => {
     const d = await device(browser, { user: U1, path: '/apps/spt/index.html' });
     await d.page.waitForTimeout(2500);

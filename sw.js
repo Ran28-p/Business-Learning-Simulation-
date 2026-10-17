@@ -8,7 +8,7 @@
 // 2. Apapun di bawah ./apps/ → tiap modul punya service worker sendiri
 //    dengan scope masing-masing; root SW ini hanya menjaga shell hub.
 
-const CACHE_NAME = 'portal-shell-v12-analytics'; // bumped: dashboard redesign (css/design-system.css, css/portal.css, index.html)
+const CACHE_NAME = 'portal-shell-v13-gamehub-quiz'; // bumped: Game Hub = Kuis Langsung; mesin XP/misi dihapus (index.html, js/portal-*.js, cloud-sync)
 
 const APP_SHELL_LOCAL = [
     './',
@@ -19,7 +19,6 @@ const APP_SHELL_LOCAL = [
     './css/responsive-foundation.css',
     './js/shared/firebase-config.js',
     './js/shared/theme.js',
-    './js/shared/gamehub-engine.js',
     './js/shared/cloud-sync-core.js',
     './js/shared/cloud-sync.js',
     './js/shared/learning-analytics.js',

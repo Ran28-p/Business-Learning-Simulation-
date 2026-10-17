@@ -5,7 +5,7 @@
  * Dimuat di portal dan modul (Accounting, Excel, SQL & Power Query, Game Hub). Ringan untuk tamu:
  * bila TIDAK ada login portal, file ini tidak memuat apa pun (tanpa Firebase SDK, tanpa jaringan).
  * Bila ada login: memuat skrip pendukung + SDK Firebase (versi sama dengan SPT), menunggu sesi Firebase
- * (dibagi dengan portal karena origin sama), lalu menyinkronkan unit accounting/excel/sqlpq/gamehub ke
+ * (dibagi dengan portal karena origin sama), lalu menyinkronkan unit accounting/excel/sqlpq ke
  *   portalSync/<uid>/<unit>
  * SPT tidak ikut: ia punya sinkron cloud sendiri di users/<uid>.
  *
@@ -73,8 +73,7 @@
   }
   function ensureLocalDeps() {
     var chain = Promise.resolve();
-    [['PortalProgress', 'js/shared/progress-aggregator.js'], ['GameHubEngine', 'js/shared/gamehub-engine.js'],
-     ['CloudSyncCore', 'js/shared/cloud-sync-core.js'], ['PORTAL_FIREBASE_CONFIG', 'js/shared/firebase-config.js']].forEach(function (d) {
+    [['PortalProgress', 'js/shared/progress-aggregator.js'], ['CloudSyncCore', 'js/shared/cloud-sync-core.js'], ['PORTAL_FIREBASE_CONFIG', 'js/shared/firebase-config.js']].forEach(function (d) {
       chain = chain.then(function () { return window[d[0]] ? null : loadScript(ROOT + d[1]); });
     });
     return chain;
@@ -143,7 +142,7 @@
       var sess = session();
       if (!user || user.isAnonymous || !user.email || !sess || sess.email !== user.email) { return false; }
       uid = user.uid; readyEmail = sess.email;
-      core = window.CloudSyncCore.create({ PP: window.PortalProgress, GH: window.GameHubEngine, storage: window.localStorage });
+      core = window.CloudSyncCore.create({ PP: window.PortalProgress, storage: window.localStorage });
       api = makeApi(firebase.database(), uid);
       return true;
     });
@@ -213,10 +212,10 @@
 
   /* ───────── notifikasi: data cloud diterapkan ke penyimpanan lokal ───────── */
   // Modul menyimpan state di memori; setelah pull, tampilan baru ikut berubah bila halaman dimuat ulang.
-  // Portal & Game Hub merender ulang sendiri (mendengarkan event); modul lain menampilkan bilah kecil.
+  // Portal merender ulang sendiri (mendengarkan event); modul lain menampilkan bilah kecil.
   function notifyPulled() {
     var app = document.documentElement.getAttribute('data-app') || '';
-    if (!app || app === 'gamehub') return;
+    if (!app) return;
     if (document.getElementById('ds-cloud-notice')) return;
     var bar = document.createElement('div');
     bar.id = 'ds-cloud-notice'; bar.className = 'ds-cloud-notice'; bar.setAttribute('role', 'status');

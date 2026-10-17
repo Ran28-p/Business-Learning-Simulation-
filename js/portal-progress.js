@@ -88,30 +88,12 @@
   /* ───────── dashboard: status kartu, aktivitas terbaru, pencapaian ─────────
      Semua dari PP.summarize(); tidak ada angka karangan. Modul yang belum dimulai
      ditampilkan apa adanya ("Belum dimulai"). */
-  // Banner Game Hub: level, XP gabungan, dan misi siap klaim — dari mesin yang sama dengan halaman Game Hub.
-  // Hanya MEMBACA (tidak menyimpan state); angka nyata, bukan placeholder.
-  function renderGameHubBanner(sum) {
-    const el = $("#ghBannerStats");
-    if (!el || !window.GameHubEngine || !sum) return;
-    try {
-      const GH = window.GameHubEngine;
-      let state = null;
-      try { state = JSON.parse(localStorage.getItem("gamehub_state_v1") || "null"); } catch (_) { /* abaikan */ }
-      const v = GH.evaluate(state, sum, new Date()).view;
-      const ready = v.missions.filter(function (m) { return m.done && !m.claimed; }).length + (v.weekly.done && !v.weekly.claimed ? 1 : 0);
-      el.textContent = "Level " + v.player.level + " · " + v.totalXp.toLocaleString("id-ID") + " XP gabungan"
-        + (v.streak > 0 ? " · streak " + v.streak + " hari" : "")
-        + (ready > 0 ? " · " + ready + " misi siap diklaim" : "");
-    } catch (_) { /* biarkan teks bawaan */ }
-  }
-
   function renderDashboard(sum) {
     document.querySelectorAll("[data-progress-for]").forEach((el) => {
       const m = sum && sum.modules.find((x) => x.id === el.getAttribute("data-progress-for"));
       el.classList.toggle("is-started", !!(m && m.started));
       el.textContent = m && m.started ? m.levelLabel + " " + m.level + " · " + m.xp + " XP" : "Belum dimulai";
     });
-    renderGameHubBanner(sum);
     const recent = $("#recentList");
     const ach = $("#achievementList");
     if (!recent || !ach) return;
@@ -152,7 +134,7 @@
     const box = $("#cloudBox");
     if (!box) return;
     const st = $("#cloudStatus"), btn = $("#btnCloudSync"), choice = $("#cloudChoice"), list = $("#cloudChoiceList");
-    const LABEL = { accounting: "Accounting", excel: "Excel", sqlpq: "SQL & Power Query", gamehub: "Game Hub" };
+    const LABEL = { accounting: "Accounting", excel: "Excel", sqlpq: "SQL & Power Query" };
     function paint() {
       const c = window.CloudSync ? window.CloudSync.status() : { state: "off", message: "Sinkron cloud tidak tersedia." };
       box.setAttribute("data-state", c.state);

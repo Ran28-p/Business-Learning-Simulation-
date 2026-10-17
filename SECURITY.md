@@ -10,7 +10,8 @@ serius: **Firebase Realtime Database**.
 
 | Aset | Di mana | Risiko utama | Pengendali |
 |---|---|---|---|
-| Progres belajar (XP, level, riwayat) | `localStorage` per modul; `apps/spt` sinkron ke Firebase `users/{uid}`; Accounting/Excel/SQL/Game Hub ke `portalSync/{uid}` | Data orang lain terbaca/tertimpa; database dipenuhi data sampah sampai kuota habis | Firebase Security Rules (`database.rules.json`) |
+| Progres belajar (XP, level, riwayat) | `localStorage` per modul; `apps/spt` sinkron ke Firebase `users/{uid}`; Accounting/Excel/SQL & Power Query ke `portalSync/{uid}` | Data orang lain terbaca/tertimpa; database dipenuhi data sampah sampai kuota habis | Firebase Security Rules (`database.rules.json`) |
+| Ruang Kuis Langsung (`liveRooms/<KODE>`: soal, jawaban, skor siswa) | Firebase RTDB, login anonim; kode ruang 6 karakter acak sebagai rahasia ruang | Siswa membaca kunci jawaban, menulis skor sendiri, memalsukan waktu jawab, menimpa ruang guru lain, membaca semua ruang | Rules: `key/` hanya guru, jawaban tulis-sekali dengan waktu server, skor hanya ditulis guru; diuji di `scripts/check-firebase-rules.mjs` bagian D |
 | Email & nama tampilan peserta | Firebase Auth + `users/{uid}` | Kebocoran data pribadi | Rules: hanya pemilik uid yang bisa membaca |
 | Kode aplikasi | GitHub Pages | Library pihak ketiga disusupi; XSS dari input pengguna | Library divendor lokal; input Power Query/SQL tidak dieksekusi sebagai JS (lihat di bawah) |
 | Kuota/biaya Firebase | Proyek Firebase | Tagihan tak terduga | Tetap di paket **Spark** (tidak bisa menagih) |
@@ -152,7 +153,7 @@ formal (lihat bagian "Batasan").
 
 ## Sinkron cloud lintas modul (`portalSync`)
 
-Progres **Accounting, Excel, SQL & Power Query, dan Game Hub** disinkronkan ke Firebase Realtime Database
+Progres **Accounting, Excel, dan SQL & Power Query** disinkronkan ke Firebase Realtime Database
 untuk pengguna yang login di Portal (`js/shared/cloud-sync*.js`). Simulator SPT **tidak** ikut: ia sudah
 punya sinkron sendiri ke `users/{uid}` dengan skema dan aturan berbeda.
 
@@ -169,7 +170,7 @@ Uji di **Rules Playground** setelah deploy (gratis):
 - *write* `/portalSync/uid-sendiri/sqlpq/data/spt_simulator_data` → **ditolak** (kunci di luar allowlist unit).
 
 Model data: `portalSync/{uid}/{unit}` = `{ rev, updatedAt, device, hash, xp, act, data: { <kunci ter-encode>: "<teks JSON>" } }`.
-Aturan membatasi: unit hanya `accounting|excel|sqlpq|gamehub`; kunci `data` harus ada di allowlist **unit itu**
+Aturan membatasi: unit hanya `accounting|excel|sqlpq`; kunci `data` harus ada di allowlist **unit itu**
 (daftar kunci dijaga CI agar sama dengan `progress-aggregator.js`; kunci SPT tidak boleh muncul); nilai berupa
 teks ≤ 2.000.000 karakter; field lain ditolak. Aplikasi **tidak mempercayai** data cloud: kunci, ukuran, dan
 bentuk JSON diperiksa ulang sebelum menyentuh `localStorage`, hash dihitung ulang, dan penulisan lokal atomik.

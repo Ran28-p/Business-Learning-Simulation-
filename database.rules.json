@@ -52,7 +52,7 @@
         ".read": "auth != null && auth.uid === $uid",
         ".write": "auth != null && auth.uid === $uid",
         "$unit": {
-          ".validate": "$unit.matches(/^(accounting|excel|sqlpq|gamehub)$/) && newData.hasChildren(['rev', 'updatedAt', 'hash'])",
+          ".validate": "$unit.matches(/^(accounting|excel|sqlpq)$/) && newData.hasChildren(['rev', 'updatedAt', 'hash'])",
           "rev": {
             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000"
           },
@@ -73,12 +73,152 @@
           },
           "data": {
             "$key": {
-              ".validate": "newData.isString() && newData.val().length <= 2000000 && (($unit == 'accounting' && $key.matches(/^ACT_MASTER_(STATE|PROGRESS|TAX_STATE)$/)) || ($unit == 'excel' && $key == 'efpg%3Aprogress') || ($unit == 'sqlpq' && $key.matches(/^sqlpq_(progress_v1|dataset_history_v1)$/)) || ($unit == 'gamehub' && $key == 'gamehub_state_v1'))"
+              ".validate": "newData.isString() && newData.val().length <= 2000000 && (($unit == 'accounting' && $key.matches(/^ACT_MASTER_(STATE|PROGRESS|TAX_STATE)$/)) || ($unit == 'excel' && $key == 'efpg%3Aprogress') || ($unit == 'sqlpq' && $key.matches(/^sqlpq_(progress_v1|dataset_history_v1)$/)))"
             }
           },
           "$other": {
             ".validate": false
           }
+        }
+      }
+    },
+    "liveRooms": {
+      ".read": false,
+      ".write": false,
+      "$code": {
+        ".write": "auth != null && (!data.exists() || data.child('meta/host').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['meta'])",
+        "meta": {
+          ".read": "auth != null",
+          ".validate": "newData.hasChildren(['host', 'status', 'timer'])",
+          "host": {
+            ".validate": "newData.isString() && newData.val() === auth.uid"
+          },
+          "status": {
+            ".validate": "newData.isString() && newData.val().matches(/^(lobby|question|reveal|finished)$/)"
+          },
+          "qIndex": {
+            ".validate": "newData.isNumber() && newData.val() >= -1 && newData.val() <= 99"
+          },
+          "qCount": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+          },
+          "timer": {
+            ".validate": "newData.isNumber() && newData.val() >= 5 && newData.val() <= 300"
+          },
+          "theme": {
+            ".validate": "newData.isString() && newData.val().length <= 40"
+          },
+          "title": {
+            ".validate": "newData.isString() && newData.val().length <= 100"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "questions": {
+          ".read": "auth != null",
+          "$i": {
+            ".validate": "$i.matches(/^[0-9]{1,2}$/) && newData.hasChildren(['q', 'o'])",
+            "q": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 400"
+            },
+            "o": {
+              "$k": {
+                ".validate": "$k.matches(/^[0-3]$/) && newData.isString() && newData.val().length >= 1 && newData.val().length <= 150"
+              }
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "key": {
+          ".read": "auth != null && root.child('liveRooms/'+$code+'/meta/host').val() === auth.uid",
+          "$i": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3"
+          }
+        },
+        "starts": {
+          ".read": "auth != null",
+          "$i": {
+            ".validate": "$i.matches(/^[0-9]{1,2}$/) && newData.isNumber()"
+          }
+        },
+        "reveal": {
+          ".read": "auth != null",
+          "$i": {
+            ".validate": "$i.matches(/^[0-9]{1,2}$/) && newData.hasChildren(['a'])",
+            "a": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3"
+            },
+            "e": {
+              ".validate": "newData.isString() && newData.val().length <= 600"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "players": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid",
+            ".validate": "newData.hasChildren(['name', 'joinedAt'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+            },
+            "joinedAt": {
+              ".validate": "newData.isNumber()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "answers": {
+          ".read": "auth != null && root.child('liveRooms/'+$code+'/meta/host').val() === auth.uid",
+          "$i": {
+            ".validate": "$i.matches(/^[0-9]{1,2}$/)",
+            "$uid": {
+              ".read": "auth != null && auth.uid === $uid",
+              ".write": "auth != null && auth.uid === $uid && !data.exists() && root.child('liveRooms/'+$code+'/meta/status').val() === 'question' && root.child('liveRooms/'+$code+'/starts/'+$i).exists()",
+              ".validate": "newData.hasChildren(['c', 't'])",
+              "c": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3"
+              },
+              "t": {
+                ".validate": "newData.isNumber() && newData.val() <= now"
+              },
+              "$other": {
+                ".validate": false
+              }
+            }
+          }
+        },
+        "scores": {
+          ".read": "auth != null",
+          "$uid": {
+            ".validate": "newData.hasChildren(['total', 'correct', 'ms'])",
+            "total": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000"
+            },
+            "correct": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "ms": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 30000000"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
         }
       }
     }
