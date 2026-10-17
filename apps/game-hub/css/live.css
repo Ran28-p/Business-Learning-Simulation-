@@ -18,7 +18,8 @@ a { color: inherit; text-decoration: none; }
 .gh-brand__mark { width: 40px; height: 40px; border-radius: var(--ds-r-md); background: #fbbf24; color: var(--ds-navy-950); display: grid; place-items: center; font-size: 1.3rem; flex: none; }
 .gh-brand h1 { font-size: var(--ds-fs-lg); line-height: 1.2; }
 .gh-brand p { font-size: var(--ds-fs-xs); color: #a9bbd6; }
-.gh-header__actions { display: flex; align-items: center; gap: var(--ds-sp-2); min-width: 0; }
+.gh-header__actions { display: flex; align-items: center; gap: var(--ds-sp-2); flex: none; } /* tidak ikut menyusut: tombol portal/tema/profil tetap utuh, teks brand yang mengalah */
+.gh-brand > div { min-width: 0; }
 .gh-header .ds-portal-link, .gh-header .ds-theme-btn, .gh-header .ds-profile-chip { background: transparent; color: #fff; border-color: #3a5f96; }
 .gh-header .ds-profile-chip__role { color: #a9bbd6; }
 .gh-header .ds-portal-link:hover, .gh-header .ds-theme-btn:hover { background: var(--ds-navy-700); color: #fff; border-color: #6d8fc4; }

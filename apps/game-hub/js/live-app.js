@@ -53,7 +53,7 @@
   }
   function renderPlayer(v) {
     var root = $('v-play'), uid = db.uid;
-    var key = [v.status, v.qIndex, v.myChoice, v.reveal && v.reveal.a, v.me && v.me.total, v.playerCount, v.board.length].join('|');
+    var key = LR.Player.viewKey(v);
     if (key === lastPKey) return; lastPKey = key; root.textContent = '';
     var stage = h('div', 'lq-stage'); root.appendChild(stage);
     if (v.status === 'lobby') {

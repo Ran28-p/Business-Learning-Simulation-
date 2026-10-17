@@ -240,6 +240,10 @@
       correct: rv && my ? my.c === rv.a : null, gained: gained, me: me, board: board, playerCount: Object.keys(this.players).length, remainingMs: this.remainingMs() };
   };
 
+  // Kunci render layar siswa: HARUS memuat semua yang mengubah tampilan. Urutan callback listener (meta vs questions vs reveal)
+  // tidak dijamin; kalau soal/reveal yang tiba belakangan tidak ikut kunci, layar macet di "Memuat soal…" (regresi nyata, lihat tests).
+  Player.viewKey = function (v) { return [v.status, v.qIndex, v.myChoice, v.question ? v.question.q : '', v.reveal ? 'r' + v.reveal.a : '', v.gained, v.me && v.me.total, v.me && v.me.rank, v.playerCount, v.board.length].join('|'); };
+
   root.LiveDb = { makeCore: makeCore, memory: memoryDb, browserLocal: browserLocal, firebase: firebaseDb };
   root.LiveRoom = { Host: Host, Player: Player, base: base };
 })(typeof window !== 'undefined' ? window : globalThis);

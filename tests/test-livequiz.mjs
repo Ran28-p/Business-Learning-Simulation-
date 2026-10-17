@@ -233,5 +233,21 @@ async function run() {
 }
 await run();
 
+section('D2. Layar siswa: soal/reveal yang tiba SETELAH meta tetap memicu render');
+{
+  let clock = 5_000_000; const core = DB.makeCore({ clock: () => clock });
+  const teacher = DB.memory(core, 'T9'), stu = DB.memory(core, 'S9'), host = new Host(teacher, { theme: 'pajak', timer: 20 }), code = await host.create();
+  const p = new Player(stu); await p.join(code, 'Uji'); const keys = []; p.onChange((v) => keys.push([Player.viewKey(v), !!v.question, v.status]));
+  const quiz = LQ.buildQuiz({ theme: 'pajak', count: 2, seed: 8 }), P = 'liveRooms/' + code;
+  // satu commit atomik mengubah meta + questions + starts → listener meta berjalan SEBELUM listener questions (urutan pendaftaran)
+  await teacher.update(P, { questions: { 0: { q: quiz[0].q, o: quiz[0].o }, 1: { q: quiz[1].q, o: quiz[1].o } }, 'starts/0': clock, 'meta/status': 'question', 'meta/qIndex': 0, 'meta/qCount': 2 });
+  const withQ = keys.filter((k) => k[2] === 'question' && k[1]), noQ = keys.filter((k) => k[2] === 'question' && !k[1]);
+  check(withQ.length >= 1, 'siswa akhirnya menerima soal setelah update atomik');
+  if (noQ.length) check(noQ.every((k) => !withQ.some((w) => w[0] === k[0])), 'kunci render saat soal BELUM ada ≠ kunci saat soal sudah ada (kalau sama, layar macet "Memuat soal…")');
+  check(Player.viewKey({ status: 'question', qIndex: 0, board: [], question: null }) !== Player.viewKey({ status: 'question', qIndex: 0, board: [], question: { q: 'x' } }), 'viewKey membedakan ada/tidaknya soal');
+  check(Player.viewKey({ status: 'reveal', qIndex: 0, board: [], reveal: null }) !== Player.viewKey({ status: 'reveal', qIndex: 0, board: [], reveal: { a: 0 } }), 'viewKey membedakan ada/tidaknya reveal (termasuk jawaban 0)');
+}
+
+
 console.log(`\n${failed ? '✗' : '✓'} test-livequiz: ${passed} lulus, ${failed} gagal`);
 process.exit(failed ? 1 : 0);

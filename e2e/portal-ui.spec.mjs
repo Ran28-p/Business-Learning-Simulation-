@@ -85,8 +85,17 @@ test.describe('Tema gelap benar-benar berlaku', () => {
 
   test('spt dark: teks banner hero terbaca (kontras ≥ 4.5)', async ({ page }) => {
     await open(page, '/apps/spt/index.html', { theme: 'dark' });
-    const { fg, bg } = await page.evaluate(() => { const h = document.querySelector('.hero-card'); return { fg: getComputedStyle(h.querySelector('h2')).color, bg: getComputedStyle(h).backgroundColor }; });
-    expect(contrast(fg, bg)).toBeGreaterThanOrEqual(4.5);
+    const { fg, backgrounds } = await page.evaluate(() => {
+      const hero = document.querySelector('.hero-card');
+      const style = getComputedStyle(hero);
+      const gradientColors = style.backgroundImage.match(/rgba?\([^)]*\)/g) || [];
+      return {
+        fg: getComputedStyle(hero.querySelector('h2')).color,
+        backgrounds: gradientColors.length ? gradientColors : [style.backgroundColor],
+      };
+    });
+    // A gradient's backgroundColor can be transparent or unrelated to its visible stops.
+    expect(Math.min(...backgrounds.map((bg) => contrast(fg, bg)))).toBeGreaterThanOrEqual(4.5);
   });
 });
 
