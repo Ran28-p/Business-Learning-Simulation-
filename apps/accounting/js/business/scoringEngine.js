@@ -14,8 +14,6 @@
  * Hint Penalty, Retry Penalty → persisted in User Progress.
  */
 
-import { saveAppState, loadAppState } from '../storage/localStorage.js';
-import { STORAGE_KEYS } from '../utils/constants.js';
 import { showToast } from '../presentation/modals.js';
 
 /* ═══════════════════════════════════════════════════════════
@@ -499,7 +497,6 @@ export function renderAssessmentHTML(assessment) {
   let componentBars = '';
   Object.keys(SCORE_WEIGHTS).forEach(key => {
     const val = a.components[key] ?? 0;
-    const weight = Math.round(SCORE_WEIGHTS[key] * 100);
     componentBars += `
       <div style="margin-bottom:8px;">
         <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:2px;">

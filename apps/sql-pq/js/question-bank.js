@@ -38,7 +38,6 @@
     if (!res.values.length || res.values[0][0] == null) return { min: 0, max: 100, avg: 50 };
     return { min: res.values[0][0], max: res.values[0][1], avg: res.values[0][2] };
   }
-  function round2(n) { return Math.round(n * 100) / 100; }
   function quantileOf(table, col, p) {
     const eng = global.SQLPQ_Engine;
     const cnt = eng.run(`SELECT COUNT("${col}") FROM "${table}" WHERE "${col}" IS NOT NULL`).values[0][0];

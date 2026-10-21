@@ -15,85 +15,21 @@
  * Fungsi Level 1 (agregasi atas rentang) TIDAK diubah sama sekali agar
  * jawaban yang sudah benar pada Tahap 1 tetap benar.
  * ---------------------------------------------------------------------------
+ *
+ * Struktur: spreadsheet/refs.js (alamat sel & rentang), dates.js (serial tanggal, DATEDIF), syntax.js (parsing sintaks rumus),
+ * compare.js (operator & kriteria perbandingan), refshift.js (geser referensi). Evaluator rekursif tetap di file ini;
+ * daftar export tidak berubah.
  */
 
-// ============================================================================
-// Referensi sel & rentang (A1, B2:B10, $A$1, dst.)
-// ============================================================================
+import { parseRange, cellAddress, parseCellAddress } from './spreadsheet/refs.js';
+import { isQuotedString, unquote, isNumericLiteral, isFunctionCallSyntax, FUNCTION_CALL_SYNTAX_RE, splitArgs, FORMULA_CALL_RE } from './spreadsheet/syntax.js';
+import { findTopLevelOperator, compareValues, matchCriteria } from './spreadsheet/compare.js';
+import { dateToSerial, serialToDate, computeDatedif } from './spreadsheet/dates.js';
 
-/** Ubah indeks kolom (0-based) menjadi huruf kolom gaya Excel (0 -> A, 26 -> AA). */
-export function indexToColLetter(index) {
-  let n = index + 1;
-  let letters = '';
-  while (n > 0) {
-    const rem = (n - 1) % 26;
-    letters = String.fromCharCode(65 + rem) + letters;
-    n = Math.floor((n - 1) / 26);
-  }
-  return letters;
-}
-
-/** Ubah huruf kolom gaya Excel menjadi indeks kolom (0-based). */
-export function colLetterToIndex(letters) {
-  let n = 0;
-  const clean = letters.toUpperCase();
-  for (let i = 0; i < clean.length; i++) {
-    n = n * 26 + (clean.charCodeAt(i) - 64);
-  }
-  return n - 1;
-}
-
-const CELL_REF_RE = /^\$?([A-Za-z]+)\$?(\d+)$/;
-
-/**
- * Uraikan alamat sel tunggal, mendukung referensi absolut/campuran ($A$1, A$1, $A1).
- * Tanda '$' diterima secara sintaksis (agar mode praktik yang menuntut penulisan
- * referensi absolut tetap valid) namun tidak mempengaruhi hasil perhitungan,
- * karena mesin ini tidak melakukan copy-paste rumus antar sel pada Tahap 1.
- */
-export function parseCellAddress(addr) {
-  const match = CELL_REF_RE.exec(addr.trim());
-  if (!match) return null;
-  return {
-    col: colLetterToIndex(match[1]),
-    row: parseInt(match[2], 10) - 1, // 0-based, baris 1 = header
-    colLetter: match[1].toUpperCase(),
-    rowNumber: parseInt(match[2], 10),
-  };
-}
-
-/**
- * Uraikan referensi rentang "A2:A26" atau sel tunggal "A2" menjadi daftar alamat {col,row}.
- * Mengembalikan null jika bukan referensi sel/rentang yang valid.
- */
-export function parseRange(ref) {
-  const clean = ref.trim();
-  if (clean.includes(':')) {
-    const [startRaw, endRaw] = clean.split(':');
-    const start = parseCellAddress(startRaw);
-    const end = parseCellAddress(endRaw);
-    if (!start || !end) return null;
-    const colFrom = Math.min(start.col, end.col);
-    const colTo = Math.max(start.col, end.col);
-    const rowFrom = Math.min(start.row, end.row);
-    const rowTo = Math.max(start.row, end.row);
-    const cells = [];
-    for (let r = rowFrom; r <= rowTo; r++) {
-      for (let c = colFrom; c <= colTo; c++) {
-        cells.push({ col: c, row: r });
-      }
-    }
-    return cells;
-  }
-  const single = parseCellAddress(clean);
-  if (!single) return null;
-  return [{ col: single.col, row: single.row }];
-}
-
-/** Bentuk alamat sel "A1" dari indeks 0-based. */
-export function cellAddress(col, row) {
-  return `${indexToColLetter(col)}${row + 1}`;
-}
+// API publik lama tetap diekspor dari sini (isi dipindah ke ./spreadsheet/).
+export { indexToColLetter, colLetterToIndex, parseCellAddress, parseRange, cellAddress } from './spreadsheet/refs.js';
+export { dateToSerial, serialToDate } from './spreadsheet/dates.js';
+export { adjustFormulaRefs } from './spreadsheet/refshift.js';
 
 // ============================================================================
 // Model grid
@@ -119,11 +55,6 @@ export function setCellRaw(grid, addr, raw, opts = {}) {
   return true;
 }
 
-/** Ambil objek sel mentah (atau undefined jika kosong). */
-export function getCellRaw(grid, addr) {
-  return grid.cells.get(addr);
-}
-
 /**
  * Tumpukan alamat sel yang SEDANG dievaluasi (module-level, disengaja bukan
  * per-panggilan) — dipakai getCellValue() untuk mendeteksi RUMUS BERANTAI
@@ -136,11 +67,6 @@ export function getCellRaw(grid, addr) {
  * tidak ada evaluasi paralel yang bisa saling mengotori stack ini.
  */
 const evaluatingCells = new Set();
-
-/** True jika alamat sel sedang berada di tengah rantai evaluasi rumus (dipakai UI untuk pesan #SIRK!). */
-export function isCircularReference(addr) {
-  return evaluatingCells.has(addr);
-}
 
 /**
  * Ambil NILAI TERHITUNG sebuah sel (string/number biasa apa adanya,
@@ -170,111 +96,6 @@ export function getCellValue(grid, addr) {
 /** True jika nilai sel adalah angka murni (dipakai fungsi agregasi seperti Excel asli). */
 function isNumericValue(v) {
   return typeof v === 'number' && Number.isFinite(v);
-}
-
-// ============================================================================
-// Konversi tanggal <-> "serial number" bergaya Excel
-// ---------------------------------------------------------------------------
-// Sama seperti Excel asli, tanggal di mesin ini disimpan sebagai ANGKA (jumlah
-// hari sejak epoch), bukan string. Ini penting agar fungsi tanggal (YEAR,
-// MONTH, DATEDIF, dst.) bekerja pada nilai apa pun yang ada di sel — sama
-// seperti Excel asli yang tidak peduli "format tampilan" sel saat menghitung.
-// Format tampilan (DD/MM/YYYY) murni urusan lapisan UI (app.js), bukan mesin ini.
-// ============================================================================
-
-const EXCEL_EPOCH_MS = Date.UTC(1899, 11, 30);
-const MS_PER_DAY = 86400000;
-
-/** Ubah objek Date menjadi serial number bergaya Excel (berbasis UTC agar konsisten lintas zona waktu). */
-export function dateToSerial(date) {
-  const utcMidnight = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-  return Math.round((utcMidnight - EXCEL_EPOCH_MS) / MS_PER_DAY);
-}
-
-/** Ubah serial number bergaya Excel kembali menjadi objek Date (UTC). */
-export function serialToDate(serial) {
-  return new Date(EXCEL_EPOCH_MS + serial * MS_PER_DAY);
-}
-
-/** Format serial tanggal menjadi teks "DD/MM/YYYY" untuk ditampilkan di UI. */
-export function formatSerialAsDate(serial) {
-  if (!isNumericValue(serial)) return '';
-  const d = serialToDate(serial);
-  const pad2 = (n) => String(n).padStart(2, '0');
-  return `${pad2(d.getUTCDate())}/${pad2(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
-}
-
-// ============================================================================
-// Evaluator rumus
-// ============================================================================
-
-const FORMULA_CALL_RE = /^=\s*([A-Za-z]+)\s*\((.*)\)\s*$/s;
-
-/**
- * Pisahkan argumen rumus dengan pemisah ',' ATAU ';' (mendukung kebiasaan lokal
- * yang memakai titik koma). Menghormati tanda kutip (string literal) DAN
- * kedalaman tanda kurung, supaya argumen dari fungsi bersarang seperti
- * IF(AND(H2>5,I2>1000),"Besar","Kecil") tidak ikut terpotong pada koma
- * milik AND(...) di dalamnya.
- */
-function splitArgs(argsString) {
-  const args = [];
-  let current = '';
-  let depth = 0;
-  let inQuotes = false;
-  for (let i = 0; i < argsString.length; i++) {
-    const ch = argsString[i];
-    if (ch === '"') {
-      inQuotes = !inQuotes;
-      current += ch;
-      continue;
-    }
-    if (!inQuotes) {
-      if (ch === '(') depth++;
-      if (ch === ')') depth--;
-      if ((ch === ',' || ch === ';') && depth === 0) {
-        args.push(current.trim());
-        current = '';
-        continue;
-      }
-    }
-    current += ch;
-  }
-  if (current.trim() !== '') args.push(current.trim());
-  return args;
-}
-
-/** True jika string diapit tanda kutip ganda secara utuh, mis. '"Jawa Barat"'. */
-function isQuotedString(s) {
-  return s.length >= 2 && s[0] === '"' && s[s.length - 1] === '"';
-}
-function unquote(s) {
-  return s.slice(1, -1);
-}
-
-const NUMERIC_LITERAL_RE = /^-?\d+(\.\d+)?$/;
-function isNumericLiteral(s) {
-  return NUMERIC_LITERAL_RE.test(s.trim());
-}
-
-/** True jika seluruh kedalaman tanda kurung pada string seimbang (dan tidak pernah negatif). */
-function isBalancedParens(s) {
-  let depth = 0;
-  let inQuotes = false;
-  for (const ch of s) {
-    if (ch === '"') { inQuotes = !inQuotes; continue; }
-    if (inQuotes) continue;
-    if (ch === '(') depth++;
-    if (ch === ')') depth--;
-    if (depth < 0) return false;
-  }
-  return depth === 0;
-}
-
-const FUNCTION_CALL_SYNTAX_RE = /^([A-Za-z]+)\((.*)\)$/s;
-/** True jika string SECARA UTUH berbentuk PEMANGGILAN FUNGSI, mis. "AND(H2>5,I2>1000)". */
-function isFunctionCallSyntax(s) {
-  return FUNCTION_CALL_SYNTAX_RE.test(s) && isBalancedParens(s);
 }
 
 /** Kumpulkan seluruh nilai numerik dari daftar argumen referensi (rentang/sel). */
@@ -343,10 +164,13 @@ export const FORMULA_FUNCTIONS = {
 };
 
 const AGGREGATE_FUNCTION_NAMES = new Set(Object.keys(FORMULA_FUNCTIONS));
+
 // Fungsi agregasi "apa saja terisi" — berbeda dari AGGREGATE_FUNCTION_NAMES karena tidak
 // memfilter hanya nilai numerik (COUNTA menghitung teks juga).
 const ANY_VALUE_AGGREGATE_FUNCTION_NAMES = new Set(['COUNTA']);
+
 const CONDITIONAL_AGGREGATE_FUNCTION_NAMES = new Set(['COUNTIF', 'SUMIF', 'COUNTIFS', 'SUMIFS', 'AVERAGEIF', 'AVERAGEIFS']);
+
 const SCALAR_FUNCTION_NAMES = new Set([
   'IF', 'IFS', 'AND', 'OR', 'NOT', 'IFERROR', 'ROUND',
   'LEFT', 'RIGHT', 'MID', 'LEN', 'TRIM', 'LOWER', 'UPPER', 'PROPER', 'CONCAT', 'FIND', 'SEARCH', 'SUBSTITUTE',
@@ -404,51 +228,6 @@ function resolveArgValue(argStr, grid) {
   return evaluateExpression(argStr, grid).value;
 }
 
-const COMPARISON_OPERATORS = ['<>', '>=', '<=', '=', '>', '<']; // urutan penting: 2 karakter dicek lebih dulu
-
-/** Cari operator perbandingan di kedalaman tanda kurung 0 (di luar tanda kutip). */
-function findTopLevelOperator(str) {
-  let depth = 0;
-  let inQuotes = false;
-  for (let i = 0; i < str.length; i++) {
-    const ch = str[i];
-    if (ch === '"') { inQuotes = !inQuotes; continue; }
-    if (inQuotes) continue;
-    if (ch === '(') { depth++; continue; }
-    if (ch === ')') { depth--; continue; }
-    if (depth !== 0) continue;
-    for (const op of COMPARISON_OPERATORS) {
-      if (str.startsWith(op, i)) return { operator: op, index: i };
-    }
-  }
-  return null;
-}
-
-function compareValues(a, b, operator) {
-  if (typeof a === 'number' && typeof b === 'number') {
-    switch (operator) {
-      case '=': return a === b;
-      case '<>': return a !== b;
-      case '>': return a > b;
-      case '<': return a < b;
-      case '>=': return a >= b;
-      case '<=': return a <= b;
-      default: return false;
-    }
-  }
-  const as = String(a ?? '').toLowerCase();
-  const bs = String(b ?? '').toLowerCase();
-  switch (operator) {
-    case '=': return as === bs;
-    case '<>': return as !== bs;
-    case '>': return as > bs;
-    case '<': return as < bs;
-    case '>=': return as >= bs;
-    case '<=': return as <= bs;
-    default: return false;
-  }
-}
-
 /**
  * Selesaikan satu ekspresi menjadi BOOLEAN — dipakai untuk kondisi IF dan argumen AND/OR/NOT.
  * Menangani ekspresi perbandingan (H2>5, F2="Jawa Barat") dan pemanggilan AND/OR/NOT bersarang.
@@ -503,27 +282,6 @@ function evaluateLogicalCall(fnName, args, grid) {
   }
   if (fnName === 'AND') return { value: results.length > 0 && results.every(Boolean), error: null };
   return { value: results.some(Boolean), error: null }; // OR
-}
-
-/** Selisih DATEDIF antara dua serial tanggal, unit "Y" (tahun penuh), "M" (bulan penuh), atau "D" (hari). */
-function computeDatedif(startSerial, endSerial, unit) {
-  if (unit === 'D') return endSerial - startSerial;
-  const start = serialToDate(startSerial);
-  const end = serialToDate(endSerial);
-  if (unit === 'M') {
-    let months = (end.getUTCFullYear() - start.getUTCFullYear()) * 12 + (end.getUTCMonth() - start.getUTCMonth());
-    if (end.getUTCDate() < start.getUTCDate()) months -= 1;
-    return months;
-  }
-  if (unit === 'Y') {
-    let years = end.getUTCFullYear() - start.getUTCFullYear();
-    const beforeAnniversary =
-      end.getUTCMonth() < start.getUTCMonth() ||
-      (end.getUTCMonth() === start.getUTCMonth() && end.getUTCDate() < start.getUTCDate());
-    if (beforeAnniversary) years -= 1;
-    return years;
-  }
-  return null;
 }
 
 /**
@@ -895,23 +653,6 @@ function resolveCriteria(argStr, grid) {
   return { operator: '=', value: raw, isNumeric: typeof raw === 'number' };
 }
 
-function matchCriteria(cellValue, criteria) {
-  if (criteria.isNumeric && typeof cellValue === 'number') {
-    switch (criteria.operator) {
-      case '=': return cellValue === criteria.value;
-      case '<>': return cellValue !== criteria.value;
-      case '>': return cellValue > criteria.value;
-      case '<': return cellValue < criteria.value;
-      case '>=': return cellValue >= criteria.value;
-      case '<=': return cellValue <= criteria.value;
-      default: return false;
-    }
-  }
-  const a = String(cellValue ?? '').toLowerCase();
-  const b = String(criteria.value ?? '').toLowerCase();
-  return criteria.operator === '<>' ? a !== b : a === b;
-}
-
 /** Evaluasi COUNTIF(rentang, kriteria) atau SUMIF(rentang, kriteria, [rentang_jumlah]). */
 function evaluateConditionalAggregate(fnName, args, grid) {
   if (args.length < 2) {
@@ -1153,100 +894,4 @@ export function evaluateFormula(formulaStr, grid) {
     functionName,
     refs: [],
   };
-}
-
-/**
- * Ekstrak SEMUA nama fungsi yang dipakai pada sebuah rumus (berguna untuk
- * validator memeriksa apakah siswa memakai fungsi yang diharapkan).
- * Tahap 1: setiap rumus hanya berisi satu pemanggilan fungsi di level atas,
- * tapi fungsi ini ditulis agar mudah diperluas untuk rumus bertingkat nanti.
- */
-export function extractFunctionNames(formulaStr) {
-  const found = new Set();
-  const re = /([A-Za-z]+)\s*\(/g;
-  let m;
-  while ((m = re.exec(formulaStr)) !== null) {
-    found.add(m[1].toUpperCase());
-  }
-  return Array.from(found);
-}
-
-/** Ekstrak semua token referensi sel/rentang (A1 atau A1:B10) dari sebuah rumus. */
-export function extractReferences(formulaStr) {
-  const re = /\$?[A-Za-z]+\$?\d+(?::\$?[A-Za-z]+\$?\d+)?/g;
-  return formulaStr.match(re) || [];
-}
-
-// ============================================================================
-// Penyesuaian referensi rumus (dipakai Fill Handle: menyalin rumus ke sel
-// lain sambil menggeser referensi relatif, persis seperti Excel asli)
-// ============================================================================
-
-// Cocokkan satu referensi sel TUNGGAL, mis. "A1", "$A1", "A$1", "$A$1".
-const SINGLE_REF_TOKEN_RE = /(\$?)([A-Za-z]{1,3})(\$?)(\d+)/g;
-
-/**
- * Geser SATU token referensi sel ("A1", "$A1", dst.) sejumlah rowOffset/colOffset,
- * menghormati tanda '$' (bagian yang diberi '$' tidak digeser — persis seperti
- * referensi absolut/campuran Excel saat rumus disalin ke sel lain).
- * Baris & kolom hasil geser di-clamp ke minimum 1/A agar tidak menghasilkan
- * referensi negatif yang tidak valid jika geseran melebihi batas atas grid.
- */
-function shiftSingleRefToken(colDollar, colLetters, rowDollar, rowDigits, rowOffset, colOffset) {
-  let colIdx = colLetterToIndex(colLetters);
-  let rowNum = parseInt(rowDigits, 10);
-  if (colDollar !== '$') colIdx = Math.max(0, colIdx + colOffset);
-  if (rowDollar !== '$') rowNum = Math.max(1, rowNum + rowOffset);
-  return `${colDollar}${indexToColLetter(colIdx)}${rowDollar}${rowNum}`;
-}
-
-/**
- * Jalankan `transform(segment)` HANYA pada bagian rumus di LUAR literal string
- * ("..."), supaya token yang kebetulan terlihat seperti referensi sel di dalam
- * kutip (mis. kriteria SUMIF `"B2"`) tidak ikut digeser.
- */
-function mapOutsideQuotes(str, transform) {
-  let result = '';
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < str.length; i++) {
-    const ch = str[i];
-    if (ch === '"') {
-      if (!inQuotes) {
-        result += transform(current);
-        current = '';
-      }
-      inQuotes = !inQuotes;
-      result += ch;
-      continue;
-    }
-    if (inQuotes) {
-      result += ch;
-    } else {
-      current += ch;
-    }
-  }
-  result += transform(current);
-  return result;
-}
-
-/**
- * Geser SELURUH referensi sel/rentang di dalam sebuah rumus sejumlah
- * rowOffset/colOffset (dipakai Fill Handle). Referensi absolut ($A$1) atau
- * campuran ($A1 / A$1) menghormati tanda '$' per-komponen. Literal string
- * ("...") tidak disentuh. Bukan rumus (tidak diawali '=') dikembalikan apa
- * adanya tanpa perubahan.
- * @param {string} formulaStr
- * @param {number} rowOffset jumlah baris yang digeser (boleh negatif)
- * @param {number} colOffset jumlah kolom yang digeser (boleh negatif)
- * @returns {string} rumus baru dengan referensi yang sudah disesuaikan
- */
-export function adjustFormulaRefs(formulaStr, rowOffset, colOffset) {
-  if (typeof formulaStr !== 'string' || !formulaStr.trim().startsWith('=')) return formulaStr;
-  if (rowOffset === 0 && colOffset === 0) return formulaStr;
-  return mapOutsideQuotes(formulaStr, (segment) => segment.replace(
-    SINGLE_REF_TOKEN_RE,
-    (match, colDollar, colLetters, rowDollar, rowDigits) =>
-      shiftSingleRefToken(colDollar, colLetters, rowDollar, rowDigits, rowOffset, colOffset),
-  ));
 }

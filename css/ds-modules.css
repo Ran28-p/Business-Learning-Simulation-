@@ -100,7 +100,7 @@
 :root[data-app="spt"][data-theme="dark"] .hero-card { background: var(--ds-navy-800); border: 1px solid var(--ds-navy-700); }
 
 /* ── Excel dark: teks yang tadinya hijau tua (--efpg-green-700/600) → hijau terang agar terbaca ──
-   Dibuat otomatis dari semua aturan "color: var(--efpg-green-700|600)" di style.css & pivot-dashboard.
+   Dibuat otomatis dari semua aturan "color: var(--efpg-green-700|600)" di style.css.
    :where() menjaga spesifisitas rendah supaya aturan state (mis. .badge-pill[data-state="ready"]) tetap menang. */
 :where(:root[data-app="excel"][data-theme="dark"]) .badge-pill,
 :where(:root[data-app="excel"][data-theme="dark"]) .level-path__item .level-node,
@@ -117,16 +117,7 @@
 :where(:root[data-app="excel"][data-theme="dark"]) .fx-hint__fn,
 :where(:root[data-app="excel"][data-theme="dark"]) .dataset-nav__item:not([disabled]):hover,
 :where(:root[data-app="excel"][data-theme="dark"]) .level-path__item:not([disabled]):hover,
-:where(:root[data-app="excel"][data-theme="dark"]) .pd-header h1,
-:where(:root[data-app="excel"][data-theme="dark"]) .pd-engine-status.pd-engine-status--ready,
-:where(:root[data-app="excel"][data-theme="dark"]) .pd-tab:hover,
-:where(:root[data-app="excel"][data-theme="dark"]) .pd-tab--active,
-:where(:root[data-app="excel"][data-theme="dark"]) .btn--ghost,
-:where(:root[data-app="excel"][data-theme="dark"]) table.pd-data-table th,
-:where(:root[data-app="excel"][data-theme="dark"]) table.pd-pivot-table th { color: var(--ds-accent-excel); }
+:where(:root[data-app="excel"][data-theme="dark"]) .btn--ghost { color: var(--ds-accent-excel); }
 
 /* Avatar/teks di atas warna aksen: terang → teks putih; gelap (dark mode, aksen terang) → teks gelap */
 
-/* Excel dark: kontrol pivot yang latarnya di-hardcode putih (#fff) */
-:root[data-app="excel"][data-theme="dark"] .pd-field-label select { background: var(--efpg-paper); color: var(--efpg-ink-900); }
-:root[data-app="excel"][data-theme="dark"] .pd-shell .btn:not(.btn--primary):not(.btn--ghost) { background: var(--efpg-paper); color: var(--efpg-ink-900); }

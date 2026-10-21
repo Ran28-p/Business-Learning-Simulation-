@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kuis Langsung — Game Hub</title>
 <meta name="description" content="Kuis real-time ala Quizizz: guru memilih tema, soal dibuat otomatis, siswa masuk dengan kode ruang, papan peringkat berdasarkan ketepatan dan kecepatan.">
+<link rel="icon" href="../../spt/icons/favicon-32.png">
 <link rel="stylesheet" href="../../../css/design-system.css">
 <link rel="stylesheet" href="../../../css/ds-modules.css">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="./css/live.css">
+<link rel="stylesheet" href="../css/quiz-theme.css">
 <script src="../../../js/shared/theme.js"></script>
 </head>
 <body>
@@ -65,6 +67,11 @@
       <div class="lq-themes" id="lq-themes" role="radiogroup" aria-label="Tema kuis"></div>
 
       <h2 class="lq-title">2. Pengaturan</h2>
+      <fieldset class="lq-mode">
+        <legend>Mode kuis</legend>
+        <label><input type="radio" name="quiz-mode" value="choice" checked> Pilihan ganda</label>
+        <label><input type="radio" name="quiz-mode" value="essay"> Esai — penilaian otomatis berdasarkan kata kunci</label>
+      </fieldset>
       <div class="lq-card lq-settings">
         <label>Judul kuis (opsional)<input id="in-title" maxlength="100" placeholder="mis. Kuis PPh Pasal 21"></label>
         <label>Jumlah soal<input id="in-count" type="number" min="5" max="50" value="20" inputmode="numeric"></label>
@@ -72,6 +79,7 @@
           <span class="lq-inline"><input id="in-timer" type="number" min="5" max="300" value="20" inputmode="numeric"><select id="in-unit" aria-label="Satuan waktu"><option value="s">detik</option><option value="m">menit</option></select></span>
         </label>
         <p class="gh-hint lq-settings__note" id="lq-timer-note">Poin: benar = 500–1000, makin cepat makin tinggi. Salah / lewat waktu = 0.</p>
+        <p class="gh-hint lq-settings__note" id="lq-mode-note" hidden>Jawaban esai dinilai otomatis dari kecocokan kata kunci dalam rubrik, bukan pemahaman makna. Periksa jawaban siswa sebelum memakai skor sebagai nilai akhir.</p>
       </div>
 
       <div class="lq-section-head"><h2 class="lq-title">3. Periksa &amp; edit soal <span class="lq-badge" id="lq-qcount">0</span></h2>
@@ -90,6 +98,7 @@
   <script src="../../../js/shared/livequiz-room.js"></script>
   <script src="../../../js/shared/firebase-config.js"></script>
   <script src="../../spt/tax_career/data/questions.js"></script>
+  <script src="../js/celebration.js"></script>
   <script src="./js/live-app.js"></script>
   <script src="../../../js/shared/app-shell.js"></script>
 </body>

@@ -1,0 +1,73 @@
+.xl-shell { width: min(1260px, 100%); margin: 0 auto; padding: 28px 20px 52px; color: var(--efpg-ink-900); }
+.xl-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+.xl-back { color: var(--efpg-green-700); font-size: 13px; font-weight: 700; text-decoration: none; }
+.xl-back:hover { text-decoration: underline; }
+.xl-header h1 { margin: 7px 0; color: var(--efpg-green-700); font-size: clamp(24px, 3vw, 32px); letter-spacing: -.03em; }
+.xl-header p { max-width: 700px; margin: 0; color: var(--efpg-ink-500); font-size: 14px; line-height: 1.65; }
+.xl-header-actions { justify-content: flex-end; }
+.xl-score { flex: 0 0 auto; padding: 9px 14px; border: 1px solid var(--efpg-green-500); border-radius: 999px; background: var(--efpg-green-50); color: var(--efpg-green-700); font-size: 13px; font-weight: 800; }
+.xl-course { display: grid; grid-template-columns: 220px minmax(0, 1fr); align-items: start; gap: 18px; }
+.xl-course-nav { position: sticky; top: 16px; padding: 16px; border: 1px solid var(--efpg-line); border-radius: 12px; background: var(--efpg-paper); }
+.xl-course-nav h2 { margin: 0 0 12px; color: var(--efpg-ink-700); font-size: 14px; }
+.xl-course-nav ol { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.xl-course-nav button { width: 100%; padding: 10px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--efpg-ink-700); font: inherit; font-size: 12px; text-align: left; cursor: pointer; }
+.xl-course-nav button:hover { background: var(--efpg-canvas); }
+.xl-course-nav button[aria-current="step"] { border-color: var(--efpg-green-500); background: var(--efpg-green-50); color: var(--efpg-green-700); font-weight: 800; }
+.xl-lesson-done { float: right; color: var(--efpg-green-700); font-weight: 800; }
+.xl-workspace { min-width: 0; }
+.xl-card { padding: 20px; border: 1px solid var(--efpg-line); border-radius: 12px; margin-bottom: 16px; background: var(--efpg-paper); box-shadow: 0 6px 20px rgba(15, 23, 42, .04); }
+.xl-card h2 { margin: 0 0 8px; font-size: 18px; }
+.xl-card p { color: var(--efpg-ink-500); font-size: 13px; line-height: 1.6; }
+.xl-lesson-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.xl-lesson-meta span { padding: 4px 9px; border-radius: 999px; background: var(--efpg-canvas); color: var(--efpg-ink-700); font-size: 11px; font-weight: 800; }
+.xl-lesson-card > p { margin: 0; }
+.xl-learning-note { padding: 11px 13px; border-left: 3px solid var(--efpg-green-600); margin-top: 14px; background: var(--efpg-green-50); color: var(--efpg-ink-700); font-size: 12px; line-height: 1.6; }
+.xl-workbook-title, .xl-editor-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.xl-workbook-title > span, .xl-language-tag { color: var(--efpg-ink-500); font-size: 11px; }
+.xl-sheet-tabs { display: flex; gap: 5px; margin: 8px 0 0; border-bottom: 1px solid var(--efpg-line); }
+.xl-sheet-tab { min-height: 36px; padding: 8px 12px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--efpg-ink-500); font-size: 12px; font-weight: 700; cursor: pointer; }
+.xl-sheet-tab--active { border-bottom-color: var(--efpg-green-600); color: var(--efpg-green-700); }
+.xl-sheet-tab:focus-visible, .xl-button:focus-visible, .xl-course-nav button:focus-visible, .xl-label textarea:focus-visible { outline: 2px solid var(--efpg-green-600); outline-offset: 2px; }
+.xl-sheet-wrap { width: 100%; overflow: auto; border: 1px solid var(--efpg-line); border-radius: 8px; margin-top: 12px; }
+.xl-grid { width: 100%; min-width: 650px; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+.xl-grid th, .xl-grid td { min-width: 74px; padding: 8px 10px; border: 1px solid var(--efpg-line); text-align: left; }
+.xl-grid th { background: var(--efpg-canvas); color: var(--efpg-ink-700); font-weight: 700; }
+.xl-grid td:first-child, .xl-grid th:first-child { min-width: 36px; color: var(--efpg-ink-500); text-align: center; }
+.xl-grid tbody tr:nth-child(even) { background: color-mix(in srgb, var(--efpg-canvas) 55%, transparent); }
+.xl-grid td[data-column="E"], .xl-grid td[data-column="F"] { background: var(--efpg-green-50); }
+.xl-macro-note { padding: 12px 14px; color: var(--efpg-ink-700); font-size: 12px; line-height: 1.6; }
+.xl-macro-note p { margin: 7px 0 0; }
+.xl-macro-note code { font-family: var(--font-mono, Consolas, monospace); }
+.xl-editor-heading { align-items: flex-start; }
+.xl-editor-heading p { margin: 0; }
+.xl-language-tag { padding: 5px 8px; border-radius: 6px; background: var(--efpg-canvas); white-space: nowrap; }
+.xl-label { display: block; margin: 14px 0 0; color: var(--efpg-ink-700); font-size: 12px; font-weight: 800; }
+.xl-label textarea { display: block; width: 100%; min-height: 210px; padding: 13px; border: 1px solid var(--efpg-line-strong); border-radius: 8px; margin-top: 7px; background: #17202b; color: #e5edf5; font: 13px/1.6 var(--font-mono, Consolas, monospace); tab-size: 4; resize: vertical; }
+.xl-hint { padding: 10px 12px; border-radius: 7px; margin: 10px 0 0; background: var(--efpg-canvas); color: var(--efpg-ink-700) !important; font-size: 12px !important; }
+.xl-hint[hidden], .xl-output[hidden] { display: none; }
+.xl-actions, .xl-course-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.xl-button { min-height: 38px; padding: 8px 12px; border: 1px solid var(--efpg-line-strong); border-radius: 7px; background: var(--efpg-paper); color: var(--efpg-green-700); font-size: 12px; font-weight: 700; cursor: pointer; }
+.xl-button:hover:not(:disabled) { background: var(--efpg-green-50); }
+.xl-button--primary { border-color: var(--efpg-green-700); background: var(--efpg-green-700); color: #fff; }
+.xl-button--primary:hover:not(:disabled) { background: var(--efpg-green-600); }
+.xl-button:disabled { opacity: .5; cursor: not-allowed; }
+.xl-feedback { min-height: 1.5em; margin: 12px 0 0 !important; font-size: 12px !important; font-weight: 700; }
+.xl-feedback--success { color: var(--efpg-green-700) !important; }
+.xl-feedback--error { color: #b91c1c !important; }
+.xl-output { padding: 11px 13px; border: 1px solid var(--efpg-line); border-radius: 8px; margin-top: 9px; background: var(--efpg-canvas); color: var(--efpg-ink-700); font-size: 12px; line-height: 1.65; }
+.xl-output strong { display: block; margin-bottom: 3px; }
+.xl-course-actions { justify-content: space-between; padding-top: 13px; border-top: 1px solid var(--efpg-line); margin-top: 18px; }
+@media (max-width: 760px) {
+  .xl-shell { padding: 18px 12px 36px; }
+  .xl-header { flex-direction: column; gap: 12px; }
+  .xl-header-actions { justify-content: flex-start; }
+  .xl-course { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .xl-course-nav { position: static; padding: 12px; }
+  .xl-course-nav ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .xl-card { padding: 15px; }
+  .xl-editor-heading { flex-direction: column; gap: 7px; }
+}
+@media (max-width: 380px) {
+  .xl-course-nav ol { grid-template-columns: 1fr; }
+  .xl-language-tag { white-space: normal; }
+}

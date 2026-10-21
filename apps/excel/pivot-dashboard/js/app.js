@@ -286,8 +286,11 @@
       btn.addEventListener('click', () => {
         document.querySelectorAll('.pd-tab').forEach((b) => b.classList.remove('pd-tab--active'));
         document.querySelectorAll('.pd-panel').forEach((p) => p.classList.remove('pd-panel--active'));
+        document.querySelectorAll('.pd-tab').forEach((b) => b.setAttribute('aria-selected', 'false'));
         btn.classList.add('pd-tab--active');
-        document.querySelector(`.pd-panel[data-pd-panel="${btn.dataset.pdTab}"]`).classList.add('pd-panel--active');
+        btn.setAttribute('aria-selected', 'true');
+        const panel = document.querySelector(`.pd-panel[data-pd-panel="${btn.dataset.pdTab}"]`);
+        panel.classList.add('pd-panel--active');
       });
     });
   }

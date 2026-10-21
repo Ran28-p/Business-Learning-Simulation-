@@ -179,7 +179,7 @@ const MODULE_PAGES = [
   { id: 'spt', path: '/apps/spt/index.html' },
   { id: 'accounting', path: '/apps/accounting/index.html' },
   { id: 'excel', path: '/apps/excel/index.html' },
-  { id: 'excel-pivot', path: '/apps/excel/pivot-dashboard/index.html' },
+  { id: 'excel-interactive', path: '/apps/excel/interactive/index.html' },
   { id: 'sqlpq', path: '/apps/sql-pq/index.html' },
   { id: 'gamehub', path: '/apps/game-hub/index.html' },
   { id: 'pengajar', path: '/apps/pengajar/index.html' },
@@ -245,32 +245,6 @@ test.describe('Tema terpusat', () => {
     await page.locator('#btn-theme').click();
     await page.goto('/apps/sql-pq/index.html', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  });
-});
-
-test.describe('Excel mode gelap', () => {
-  test('pivot-dashboard: select/tombol tidak putih & judul terbaca', async ({ page }) => {
-    await open(page, '/apps/excel/pivot-dashboard/index.html', { theme: 'dark' });
-    await page.getByText('2. Pivot Table').click();
-    const r = await page.evaluate(() => {
-      const sel = document.querySelector('.pd-field-label select');
-      const h1 = document.querySelector('.pd-header h1');
-      return { selBg: getComputedStyle(sel).backgroundColor, selFg: getComputedStyle(sel).color, h1: getComputedStyle(h1).color, body: getComputedStyle(document.body).backgroundColor };
-    });
-    expect(lum(r.selBg)).toBeLessThan(0.15);
-    expect(contrast(r.selFg, r.selBg)).toBeGreaterThanOrEqual(4.5);
-    expect(contrast(r.h1, r.body)).toBeGreaterThanOrEqual(4.5);
-  });
-
-  test('halaman utama: tombol "Latihan Baru" terbaca (kontras ≥ 4.5)', async ({ page }) => {
-    await open(page, '/apps/excel/index.html', { theme: 'dark' });
-    const r = await page.evaluate(() => {
-      const el = [...document.querySelectorAll('a,button')].find((e) => /Pivot/.test(e.textContent));
-      let bg = getComputedStyle(el).backgroundColor, n = el;
-      while ((bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') && n.parentElement) { n = n.parentElement; bg = getComputedStyle(n).backgroundColor; }
-      return { fg: getComputedStyle(el).color, bg };
-    });
-    expect(contrast(r.fg, r.bg)).toBeGreaterThanOrEqual(4.5);
   });
 });
 

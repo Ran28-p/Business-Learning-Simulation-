@@ -87,7 +87,3 @@ export const EDUCATIONAL_NOTE_NONPKP_BUYER =
 export const EDUCATIONAL_NOTE_COMPANY_NONPKP =
   'Perusahaan berstatus Non-PKP: Pajak Keluaran tidak dapat dibuat dan Pajak Masukan tidak dapat dikreditkan. ' +
   'Transaksi tetap dapat dicatat sebagai penjualan atau pembelian biasa.';
-
-export const EDUCATIONAL_NOTE_CREDIT =
-  'Pengkreditan Pajak Masukan bergantung pada ketentuan perpajakan yang berlaku dan karakter transaksi — ' +
-  'tidak seluruh Pajak Masukan otomatis dapat dikreditkan.';

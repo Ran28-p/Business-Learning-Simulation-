@@ -13,7 +13,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
-import { join, dirname, relative, extname } from 'node:path';
+import { join, dirname, relative } from 'node:path';
 
 const ROOT = process.cwd();
 const SKIP_DIRS = new Set(['.git', '.github', 'node_modules']);

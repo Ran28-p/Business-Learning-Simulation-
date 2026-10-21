@@ -97,12 +97,6 @@ export function loadSession() {
   }
 }
 
-export function clearSession() {
-  try {
-    localStorage.removeItem(STORAGE_KEYS.SESSION);
-  } catch (_) { /* ignore */ }
-}
-
 /**
  * Tax / Invoicing module persistence (Simulator Accounting & Perpajakan
  * Interaktif). Isolated under its own storage key so it never collides

@@ -7,7 +7,7 @@ import vm from 'node:vm';
 const R = join(dirname(fileURLToPath(import.meta.url)), '..', 'apps', 'spt', 'modul_pajak') + '/';
 const src=readFileSync(R+'script.js','utf8');
 const grab=(name)=>{const i=src.indexOf('function '+name+'('); let d=0,j=src.indexOf('{',i); for(let k=j;k<src.length;k++){if(src[k]==='{')d++; if(src[k]==='}'){d--; if(!d) return src.slice(i,k+1);}}};
-const code=['escapeHTML','cleanNumber','normText','isTextCorrect','pembahasanHtml'].map(grab).join('\n');
+const code=readFileSync(R+'../js/shared/html-utils.js','utf8')+'\n'+['cleanNumber','normText','isTextCorrect','pembahasanHtml'].map(grab).join('\n'); // escapeHTML kini di js/shared/html-utils.js
 const sb={}; vm.createContext(sb); vm.runInContext(code+';this.f={cleanNumber,isTextCorrect,pembahasanHtml};',sb);
 const {cleanNumber,isTextCorrect,pembahasanHtml}=sb.f;
 let ok=0,bad=0; const t=(c,l)=>{c?ok++:(bad++,console.log('GAGAL',l))};

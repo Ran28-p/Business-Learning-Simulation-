@@ -25,14 +25,6 @@ const state = {
 
 /* ─── Getters ─── */
 
-export function getState() {
-  return state;
-}
-
-export function getAccounts() {
-  return state.accounts;
-}
-
 export function getJournalData() {
   return state.journalData;
 }
@@ -70,14 +62,6 @@ export function setMode(mode) {
 
 export function setJournalData(entries) {
   state.journalData = entries;
-}
-
-export function setAdjustmentData(entries) {
-  state.adjustmentData = entries;
-}
-
-export function setClosingData(entries) {
-  state.closingData = entries;
 }
 
 export function addXP(value) {

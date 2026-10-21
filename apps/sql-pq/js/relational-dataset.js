@@ -9,8 +9,6 @@
   "use strict";
   const H = () => global.SQLPQ_DatasetGenerator._helpers;
 
-  function pad(n, len) { return String(n).padStart(len, "0"); }
-
   function generateRelationalDB(scale) {
     const { rnd, pick, randomDateISO } = H();
     scale = scale || "medium"; // small | medium | large

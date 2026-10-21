@@ -60,7 +60,6 @@ Tanggal tinjau: Oktober 2026. Fase 3 selesai untuk SPT (modul_pajak, tax_career,
 | SPT | 32 | 27 | 5 | 25 |
 | Accounting | 12 | 11 | 1 | 8 |
 | Excel | 28 | 26 | 2 | 1 |
-| Excel Pivot | 8 | 5 | 3 | 0 |
 | SQL & PQ | 11 | 10 | 1 | 4 |
 
 ## Perlu dicek manual oleh pengembang materi

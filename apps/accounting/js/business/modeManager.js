@@ -37,10 +37,6 @@ export function changeMode(mode) {
   return getMode();
 }
 
-export function isExamMode() {
-  return getMode() === MODES.UJIAN;
-}
-
 export function isLearningMode() {
   return getMode() === MODES.BELAJAR;
 }
@@ -49,21 +45,8 @@ export function isExamActive() {
   return exam.active && !exam.finished;
 }
 
-export function isExamFinished() {
-  return exam.finished;
-}
-
 export function canUseHint() {
   return isLearningMode() && !isExamActive();
-}
-
-export function canShowCorrection() {
-  return isLearningMode() && !isExamActive();
-}
-
-export function canRevise() {
-  if (isExamActive()) return true;
-  return isLearningMode();
 }
 
 export function startExam(minutes = DEFAULT_EXAM_MINUTES, hooks = {}) {
@@ -191,10 +174,6 @@ export function getExamState() {
     phases: exam.submissions.map(s => s.phase),
     result: exam.result
   };
-}
-
-export function getExamResult() {
-  return exam.result;
 }
 
 export function renderExamReportHTML(result) {

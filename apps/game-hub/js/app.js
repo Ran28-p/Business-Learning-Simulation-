@@ -22,7 +22,6 @@
 
   var state = loadState();
   var view = null;
-  var lastLevel = null;
 
   function refresh() {
     var summary;
@@ -144,7 +143,6 @@
       var label = e.id === 'weekly' ? 'Misi mingguan' : ({ focus: 'Misi fokus', xp: 'Misi XP', explore: 'Misi jelajah' })[e.id] || e.id;
       var li = h('li'); li.appendChild(h('span', '', e.day)); li.appendChild(h('span', '', label)); li.appendChild(h('strong', '', '+' + e.xp + ' XP')); log.appendChild(li);
     });
-    lastLevel = p.level;
   }
 
   // Muat ulang saat kembali ke tab (setelah berlatih di modul), saat data modul berubah di tab lain, dan agar pergantian hari terdeteksi.

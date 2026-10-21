@@ -18,7 +18,7 @@
 // kesalahan logika & regresi skema; uji akhir sebelum deploy tetap lewat Rules Playground
 // (Firebase Console → Realtime Database → Rules → Rules Playground, gratis). Lihat SECURITY.md.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -55,8 +55,9 @@ check(rules.users && Object.keys(rules.users).filter((k) => !k.startsWith('.')).
 check(userNode && userNode.$other && userNode.$other['.validate'] === false, 'users/$uid harus menolak field di luar skema ($other: false)');
 check(userNode && userNode.history && userNode.history.$index && userNode.history.$index.$other, 'history/$index harus menolak field di luar skema');
 
-// Field yang ditulis aplikasi harus punya aturan. Sumber kebenaran: appState.user di app-main.js.
-const src = readFileSync(join(ROOT, 'apps/spt/js/app-main.js'), 'utf8');
+// Field yang ditulis aplikasi harus punya aturan. Sumber kebenaran: appState.user di app-*.js (app-main.js dipecah per tanggung jawab).
+const sptJsDir = join(ROOT, 'apps/spt/js');
+const src = readdirSync(sptJsDir).filter((f) => /^app-.*\.js$/.test(f)).sort().map((f) => readFileSync(join(sptJsDir, f), 'utf8')).join('\n');
 const written = new Set();
 for (const m of src.matchAll(/appState\.user\.([A-Za-z_]\w*)\s*(?:=(?!=)|\.push\()/g)) written.add(m[1]);
 for (const m of src.matchAll(/appState\.user\s*=\s*\{([^}]*)\}/g)) for (const k of m[1].matchAll(/(?:^|,)\s*([A-Za-z_]\w*)\s*:/g)) written.add(k[1]);
@@ -65,7 +66,7 @@ check(written.size >= 5, 'pemindai harus menemukan field appState.user (kalau 0,
 for (const f of written) check(userNode && userNode[f], `field "${f}" ditulis app tetapi TIDAK punya aturan di database.rules.json (sinkron cloud akan ditolak)`);
 // Sebaliknya: aturan untuk field yang sudah tidak dipakai app = kemungkinan sisa lama.
 for (const f of Object.keys(userNode || {}).filter((k) => !k.startsWith('.') && !k.startsWith('$')))
-  check(written.has(f), `aturan "${f}" tidak ada penulisnya di app-main.js (sisa lama? hapus atau perbarui pemindai)`);
+  check(written.has(f), `aturan "${f}" tidak ada penulisnya di apps/spt/js/app-*.js (sisa lama? hapus atau perbarui pemindai)`);
 
 // ------------------------------------------------------------ B. PERILAKU --
 section('B. Simulasi rules terhadap payload nyata');
@@ -295,7 +296,7 @@ const L_ = {
     return L_.validate(last.node, last.abs, newTree, last.vars, auth, root, tree, path);
   }
 };
-const CODE = 'ABC234', R = 'liveRooms/' + CODE, HOST = { uid: 'guru-1' }, S1 = { uid: 'siswa-1' }, S2 = { uid: 'siswa-2' };
+const CODE = 'ABC234', R = 'liveRooms/' + CODE, HOST = { uid: 'guru-1' }, S1 = { uid: 'siswa-1' };
 const meta = (over) => Object.assign({ host: 'guru-1', status: 'lobby', qIndex: -1, qCount: 0, timer: 20, theme: 'pajak', title: 'Uji', createdAt: Date.now() }, over);
 const room = (over) => ({ liveRooms: { [CODE]: Object.assign({ meta: meta() }, over) } });
 const questions = { 0: { q: 'Berapa?', o: ['1', '2', '3', '4'] }, 1: { q: 'Lagi?', o: ['a', 'b'] } };

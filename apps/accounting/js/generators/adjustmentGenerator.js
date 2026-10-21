@@ -6,7 +6,7 @@
  */
 
 import {
-  periodEndDate, randomAmount, randChoice, randInt
+  periodEndDate, randomAmount, randChoice
 } from './randomUtils.js';
 import { consumeFIFO, consumeWeightedAverage } from '../accounting/inventoryCosting.js';
 

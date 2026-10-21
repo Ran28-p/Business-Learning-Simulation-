@@ -7,20 +7,6 @@ const quizForm = document.getElementById('quiz-form');
 const quizTitle = document.getElementById('quiz-title');
 const quizResult = document.getElementById('quiz-result');
 
-// Tambahkan fungsi ini untuk mencegah XSS
-function escapeHTML(str) {
-  if (str === null || str === undefined) return '';
-  return String(str).replace(/[&<>'"]/g, function(match) {
-    const escapeMap = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      "'": '&#39;',
-      '"': '&quot;'
-    };
-    return escapeMap[match];
-  });
-}
 // Try to load questions from embedded JSON first (works on file://), then fallback to fetch
 function loadQuestions(){
   // 1) embedded

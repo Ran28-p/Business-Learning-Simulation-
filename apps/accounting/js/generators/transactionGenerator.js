@@ -11,7 +11,7 @@
 import {
   randomDates, randomAmount, randomCustomer, randomVendor,
   randomAsset, randomExpense, randomRevenueType, randomSupplyItem,
-  randomRevenueAmount, randInt, randChoice
+  randomRevenueAmount, randChoice
 } from './randomUtils.js';
 import {
   addPurchaseLayer, consumeFIFO, consumeWeightedAverage,

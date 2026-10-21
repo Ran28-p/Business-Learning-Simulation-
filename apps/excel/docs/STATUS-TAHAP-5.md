@@ -47,7 +47,7 @@ Ini murni **lapisan pengelompokan presentasi di atas mesin yang sudah ada** — 
 ## 4. Keterbatasan yang Diketahui
 
 - `app.js` sendiri (orkestrator UI) tidak punya test otomatis khusus di codebase ini — baik sebelum maupun sesudah tahap ini (bukan regresi baru, ini gap pre-existing). Perubahan di `app.js` pada tahap ini divalidasi lewat `node --check` (syntax) + review manual + fakta bahwa satu-satunya import baru (`TIER_CONFIG`, `getTierForLevel`) sudah diverifikasi benar lewat 53 test di atas. Menyiapkan test DOM penuh untuk `app.js` (memuat `index.html` asli via jsdom dengan module resolution) adalah pekerjaan tersendiri yang cukup besar dan di luar cakupan tahap ini.
-- Belum ada perubahan pada `apps/excel/pivot-dashboard/` (sub-halaman terpisah) — tier hanya diterapkan di halaman utama Excel Practice.
+- (Modul `apps/excel/pivot-dashboard/` sudah dihapus; tier hanya diterapkan di halaman utama Excel Practice.)
 
 ## 5. Sisa Pekerjaan Besar (belum dikerjakan)
 

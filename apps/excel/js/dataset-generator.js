@@ -15,7 +15,7 @@
  */
 
 import { dateToSerial } from './spreadsheet-engine.js';
-import { TER_TABEL, PTKP_SETAHUN, KATEGORI_TER, PASAL17, BATAS_TERBUKA } from '../data/payroll-ter.js';
+import { TER_TABEL, PTKP_SETAHUN, KATEGORI_TER, PASAL17 } from '../data/payroll-ter.js';
 
 /**
  * PRNG sederhana (mulberry32) agar dataset dapat dibuat ulang persis sama
@@ -112,7 +112,6 @@ const NAMA_BELAKANG = [
   'Saputra', 'Wijaya', 'Kusuma', 'Pratama', 'Setiawan', 'Handayani', 'Nugroho', 'Santoso',
   'Ramadhan', 'Utami', 'Hidayat', 'Permata', 'Firmansyah', 'Anggraini', 'Susanto', 'Maharani',
 ];
-const PERUSAHAAN_PREFIX = ['PT', 'CV', 'UD'];
 const PERUSAHAAN_NAMA = [
   'Sinar Abadi', 'Karya Mandiri', 'Sumber Makmur', 'Mitra Sejahtera', 'Cahaya Nusantara',
   'Bumi Perkasa', 'Tunas Jaya', 'Anugerah Sentosa', 'Berkah Utama', 'Global Sukses',
@@ -123,264 +122,12 @@ const SALES_TEAM = [
   'Hendra Kurniawan', 'Sri Mulyani', 'Doni Pratama',
 ];
 
-function generateNamaPelanggan(rng) {
-  // 60% pelanggan perorangan, 40% pelanggan perusahaan — mencerminkan data B2C+B2B yang realistis
-  if (rng() < 0.6) {
-    return `${pick(rng, NAMA_DEPAN)} ${pick(rng, NAMA_BELAKANG)}`;
-  }
-  return `${pick(rng, PERUSAHAAN_PREFIX)} ${pick(rng, PERUSAHAAN_NAMA)}`;
-}
-
 const METODE_PEMBAYARAN = ['Transfer Bank', 'Kartu Kredit', 'QRIS', 'Tunai', 'COD'];
 const CHANNEL_PENJUALAN = ['Toko Fisik', 'Online (Website)', 'Marketplace', 'Reseller'];
 const TIPE_KONSUMEN = ['Retail', 'Grosir', 'Korporat'];
 // Target bulanan per wilayah (dipakai untuk soal Pencapaian/Growth — lookup
 // via Wilayah, BUKAN kolom yang ikut disalin ke tabel transaksi).
 const WILAYAH_TARGET = WILAYAH_LIST.map((w, i) => ({ wilayah: w, target: 8000000 + (i % 5) * 1500000 }));
-
-/**
- * Menghasilkan dataset Penjualan.
- * @param {Object} options
- * @param {number} options.count - jumlah baris transaksi yang diminta
- * @param {number|string} [options.seed] - seed agar dataset dapat dibuat ulang
- * @param {number} [options.tahun] - tahun transaksi (default 2026)
- * @returns {{headers: string[], columnTypes: string[], rows: any[][], meta: object}}
- */
-export function generateSalesDataset(options = {}) {
-  const count = Math.max(1, Math.min(5000, Math.floor(options.count || 25)));
-  const rawSeed = options.seed ?? Date.now();
-  const seedNumber = typeof rawSeed === 'number' ? rawSeed >>> 0 : hashSeed(rawSeed);
-  const rng = mulberry32(seedNumber);
-  const tahun = options.tahun || 2026;
-
-  const headers = [
-    'ID Transaksi', 'Tanggal', 'Nama Pelanggan', 'Kode Produk', 'Nama Produk',
-    'Kategori', 'Wilayah', 'Jumlah', 'Harga Satuan', 'Diskon (%)',
-    'DPP', 'Pajak (PPN 11%)', 'Total Penjualan', 'Nama Sales',
-  ];
-  // 'number' | 'text' | 'date' — dipakai spreadsheet-engine.js untuk perataan & validasi tipe
-  const columnTypes = [
-    'text', 'date', 'text', 'text', 'text',
-    'text', 'text', 'number', 'number', 'number',
-    'number', 'number', 'number', 'text',
-  ];
-
-  const idPad = String(count).length + 3;
-  const rows = [];
-
-  for (let i = 1; i <= count; i++) {
-    const produk = pick(rng, PRODUK_MASTER);
-    const jumlah = randInt(rng, 1, 10);
-    // variasi harga ±5% dari harga dasar supaya tidak semua baris identik
-    const variasi = 1 + (rng() * 0.1 - 0.05);
-    const hargaSatuan = roundToNearest(produk.hargaDasar * variasi, 500);
-
-    // diskon: sebagian besar transaksi tanpa diskon, sebagian kecil dapat diskon promo
-    const diskonPersenPool = [0, 0, 0, 0, 5, 5, 10, 15];
-    const diskonPersen = pick(rng, diskonPersenPool);
-
-    const subtotal = jumlah * hargaSatuan;
-    const dpp = Math.round(subtotal * (1 - diskonPersen / 100));
-    const pajak = Math.round(dpp * 0.11);
-    const total = dpp + pajak;
-
-    const bulan = randInt(rng, 1, 6); // Januari - Juni, tahun berjalan
-    const hariMax = new Date(tahun, bulan, 0).getDate();
-    const hari = randInt(rng, 1, hariMax);
-    const tanggal = new Date(tahun, bulan - 1, hari);
-
-    rows.push([
-      `TRX-${String(i).padStart(idPad, '0')}`,
-      dateToSerial(tanggal),
-      generateNamaPelanggan(rng),
-      produk.kode,
-      produk.nama,
-      produk.kategori,
-      pick(rng, WILAYAH_LIST),
-      jumlah,
-      hargaSatuan,
-      diskonPersen,
-      dpp,
-      pajak,
-      total,
-      pick(rng, SALES_TEAM),
-    ]);
-  }
-
-  return {
-    headers,
-    columnTypes,
-    rows,
-    meta: {
-      datasetType: 'sales',
-      datasetLabel: 'Penjualan',
-      count,
-      seed: rawSeed,
-      seedNumber,
-      generatedAt: new Date().toISOString(),
-    },
-  };
-}
-
-export function generateAccountingDataset(options = {}) {
-  const count = Math.max(1, Math.min(5000, Math.floor(options.count || 25)));
-  const rawSeed = options.seed ?? Date.now();
-  const seedNumber = typeof rawSeed === 'number' ? rawSeed >>> 0 : hashSeed(rawSeed);
-  const rng = mulberry32(seedNumber);
-  const tahun = options.tahun || 2026;
-
-  const headers = ['ID Jurnal', 'Tanggal', 'Akun', 'Jenis', 'Debit', 'Kredit', 'Keterangan'];
-  const columnTypes = ['text', 'date', 'text', 'text', 'number', 'number', 'text'];
-  const akunList = [
-    'Kas', 'Piutang Usaha', 'Persediaan', 'Peralatan', 'Utang Usaha', 'Modal',
-    'Pendapatan Jasa', 'Beban Sewa', 'Beban Gaji', 'Beban Listrik',
-  ];
-  const keteranganList = [
-    'Penerimaan pembayaran', 'Pembelian perlengkapan', 'Pembayaran sewa', 'Pembayaran gaji',
-    'Pencatatan penjualan', 'Pembayaran listrik', 'Setoran modal', 'Pencairan piutang',
-  ];
-  const rows = [];
-
-  for (let i = 1; i <= count; i++) {
-    const bulan = randInt(rng, 1, 6);
-    const hariMax = new Date(tahun, bulan, 0).getDate();
-    const hari = randInt(rng, 1, hariMax);
-    const tanggal = new Date(tahun, bulan - 1, hari);
-    const akun = pick(rng, akunList);
-    const jenis = rng() > 0.5 ? 'Debit' : 'Kredit';
-    const nominal = roundToNearest(250000 + rng() * 9500000, 5000);
-    const debit = jenis === 'Debit' ? nominal : 0;
-    const kredit = jenis === 'Kredit' ? nominal : 0;
-
-    rows.push([
-      `JRL-${String(i).padStart(4, '0')}`,
-      dateToSerial(tanggal),
-      akun,
-      pick(rng, ['Operasional', 'Investasi', 'Pembiayaan']),
-      debit,
-      kredit,
-      `${pick(rng, keteranganList)} ${i}`,
-    ]);
-  }
-
-  return {
-    headers,
-    columnTypes,
-    rows,
-    meta: {
-      datasetType: 'accounting',
-      datasetLabel: 'Akuntansi',
-      count,
-      seed: rawSeed,
-      seedNumber,
-      generatedAt: new Date().toISOString(),
-    },
-  };
-}
-
-export function generateHrDataset(options = {}) {
-  const count = Math.max(1, Math.min(5000, Math.floor(options.count || 25)));
-  const rawSeed = options.seed ?? Date.now();
-  const seedNumber = typeof rawSeed === 'number' ? rawSeed >>> 0 : hashSeed(rawSeed);
-  const rng = mulberry32(seedNumber);
-  const tahun = options.tahun || 2026;
-
-  const headers = ['ID Karyawan', 'Nama', 'Divisi', 'Jabatan', 'Tanggal Masuk', 'Gaji Pokok', 'Tunjangan', 'Potongan', 'Status', 'Lokasi'];
-  const columnTypes = ['text', 'text', 'text', 'text', 'date', 'number', 'number', 'number', 'text', 'text'];
-  const divisiList = ['Finance', 'HR', 'Operasional', 'IT', 'Sales'];
-  const jabatanList = ['Staff', 'Supervisor', 'Manager', 'Analyst', 'Specialist'];
-  const lokasiList = ['Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta', 'Medan'];
-  const statusList = ['Aktif', 'Cuti', 'Training', 'Resign'];
-  const rows = [];
-
-  for (let i = 1; i <= count; i++) {
-    const bulan = randInt(rng, 1, 6);
-    const hariMax = new Date(tahun, bulan, 0).getDate();
-    const hari = randInt(rng, 1, hariMax);
-    const tanggal = new Date(tahun, bulan - 1, hari);
-    const gaji = roundToNearest(4500000 + rng() * 5500000, 50000);
-    const tunjangan = roundToNearest(rng() * 1200000, 50000);
-    const potongan = roundToNearest(rng() * 350000, 50000);
-
-    rows.push([
-      `KRY-${String(i).padStart(4, '0')}`,
-      `${pick(rng, NAMA_DEPAN)} ${pick(rng, NAMA_BELAKANG)}`,
-      pick(rng, divisiList),
-      pick(rng, jabatanList),
-      dateToSerial(tanggal),
-      gaji,
-      tunjangan,
-      potongan,
-      pick(rng, statusList),
-      pick(rng, lokasiList),
-    ]);
-  }
-
-  return {
-    headers,
-    columnTypes,
-    rows,
-    meta: {
-      datasetType: 'hr',
-      datasetLabel: 'Karyawan / HRS',
-      count,
-      seed: rawSeed,
-      seedNumber,
-      generatedAt: new Date().toISOString(),
-    },
-  };
-}
-
-export function generateInventoryDataset(options = {}) {
-  const count = Math.max(1, Math.min(5000, Math.floor(options.count || 25)));
-  const rawSeed = options.seed ?? Date.now();
-  const seedNumber = typeof rawSeed === 'number' ? rawSeed >>> 0 : hashSeed(rawSeed);
-  const rng = mulberry32(seedNumber);
-
-  const headers = ['ID Barang', 'Nama Barang', 'Kategori', 'Satuan', 'Stok Awal', 'Masuk', 'Keluar', 'Stok Akhir', 'Harga Beli', 'Nilai Persediaan'];
-  const columnTypes = ['text', 'text', 'text', 'text', 'number', 'number', 'number', 'number', 'number', 'number'];
-  const namaBarangList = [
-    'Buku Tulis', 'Pensil', 'Kertas A4', 'Stapler', 'Map File', 'Binder', 'Mouse', 'Keyboard',
-  ];
-  const kategoriList = ['ATK', 'Elektronik', 'Perlengkapan'];
-  const satuanList = ['Dus', 'Pcs', 'Box', 'Rim'];
-  const rows = [];
-
-  for (let i = 1; i <= count; i++) {
-    const stokAwal = randInt(rng, 20, 200);
-    const masuk = randInt(rng, 0, 80);
-    const keluar = randInt(rng, 0, 50);
-    const stokAkhir = stokAwal + masuk - keluar;
-    const hargaBeli = roundToNearest(15000 + rng() * 350000, 500);
-    const nilaiPersediaan = stokAkhir * hargaBeli;
-    rows.push([
-      `BRG-${String(i).padStart(4, '0')}`,
-      `${pick(rng, namaBarangList)} ${i}`,
-      pick(rng, kategoriList),
-      pick(rng, satuanList),
-      stokAwal,
-      masuk,
-      keluar,
-      stokAkhir,
-      hargaBeli,
-      nilaiPersediaan,
-    ]);
-  }
-
-  return {
-    headers,
-    columnTypes,
-    rows,
-    meta: {
-      datasetType: 'inventory',
-      datasetLabel: 'Persediaan',
-      count,
-      seed: rawSeed,
-      seedNumber,
-      generatedAt: new Date().toISOString(),
-    },
-  };
-}
 
 /**
  * Menghasilkan dataset Penjualan RELASIONAL — beda dari generateSalesDataset()
@@ -991,63 +738,6 @@ export function generateFinancialModelRelationalDataset(options = {}) {
     },
   };
 }
-
-/**
- * Peta pusat semua generator dataset yang tersedia.
- * Tahap berikutnya tinggal menambah entri baru di sini (mis. 'accounting', 'hr', 'inventory')
- * tanpa mengubah pemanggil (app.js).
- */
-export const DATASET_GENERATORS = {
-  sales: {
-    label: 'Penjualan',
-    description: 'Transaksi penjualan produk lintas wilayah, lengkap dengan DPP, PPN, dan diskon.',
-    generate: generateSalesDataset,
-    available: true,
-  },
-  hr: {
-    label: 'HR (Karyawan)',
-    description: 'Data payroll karyawan lintas divisi, lengkap dengan tunjangan dan potongan.',
-    generate: generateHrDataset,
-    available: true,
-  },
-  inventory: {
-    label: 'Persediaan / Pergudangan',
-    description: 'Kartu stok barang: barang masuk, keluar, dan nilai persediaan.',
-    generate: generateInventoryDataset,
-    available: true,
-  },
-};
-
-// Generator berikut TIDAK ditampilkan di navigasi materi (dibatasi jadi 3:
-// Penjualan/Persediaan-Pergudangan/HR) tapi tetap diekspor & dipakai test
-// suite (lihat tests/test-relational-dataset.mjs) — dipertahankan untuk
-// kemungkinan dipakai lagi nanti, bukan dihapus.
-export const EXPERIMENTAL_DATASET_GENERATORS = {
-  accounting: {
-    label: 'Akuntansi',
-    description: 'Jurnal umum lintas akun (aset, liabilitas, modal, pendapatan, beban).',
-    generate: generateAccountingDataset,
-    available: false,
-  },
-  'sales-relational': {
-    label: 'Penjualan (Multi-Tabel)',
-    description: 'Transaksi penjualan TANPA detail produk — wajib lookup lintas tabel ke Master Produk terpisah untuk Nama/Kategori/Harga.',
-    generate: generateSalesRelationalDataset,
-    available: false,
-  },
-  'hr-relational': {
-    label: 'HR / Payroll (Multi-Tabel)',
-    description: 'Data karyawan (Nama, Asal, Tanggal Lahir, Tanggal Masuk, Kode Jabatan) TANPA jabatan/gaji/bonus sendiri — wajib lookup ke Referensi Jabatan, plus DATEDIF umur & masa kerja. Skenario Expert/Payroll spesifikasi produk.',
-    generate: generateHrRelationalDataset,
-    available: false,
-  },
-  'inventory-relational': {
-    label: 'Persediaan (Multi-Tabel)',
-    description: 'Kartu stok (Kode Barang, Masuk, Keluar) TANPA nama/kategori/harga sendiri — wajib lookup ke Master Barang + tabel Kategori→Supplier.',
-    generate: generateInventoryRelationalDataset,
-    available: false,
-  },
-};
 
 
 // ---------------------------------------------------------------------------

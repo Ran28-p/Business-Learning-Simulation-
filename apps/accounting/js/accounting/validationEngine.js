@@ -14,12 +14,9 @@
 
 import {
   getExpectedJournal,
-  getLoadedTransactions,
   getLoadedAdjustments,
   generateClosingEntries,
   generateTrialBalance,
-  generateWorksheet,
-  generateFinancialStatements,
   getLedgerArray,
   getAccounts
 } from './engine.js';
@@ -140,20 +137,6 @@ function feedback({ severity, field, expected, actual, what, why, concept, fix, 
     concept,    // Konsep akuntansi
     fix,        // Cara memperbaiki
     psak: psak ? { code: psak.code, title: psak.title } : null
-  };
-}
-
-function successFeedback(summary) {
-  return {
-    severity: 'success',
-    field: 'overall',
-    expected: null,
-    actual: null,
-    what: summary,
-    why: 'Semua elemen jurnal sesuai dengan prinsip double-entry dan answer key.',
-    concept: PSAK.DOUBLE_ENTRY.concept,
-    fix: 'Lanjutkan ke tahap berikutnya (posting Buku Besar).',
-    psak: { code: PSAK.DOUBLE_ENTRY.code, title: PSAK.DOUBLE_ENTRY.title }
   };
 }
 
@@ -558,13 +541,6 @@ export function validateAdjustmentJournal(userEntries) {
   // Compare to expected adjustments
   const adjKey = getLoadedAdjustments();
   if (adjKey.length > 0) {
-    // Flatten expected adjustment entries
-    const expectedLines = [];
-    adjKey.forEach(a => {
-      // adjustments from engine store full objects with entries
-      const full = (typeof a.entries !== 'undefined') ? a : null;
-    });
-
     // Use engine's adjustment journal if built
     // For now validate structure + balance primarily
     score += 20;
@@ -706,165 +682,9 @@ export function validateLedgerPosting() {
    4. WORKSHEET VALIDATION
    ═══════════════════════════════════════════════════════════ */
 
-export function validateWorksheet() {
-  const items = [];
-  const ws = generateWorksheet();
-  let score = 0;
-  const maxScore = 100;
-
-  // Check column balances
-  const t = ws.totals;
-  if (t.nsD === t.nsK) {
-    score += 20;
-    items.push(feedback({
-      severity: 'success', field: 'worksheet',
-      what: `Kolom Neraca Saldo seimbang (Rp ${t.nsD.toLocaleString('id-ID')}).`,
-      why: 'NS yang seimbang adalah prasyarat worksheet yang benar.',
-      concept: PSAK.WORKSHEET.concept, fix: 'Baik!', psak: PSAK.WORKSHEET
-    }));
-  } else {
-    items.push(feedback({
-      severity: 'error', field: 'worksheet',
-      what: `Kolom Neraca Saldo tidak seimbang (D ${t.nsD} ≠ K ${t.nsK}).`,
-      why: 'Jika NS tidak seimbang, seluruh kolom berikutnya akan salah.',
-      concept: PSAK.WORKSHEET.concept, fix: PSAK.TRIAL_BALANCE.fix, psak: PSAK.WORKSHEET
-    }));
-  }
-
-  if (t.adjD === t.adjK) {
-    score += 20;
-    items.push(feedback({
-      severity: 'success', field: 'worksheet',
-      what: `Kolom Penyesuaian seimbang (Rp ${t.adjD.toLocaleString('id-ID')}).`,
-      why: 'Penyesuaian juga harus double-entry.',
-      concept: PSAK.ADJUSTMENT.concept, fix: 'Baik!', psak: PSAK.ADJUSTMENT
-    }));
-  } else {
-    items.push(feedback({
-      severity: 'error', field: 'worksheet',
-      what: `Kolom Penyesuaian tidak seimbang.`,
-      why: 'Setiap penyesuaian harus D = K.',
-      concept: PSAK.ADJUSTMENT.concept, fix: PSAK.ADJUSTMENT.fix, psak: PSAK.ADJUSTMENT
-    }));
-  }
-
-  if (t.adjNsD === t.adjNsK) {
-    score += 20;
-    items.push(feedback({
-      severity: 'success', field: 'worksheet',
-      what: `NS Disesuaikan seimbang (Rp ${t.adjNsD.toLocaleString('id-ID')}).`,
-      why: 'NS Disesuaikan = NS ± Penyesuaian, harus tetap seimbang.',
-      concept: PSAK.WORKSHEET.concept, fix: 'Baik!', psak: PSAK.WORKSHEET
-    }));
-  }
-
-  // IS and BS columns should balance after net income plug
-  if (t.lrD === t.lrK) {
-    score += 20;
-    items.push(feedback({
-      severity: 'success', field: 'worksheet',
-      what: `Kolom Laba Rugi seimbang setelah memasukkan ${ws.netIncome >= 0 ? 'Laba' : 'Rugi'} Bersih Rp ${Math.abs(ws.netIncome).toLocaleString('id-ID')}.`,
-      why: 'Laba/Rugi Bersih adalah balancing figure di kolom Laba Rugi.',
-      concept: PSAK.INCOME_STATEMENT.concept, fix: 'Baik!', psak: PSAK.INCOME_STATEMENT
-    }));
-  }
-
-  if (t.neracaD === t.neracaK) {
-    score += 20;
-    items.push(feedback({
-      severity: 'success', field: 'worksheet',
-      what: `Kolom Posisi Keuangan seimbang (Rp ${t.neracaD.toLocaleString('id-ID')}).`,
-      why: 'Persamaan Aset = Kewajiban + Ekuitas terjaga di worksheet.',
-      concept: PSAK.EQUATION.concept, fix: 'Baik!', psak: PSAK.EQUATION
-    }));
-  } else {
-    items.push(feedback({
-      severity: 'error', field: 'worksheet',
-      what: `Kolom Posisi Keuangan tidak seimbang.`,
-      why: 'Setelah memasukkan laba/rugi bersih, sisi Debit dan Kredit neraca harus sama.',
-      concept: PSAK.EQUATION.concept, fix: PSAK.EQUATION.fix, psak: PSAK.EQUATION
-    }));
-  }
-
-  const hasError = items.some(i => i.severity === 'error');
-  return _result(!hasError, score, maxScore, items,
-    hasError ? `Worksheet bermasalah. Skor: ${score}/${maxScore}` : `Worksheet valid. Skor: ${score}/${maxScore}`);
-}
-
 /* ═══════════════════════════════════════════════════════════
    5. FINANCIAL STATEMENTS VALIDATION
    ═══════════════════════════════════════════════════════════ */
-
-export function validateFinancialStatements() {
-  const items = [];
-  const stmts = generateFinancialStatements();
-  let score = 0;
-  const maxScore = 100;
-
-  // Income Statement
-  const is = stmts.incomeStatement;
-  if (is.totalRevenue >= 0 && is.totalExpense >= 0) {
-    score += 25;
-    items.push(feedback({
-      severity: 'success', field: 'income_statement',
-      what: `Laporan Laba Rugi tersusun: Pendapatan Rp ${is.totalRevenue.toLocaleString('id-ID')}, Beban Rp ${is.totalExpense.toLocaleString('id-ID')}, ${is.netIncome >= 0 ? 'Laba' : 'Rugi'} Rp ${Math.abs(is.netIncome).toLocaleString('id-ID')}.`,
-      why: 'Semua akun nominal telah dialokasikan dengan benar.',
-      concept: PSAK.INCOME_STATEMENT.concept, fix: 'Baik!', psak: PSAK.INCOME_STATEMENT
-    }));
-  }
-
-  // Balance Sheet equation
-  const fp = stmts.financialPosition;
-  if (fp.totalAssets === fp.totalLiabilitiesAndEquity) {
-    score += 40;
-    items.push(feedback({
-      severity: 'success', field: 'financial_position',
-      what: `Laporan Posisi Keuangan seimbang: Aset Rp ${fp.totalAssets.toLocaleString('id-ID')} = Kewajiban + Ekuitas Rp ${fp.totalLiabilitiesAndEquity.toLocaleString('id-ID')}.`,
-      why: 'Persamaan dasar akuntansi terpenuhi.',
-      concept: PSAK.EQUATION.concept, fix: 'Baik!', psak: PSAK.EQUATION
-    }));
-  } else {
-    items.push(feedback({
-      severity: 'error', field: 'financial_position',
-      expected: `Aset = Kewajiban + Ekuitas`,
-      actual: `Aset ${fp.totalAssets} ≠ L+E ${fp.totalLiabilitiesAndEquity}`,
-      what: `Laporan Posisi Keuangan tidak seimbang (selisih Rp ${Math.abs(fp.totalAssets - fp.totalLiabilitiesAndEquity).toLocaleString('id-ID')}).`,
-      why: 'Ketidakseimbangan menandakan ada akun yang salah alokasi atau laba bersih belum masuk ke ekuitas.',
-      concept: PSAK.EQUATION.concept, fix: PSAK.EQUATION.fix, psak: PSAK.EQUATION
-    }));
-  }
-
-  // Equity continuity
-  const eq = stmts.changesInEquity;
-  const expectedEnding = eq.beginningCapital + eq.netIncome - eq.prive;
-  if (eq.endingCapital === expectedEnding) {
-    score += 20;
-    items.push(feedback({
-      severity: 'success', field: 'equity',
-      what: `Modal akhir Rp ${eq.endingCapital.toLocaleString('id-ID')} = Modal awal + Laba − Prive.`,
-      why: 'Laporan Perubahan Ekuitas konsisten dengan Laba Rugi.',
-      concept: 'Ekuitas akhir = Ekuitas awal + Investasi tambahan + Laba − Prive/Dividen.',
-      fix: 'Baik!',
-      psak: PSAK.FINANCIAL_POSITION
-    }));
-  }
-
-  // Cash flow ending matches ledger
-  const cf = stmts.cashFlow;
-  score += 15;
-  items.push(feedback({
-    severity: 'info', field: 'cash_flow',
-    what: `Arus Kas: Operasi Rp ${cf.netOperating.toLocaleString('id-ID')}, Investasi Rp ${cf.netInvesting.toLocaleString('id-ID')}, Pendanaan Rp ${cf.netFinancing.toLocaleString('id-ID')}. Kas akhir Rp ${cf.endingCash.toLocaleString('id-ID')}.`,
-    why: 'Laporan Arus Kas mengklasifikasikan pergerakan Kas berdasarkan aktivitas.',
-    concept: 'PSAK 207 (dahulu PSAK 2) – Laporan Arus Kas membagi aktivitas menjadi Operasi, Investasi, dan Pendanaan.',
-    fix: 'Verifikasi bahwa Kas akhir = Kas awal + perubahan neto.',
-    psak: { code: 'PSAK 207 (dahulu PSAK 2)', title: 'Laporan Arus Kas' }
-  }));
-
-  const hasError = items.some(i => i.severity === 'error');
-  return _result(!hasError, Math.min(score, maxScore), maxScore, items,
-    hasError ? `Laporan bermasalah. Skor: ${score}/${maxScore}` : `Laporan valid. Skor: ${Math.min(score, maxScore)}/${maxScore}`);
-}
 
 /* ═══════════════════════════════════════════════════════════
    6. CLOSING VALIDATION

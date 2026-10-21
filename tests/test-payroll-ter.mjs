@@ -156,7 +156,6 @@ section('B. Contoh hitung resmi DJP dijalankan lewat rumus Excel');
 section('C. Seed acak: tanpa error & sama dengan implementasi referensi independen');
 {
   // referensi independen: TaxEngine SPT + aturan pembulatan resmi (PPh & PKP ke bawah)
-  const refTarif = (pkp) => Math.floor(TE.hitungTarifProgresif(pkp).total ?? TE.hitungTarifProgresif(pkp));
   const probe = TE.hitungTarifProgresif(54300000); const probeNum = typeof probe === 'number' ? probe : probe.total ?? probe.pajak ?? probe.pph;
   check(probeNum === 2715000, 'referensi: mesin SPT menghitung tarif progresif PKP 54,3jt = 2.715.000 (resmi) — bentuk hasil: ' + typeof probe);
   const progressive = (pkp) => { const v = TE.hitungTarifProgresif(pkp); return Math.floor(typeof v === 'number' ? v : v.total ?? v.pajak ?? v.pph); };

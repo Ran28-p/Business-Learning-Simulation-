@@ -4,7 +4,7 @@
 // ikut tercache otomatis begitu dipakai pertama kali, jadi kunjungan
 // berikutnya tidak perlu network untuk mengaktifkan SQL engine-nya.
 
-const CACHE_NAME = 'sim-sqlpq-shell-v12d-cloudsync'; // bumped: redesign UI (design-system.css, ds-modules.css)
+const CACHE_NAME = 'sim-sqlpq-shell-v12e-cloudsync'; // bumped: js/app.js dipecah jadi app-*.js (tag <script> baru di index.html)
 
 const APP_SHELL_LOCAL = [
     './',

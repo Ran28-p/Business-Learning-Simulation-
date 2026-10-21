@@ -18,7 +18,7 @@ const section = (t) => console.log('\n=== ' + t + ' ===');
 const src = (rel) => readFileSync(join(ROOT, rel), 'utf8');
 
 globalThis.window = globalThis;
-for (const f of ['js/shared/progress-aggregator.js', 'js/shared/learning-analytics.js', 'js/shared/cohort-engine.js']) vm.runInThisContext(src(f), { filename: f });
+for (const f of ['js/shared/progress-aggregator.js', 'js/shared/learning-analytics.js', 'js/shared/csv-utils.js', 'js/shared/cohort-engine.js']) vm.runInThisContext(src(f), { filename: f });
 const PP = globalThis.PortalProgress, LA = globalThis.LearningAnalytics, CE = globalThis.CohortEngine;
 const reader = (obj) => (k) => (Object.prototype.hasOwnProperty.call(obj, k) ? (typeof obj[k] === 'string' ? obj[k] : JSON.stringify(obj[k])) : null);
 const NOW = new Date('2026-10-12T09:00:00.000Z');
@@ -56,7 +56,6 @@ section('A. Topik yang perlu diulang (data nyata per modul)');
   check(sq.weak.find((w) => w.key === 'concept:join').tentative, 'salah 1× = tentatif');
 
   // Accounting
-  const mk = (a) => ({ analysis: a, account: a, side: a, amount: a, date: a, posting: a, report: a });
   const ac = LA.analyze(reader({ ACT_MASTER_PROGRESS: { componentScores: { analysis: [90, 95, 92], account: [40, 50, 45, 60], side: [30, 20, 40], amount: [60, 62], date: [10, 20, 30], posting: [95, 90, 99, 100], report: ['x', null, 50, 55, 60] } } })).modules.accounting;
   eq(ac.weak.map((w) => w.key), ['comp:side', 'comp:account', 'comp:date', 'comp:report'], 'Accounting: yang lemah (<70) terurut menurut keparahan×bobot (akun/debit-kredit lebih penting daripada tanggal)');
   check(!ac.weak.some((w) => w.key === 'comp:amount'), 'amount hanya 2 percobaan → belum dinilai');
@@ -91,11 +90,11 @@ section('A. Topik yang perlu diulang (data nyata per modul)');
   // Kesesuaian dengan sumber kebenaran modul (supaya label/bobot tidak basi)
   const qb = {}; vm.runInNewContext(src('apps/sql-pq/js/question-bank.js'), Object.assign(qb, { window: qb, console }));
   const C = qb.SQLPQ_Questions.CONCEPTS;
-  // Katalog question-bank.js + konsep "pipeline" yang dibuat langsung di apps/sql-pq/js/app.js (soal Power Query)
+  // Katalog question-bank.js + konsep "pipeline" yang dibuat langsung di apps/sql-pq/js/app-challenge.js (soal Power Query; dipecah dari app.js)
   eq(Object.keys(LA.SQL_CONCEPTS).sort(), [...Object.keys(C), 'pipeline'].sort(), 'daftar konsep SQL di analitik = katalog question-bank.js + "pipeline"');
   const bad = Object.keys(C).filter((k) => C[k].label !== LA.SQL_CONCEPTS[k]);
   eq(bad, [], 'label tiap konsep SQL sama dengan question-bank.js');
-  check(/concept: "pipeline", conceptLabel: "Power Query Pipeline"/.test(src('apps/sql-pq/js/app.js')) && LA.SQL_CONCEPTS.pipeline === 'Power Query Pipeline', 'konsep "pipeline" & labelnya sama dengan app.js');
+  check(/concept: "pipeline", conceptLabel: "Power Query Pipeline"/.test(src('apps/sql-pq/js/app-challenge.js')) && LA.SQL_CONCEPTS.pipeline === 'Power Query Pipeline', 'konsep "pipeline" & labelnya sama dengan app-challenge.js');
   const se = src('apps/accounting/js/business/scoringEngine.js');
   const weights = Object.fromEntries([...se.match(/SCORE_WEIGHTS = \{([^}]*)\}/)[1].matchAll(/(\w+):\s*([\d.]+)/g)].map((m) => [m[1], Number(m[2])]));
   eq(Object.fromEntries(Object.entries(LA.ACC_COMPONENTS).map(([k, v]) => [k, v.weight])), weights, 'bobot komponen Accounting di analitik = scoringEngine.js');

@@ -17,7 +17,7 @@ function sharedStorage() { return { getItem: (k) => (store.has(k) ? store.get(k)
 async function open(name, search = '') {
   const url = pathToFileURL(join(ROOT, 'apps/game-hub/index.html')).href + search;
   const dom = await JSDOM.fromFile(join(ROOT, 'apps/game-hub/index.html'), { url, runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true,
-    beforeParse(w) { Object.defineProperty(w, 'localStorage', { value: sharedStorage() }); w.fetch = () => Promise.reject(new Error('offline')); w.confirm = () => true; w.scrollTo = () => {}; wins.push(w); w.__name = name; w.URL.createObjectURL = () => 'blob:x'; } });
+    beforeParse(w) { Object.defineProperty(w, 'localStorage', { value: sharedStorage() }); w.fetch = () => Promise.reject(new Error('offline')); w.confirm = () => true; w.scrollTo = () => {}; w.__chromaFrame = new Uint8ClampedArray([0, 220, 0, 255, 22, 12, 21, 255]); Object.defineProperty(w.HTMLVideoElement.prototype, 'videoWidth', { configurable: true, get() { return 2; } }); Object.defineProperty(w.HTMLVideoElement.prototype, 'videoHeight', { configurable: true, get() { return 1; } }); Object.defineProperty(w.HTMLMediaElement.prototype, 'readyState', { configurable: true, get() { return 2; } }); w.HTMLCanvasElement.prototype.getContext = () => ({ drawImage() {}, getImageData() { return { data: w.__chromaFrame }; }, putImageData() {} }); w.HTMLMediaElement.prototype.play = () => Promise.resolve(); wins.push(w); w.__name = name; w.URL.createObjectURL = () => 'blob:x'; } });
   await until(() => dom.window.document.readyState === 'complete' && dom.window.LiveQuiz && dom.window.document.getElementById('btn-role-teacher'), name + ' siap');
   await sleep(50); return dom.window;
 }
@@ -45,7 +45,7 @@ await sleep(20); click(T.document.querySelector('[data-theme-id="akuntansi"]'));
 await until(() => T.document.querySelectorAll('#lq-editor .lq-q').length >= 20, '≥20 soal dibuat otomatis');
 check(T.document.querySelectorAll('#lq-editor .lq-q').length === 20, 'default 20 soal'); check(!$(T, 'btn-start').disabled, 'tombol mulai aktif');
 check(/valid/.test($(T, 'lq-errors').textContent), 'validasi: semua valid');
-const firstQ = T.document.querySelector('#lq-editor .lq-q textarea'); const before = firstQ.value;
+const firstQ = T.document.querySelector('#lq-editor .lq-q textarea');
 type(firstQ, 'Soal hasil edit guru?'); check(/Soal hasil edit/.test(T.document.querySelector('#lq-editor .lq-q textarea').value), 'edit pertanyaan');
 click(T.document.querySelectorAll('#lq-editor .lq-q .lq-btn')[0]); await sleep(30);
 check(T.document.querySelector('#lq-editor .lq-q textarea').value !== 'Soal hasil edit guru?', 'tombol "Ganti soal" membuat soal baru');
@@ -56,12 +56,12 @@ type($(T, 'in-count'), '30'); click($(T, 'btn-regen-all')); await until(() => T.
 type($(T, 'in-timer'), '1'); $(T, 'in-unit').value = 'm'; $(T, 'in-unit').dispatchEvent(new T.Event('change', { bubbles: true }));
 check(/1 menit/.test($(T, 'lq-timer-note').textContent), 'timer 1 menit terbaca');
 type($(T, 'in-count'), '5'); click($(T, 'btn-regen-all')); await until(() => T.document.querySelectorAll('#lq-editor .lq-q').length === 5, 'jadi 5 soal');
-const ed = T.document.querySelector('#lq-editor .lq-q'); const radios = ed.querySelectorAll('input[type=radio]'); const rightIdx = [...radios].findIndex((r) => r.checked);
 type(T.document.querySelectorAll('#lq-editor .lq-q input:not([type=radio])')[0], ''); check($(T, 'btn-start').disabled && /kosong/.test($(T, 'lq-errors').textContent), 'pilihan kosong → mulai dinonaktifkan');
 click($(T, 'btn-regen-all')); await until(() => !$(T, 'btn-start').disabled, 'valid lagi');
 
 console.log('=== UI: mulai kuis, siswa menjawab ===');
 click($(T, 'btn-start')); await until(() => visible(T, 'v-host'), 'layar kuis guru');
+check(!T.document.querySelector('#v-host .lq-celebration'), 'animasi tidak tampil saat kuis berjalan');
 await until(() => S.document.querySelectorAll('.lq-ans').length === 4 || S.document.querySelectorAll('.lq-ans').length === 2 || S.document.querySelectorAll('.lq-ans').length === 3, 'soal tampil di siswa');
 check(!/Benar/.test($(S, 'v-play').textContent), 'siswa belum melihat kunci saat soal berjalan');
 check(/Soal 1 \/ 5/.test($(S, 'v-play').textContent), 'penomoran soal');
@@ -82,6 +82,7 @@ for (let i = 1; i < 5; i++) {
 click([...T.document.querySelectorAll('#v-host .lq-btn--primary')].find((b) => /hasil akhir/i.test(b.textContent)));
 await until(() => /Hasil akhir/.test($(T, 'v-host').textContent), 'hasil akhir guru'); await until(() => /Kuis selesai/.test($(S, 'v-play').textContent), 'hasil akhir siswa');
 check(/Ani/.test($(T, 'v-host').textContent) && /poin/.test($(T, 'v-host').textContent), 'papan akhir memuat nama & poin');
+for (const w of [T, S]) { const cat = w.document.querySelector('.lq-celebration'); const source = w.document.querySelector('.lq-celebration-source'); check(!!cat && !!source && source.autoplay && source.loop && !source.muted && source.playsInline && /\/apps\/game-hub\/assets\/clapping-cat\.mp4$/.test(source.src), 'animasi hasil akhir besar dan bersuara'); check(!!w.document.querySelector('.lq-celebration-wrap .lq-btn'), 'tombol memutar animasi tersedia bila autoplay diblokir'); source.dispatchEvent(new w.Event('loadeddata')); check(w.__chromaFrame[3] === 0 && w.__chromaFrame[7] === 255 && w.__chromaFrame[1] === 18, 'latar hijau dihapus dan gambar kucing dipertahankan'); }
 check(/Peringkat #1/.test($(S, 'v-play').textContent), 'siswa tunggal = peringkat #1');
 let blobText = ''; T.Blob = class { constructor(p) { blobText = p.join(''); } }; click([...T.document.querySelectorAll('#v-host .lq-btn')].find((b) => /CSV/.test(b.textContent)));
 check(/Peringkat/.test(blobText) && /"Ani"/.test(blobText), 'CSV berisi hasil');

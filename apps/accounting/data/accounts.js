@@ -102,7 +102,3 @@ export function getAccountsByLevel(level) {
 export function findAccountByName(accounts, name) {
   return accounts.find(a => a.name === name) || null;
 }
-
-export function findAccountByCode(accounts, code) {
-  return accounts.find(a => a.code === code) || null;
-}

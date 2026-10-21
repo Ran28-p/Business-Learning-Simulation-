@@ -15,7 +15,6 @@ import { dirname, join } from 'node:path';
 import vm from 'node:vm';
 
 export const APP_DIR = join(dirname(fileURLToPath(import.meta.url)), '..');
-const require = createRequire(import.meta.url);
 
 // ---- Browser stubs --------------------------------------------------------
 export function makeLocalStorage() {

@@ -1,10 +1,8 @@
-// Service Worker — Excel Formula Practice Generator
+// Service Worker — Excel Formula Practice Generator dan kursus VBA interaktif
 // Sama seperti apps/accounting/sw.js: precache halaman utama, lalu
-// cache-as-you-go untuk file lokal (js/css/data/vendor, termasuk yang
-// diambil dari pivot-dashboard/ dan dari ../../vendor/hyperformula di root
-// portal — keduanya tetap same-origin jadi otomatis tercakup).
+// cache-as-you-go untuk file lokal (js/css/data/vendor — same-origin jadi otomatis tercakup).
 
-const CACHE_NAME = 'sim-excel-shell-v16-penggajian'; // bumped: redesign UI (design-system.css, ds-modules.css)
+const CACHE_NAME = 'sim-excel-shell-v19-no-pivot'; // bumped: modul Pivot & Dashboard dihapus
 
 const APP_SHELL_LOCAL = [
     './',

@@ -151,12 +151,8 @@
     };
   }
 
-  /** Netralkan injeksi rumus (CSV injection): sel berawalan = + - @ tab CR diberi apostrof di depannya. */
-  function csvCell(v) {
-    var s = v === null || v === undefined ? '' : String(v);
-    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
-    return '"' + s.replace(/"/g, '""') + '"';
-  }
+  // csvCell (netralisasi CSV injection) ada di js/shared/csv-utils.js — WAJIB dimuat sebelum file ini.
+  function csvCell(v) { return global.CsvUtils.csvCell(v); }
   function toCsv(rows) {
     var head = ['Nama', 'Email', 'Total XP', 'Modul dimulai', 'Aktivitas', 'Skor rata-rata (%)', 'Terakhir aktif', 'Hari tidak aktif', 'Level Game Hub', 'Status',
       'Topik terlemah', 'XP SPT', 'XP Accounting', 'XP Excel', 'XP SQL & Power Query', 'Rekap dibuat'];

@@ -14,7 +14,6 @@
  */
 
 import { getAccounts, getExpectedJournal, getLoadedTransactions } from '../accounting/engine.js';
-import { parseAmount } from '../utils/formatters.js';
 
 /* ═══════════════════════════════════════════════════════════
    KNOWLEDGE BASE – account nature & teaching tips
@@ -280,7 +279,6 @@ function _detectClassicMistakes(userEntries, transactions, expected = []) {
   const accounts = userEntries.map(e => e.account);
   const hasUtang = accounts.includes('Utang Usaha');
   const hasKasKredit = userEntries.some(e => e.account === 'Kas' && (Number(e.credit) || 0) > 0);
-  const hasKasDebit = userEntries.some(e => e.account === 'Kas' && (Number(e.debit) || 0) > 0);
   const hasBeban = accounts.some(a => a && a.startsWith('Beban'));
   const hasPendapatan = accounts.some(a => a && (a.includes('Pendapatan') || a === 'Penjualan'));
   const desc = (transactions || []).map(t => t.deskripsi || '').join(' ').toLowerCase();

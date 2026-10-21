@@ -1,8 +1,8 @@
 /* Kuis Langsung (Game Hub) — lapisan RUANG: transport data (memori / localStorage / Firebase RTDB) + pengontrol Host (guru) & Player (siswa).
    Tanpa DOM → Host/Player diuji penuh di tests/test-livequiz.mjs lewat LiveDb.memory (beberapa "perangkat" berbagi satu inti data).
    Model data (Firebase: liveRooms/<KODE>/…), aturan keamanan: database.rules.json:
-     meta{host,status,qIndex,qCount,timer,theme,title,createdAt} · questions/<i>{q,o[]} (TANPA kunci) · key/<i> (hanya guru) ·
-     starts/<i> (waktu server mulai soal) · answers/<i>/<uid>{c,t} (tulis-sekali, t = waktu server) · reveal/<i>{a,e} ·
+     meta{host,status,qIndex,qCount,timer,theme,title,createdAt} · questions/<i>{q,o[] | type:essay,q} (TANPA kunci) · key/<i> (hanya guru) ·
+     starts/<i> (waktu server mulai soal) · answers/<i>/<uid>{c|text,t} (tulis-sekali, t = waktu server) · reveal/<i>{a|answer,e} ·
      players/<uid>{name,joinedAt} · scores/<uid>{total,correct,ms} (hanya guru yang menulis; skor dihitung di sisi guru). */
 (function (root) {
   'use strict';
@@ -19,6 +19,10 @@
     for (var i = 0; i < ks.length - 1; i++) { if (cur[ks[i]] == null || typeof cur[ks[i]] !== 'object') cur[ks[i]] = {}; cur = cur[ks[i]]; }
     if (val === null || val === undefined) delete cur[ks[ks.length - 1]]; else cur[ks[ks.length - 1]] = clone(val);
     prune(obj);
+  }
+  function submissionExpired(db, starts, index, timer) {
+    var startedAt = Number(starts && starts[index]);
+    return !isFinite(startedAt) || db.now() > startedAt + LQ.clampTimer(timer) * 1000 + LQ.GRACE_MS;
   }
 
   /* ---------- transport: inti memori (+ penyimpanan opsional) ---------- */
@@ -136,7 +140,7 @@
     this._offs.push(this.db.on(P + '/answers', function (v) { self.answers = v || {}; self._rescore(); }));
   };
   Host.prototype._rescore = function () {
-    var self = this, sc = LQ.scoreAll(this.keyMap, this.answers, this.starts, this.timer);
+    var self = this, sc = this.quiz[0] && this.quiz[0].type === 'essay' ? LQ.scoreEssayAll(this.quiz, this.answers) : LQ.scoreAll(this.keyMap, this.answers, this.starts, this.timer);
     this.scores = sc;
     Object.keys(sc).forEach(function (uid) {
       var s = sc[uid], j = JSON.stringify([s.total, s.correct, s.ms]);
@@ -154,17 +158,29 @@
     var self = this, P = base(this.code), errs = LQ.validateQuiz(quiz);
     if (errs.length) return Promise.reject(new Error(errs[0]));
     if (this.meta && this.meta.status !== 'lobby') return Promise.reject(new Error('Kuis sudah dimulai.'));
-    this.quiz = quiz.map(function (q) { return { q: q.q, o: q.o.slice(), a: q.a, e: q.e || '', t: q.t || '' }; });
-    var pub = {}, key = {}; this.quiz.forEach(function (q, i) { pub[i] = { q: q.q, o: q.o }; key[i] = q.a; self.keyMap[i] = q.a; });
+    this.quiz = quiz.map(function (q) {
+      if (q.type === 'essay') return { type: 'essay', q: q.q, answer: q.answer, rubric: q.rubric, e: q.e || '', t: q.t || '' };
+      return { q: q.q, o: q.o.slice(), a: q.a, e: q.e || '', t: q.t || '' };
+    });
+    var pub = {}, key = {}; this.keyMap = {};
+    this.quiz.forEach(function (q, i) {
+      if (q.type === 'essay') {
+        pub[i] = { type: 'essay', q: q.q };
+        key[i] = { type: 'essay', answer: q.answer, rubric: q.rubric, e: q.e || '' };
+      } else {
+        pub[i] = { q: q.q, o: q.o }; key[i] = q.a; self.keyMap[i] = q.a;
+      }
+    });
     var db = this.db;
     return db.set(P + '/questions', pub).then(function () { return db.set(P + '/key', key); })
       .then(function () { return db.set(P + '/starts/0', db.ts()); })
-      .then(function () { return db.update(P + '/meta', { status: 'question', qIndex: 0, qCount: self.quiz.length, timer: self.timer }); });
+      .then(function () { return db.update(P + '/meta', { status: 'question', qIndex: 0, qCount: self.quiz.length, timer: self.timer, mode: self.quiz[0].type === 'essay' ? 'essay' : 'choice' }); });
   };
   Host.prototype.reveal = function () {
     var m = this.meta; if (!m || m.status !== 'question' || this._busy) return Promise.resolve(false);
     var self = this, i = m.qIndex, q = this.quiz[i], P = base(this.code), db = this.db; this._busy = true;
-    return db.set(P + '/reveal/' + i, { a: q.a, e: q.e || '' }).then(function () { return db.update(P + '/meta', { status: 'reveal' }); })
+    var result = q.type === 'essay' ? { answer: q.answer, rubric: q.rubric, e: q.e || '' } : { a: q.a, e: q.e || '' };
+    return db.update(P + '/meta', { status: 'reveal' }).then(function () { return db.set(P + '/reveal/' + i, result); })
       .then(function () { self._busy = false; return true; }, function (e) { self._busy = false; throw e; });
   };
   Host.prototype.next = function () {
@@ -186,8 +202,8 @@
   Host.prototype.detach = function () { this._offs.forEach(function (f) { f(); }); this._offs = []; };
   Host.prototype.view = function () {
     var m = this.meta || {}, qi = m.qIndex, ans = (this.answers && this.answers[qi]) || {};
-    return { code: this.code, meta: m, status: m.status || 'lobby', qIndex: qi, qCount: m.qCount || 0, timer: this.timer, players: Object.keys(this.players).map(function (u) { return { uid: u, name: this.players[u].name }; }, this),
-      answered: Object.keys(ans).length, board: LQ.leaderboard(this.scores, this.players), question: this.quiz[qi] || null, remainingMs: this.remainingMs() };
+    return { code: this.code, meta: m, mode: this.quiz[0] && this.quiz[0].type === 'essay' ? 'essay' : 'choice', status: m.status || 'lobby', qIndex: qi, qCount: m.qCount || 0, timer: this.timer, players: Object.keys(this.players).map(function (u) { return { uid: u, name: this.players[u].name }; }, this),
+      answered: Object.keys(ans).length, answers: clone(ans) || {}, board: LQ.leaderboard(this.scores, this.players), question: this.quiz[qi] || null, remainingMs: this.remainingMs() };
   };
 
   /* ---------- Player (siswa) ---------- */
@@ -225,24 +241,39 @@
     if (!m || m.status !== 'question') return Promise.resolve({ ok: false, why: 'bukan waktu menjawab' });
     if (this.mine[i]) return Promise.resolve({ ok: false, why: 'sudah menjawab' });
     var q = this.questions && this.questions[i];
+    if (q && q.type === 'essay') return Promise.resolve({ ok: false, why: 'soal ini meminta jawaban esai' });
     if (!q || !Number.isInteger(choice) || choice < 0 || choice >= q.o.length) return Promise.resolve({ ok: false, why: 'pilihan tidak valid' });
-    if (this.remainingMs() <= -LQ.GRACE_MS) return Promise.resolve({ ok: false, why: 'waktu habis' });
+    if (submissionExpired(this.db, this.starts, i, m.timer)) return Promise.resolve({ ok: false, why: 'waktu habis' });
     this.mine[i] = { c: choice, t: this.db.now() }; this._emit();
     return this.db.set(base(this.code) + '/answers/' + i + '/' + this.db.uid, { c: choice, t: this.db.ts() }).then(function () { return { ok: true }; }, function (e) { delete this.mine[i]; throw e; }.bind(this));
+  };
+  Player.prototype.submitEssay = function (text) {
+    var m = this.meta, i = m && m.qIndex, q = this.questions && this.questions[i], value = String(text == null ? '' : text).trim();
+    if (!m || m.status !== 'question') return Promise.resolve({ ok: false, why: 'bukan waktu menjawab' });
+    if (!q || q.type !== 'essay') return Promise.resolve({ ok: false, why: 'soal ini bukan esai' });
+    if (!value) return Promise.resolve({ ok: false, why: 'jawaban kosong' });
+    if (value.length > LQ.LIM.essay) return Promise.resolve({ ok: false, why: 'jawaban terlalu panjang' });
+    if (this.mine[i]) return Promise.resolve({ ok: false, why: 'sudah menjawab' });
+    if (submissionExpired(this.db, this.starts, i, m.timer)) return Promise.resolve({ ok: false, why: 'waktu habis' });
+    this.mine[i] = { text: value, t: this.db.now() }; this._emit();
+    return this.db.set(base(this.code) + '/answers/' + i + '/' + this.db.uid, { text: value, t: this.db.ts() }).then(function () { return { ok: true }; }, function (e) { delete this.mine[i]; throw e; }.bind(this));
   };
   Player.prototype.leave = function () { this._offs.forEach(function (f) { f(); }); this._offs = []; if (this._qOff) this._qOff(); this._qOff = null; };
   Player.prototype.view = function () {
     var m = this.meta || {}, i = m.qIndex, q = this.questions && this.questions[i] || null, my = this.mine[i] || null, rv = this.reveal[i] || null, uid = this.db.uid;
     var board = LQ.leaderboard(this.scores, this.players), me = board.filter(function (x) { return x.uid === uid; })[0] || null;
-    var gained = null, st = Number(this.starts[i]);
-    if (rv && my && isFinite(st)) gained = LQ.points(my.c === rv.a, Number(my.t) - st, (m.timer || 20) * 1000);
-    return { code: this.code, status: m.status || 'lobby', title: m.title || '', qIndex: i, qCount: m.qCount || 0, timer: m.timer || 0, question: q, myChoice: my ? my.c : null, reveal: rv,
-      correct: rv && my ? my.c === rv.a : null, gained: gained, me: me, board: board, playerCount: Object.keys(this.players).length, remainingMs: this.remainingMs() };
+    var gained = null, correct = null, st = Number(this.starts[i]);
+    if (rv && my && q && q.type === 'essay' && Array.isArray(rv.rubric)) {
+      var essayScore = LQ.scoreEssay({ rubric: rv.rubric }, my.text);
+      gained = essayScore.points; correct = essayScore.complete;
+    } else if (rv && my && isFinite(st)) { gained = LQ.points(my.c === rv.a, Number(my.t) - st, (m.timer || 20) * 1000); correct = my.c === rv.a; }
+    return { code: this.code, mode: m.mode || 'choice', status: m.status || 'lobby', title: m.title || '', qIndex: i, qCount: m.qCount || 0, timer: m.timer || 0, question: q, myChoice: my ? my.c : null, reveal: rv,
+      myAnswer: my ? my.text || null : null, correct: correct, gained: gained, me: me, board: board, playerCount: Object.keys(this.players).length, remainingMs: this.remainingMs() };
   };
 
   // Kunci render layar siswa: HARUS memuat semua yang mengubah tampilan. Urutan callback listener (meta vs questions vs reveal)
   // tidak dijamin; kalau soal/reveal yang tiba belakangan tidak ikut kunci, layar macet di "Memuat soal…" (regresi nyata, lihat tests).
-  Player.viewKey = function (v) { return [v.status, v.qIndex, v.myChoice, v.question ? v.question.q : '', v.reveal ? 'r' + v.reveal.a : '', v.gained, v.me && v.me.total, v.me && v.me.rank, v.playerCount, v.board.length].join('|'); };
+  Player.viewKey = function (v) { return [v.status, v.qIndex, v.myChoice, v.myAnswer, v.question ? v.question.q : '', v.reveal ? 'r' + v.reveal.a + ':' + v.reveal.answer : '', v.gained, v.me && v.me.total, v.me && v.me.rank, v.playerCount, v.board.length].join('|'); };
 
   root.LiveDb = { makeCore: makeCore, memory: memoryDb, browserLocal: browserLocal, firebase: firebaseDb };
   root.LiveRoom = { Host: Host, Player: Player, base: base };

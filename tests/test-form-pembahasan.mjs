@@ -1,6 +1,6 @@
 // Test pembahasan per titik cek (mode Isi Formulir SPT). Tanpa dependency:
 //   node tests/test-form-pembahasan.mjs
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -8,11 +8,12 @@ const R = join(dirname(fileURLToPath(import.meta.url)), '..', 'apps', 'spt') + '
 let ok = 0, bad = 0; const t = (c, l) => { if (c) ok++; else { bad++; console.log('  ✗ GAGAL: ' + l); } };
 
 const sb = { window: {} }; vm.createContext(sb);
+vm.runInContext(readFileSync(R + 'js/shared/html-utils.js', 'utf8'), sb); // escapeHTML dipakai esc()
 vm.runInContext(readFileSync(R + 'js/data/form-pembahasan.js', 'utf8'), sb);
 const FP = sb.window.FormPembahasan;
 
-// 1. Semua label titik cek di app-main.js punya aturan pembahasan
-const src = readFileSync(R + 'js/app-main.js', 'utf8');
+// 1. Semua label titik cek di app-*.js (app-main.js dipecah per tanggung jawab) punya aturan pembahasan
+const src = readdirSync(R + 'js').filter((f) => /^app-.*\.js$/.test(f)).sort().map((f) => readFileSync(R + 'js/' + f, 'utf8')).join('\n');
 const labels = [...src.matchAll(/\{ label: '([^']+)', ok:/g)].map((m) => m[1]);
 t(labels.length >= 50, 'ditemukan ≥ 50 label titik cek, dapat ' + labels.length);
 const uncovered = [...new Set(labels)].filter((l) => !FP.lookup(l));

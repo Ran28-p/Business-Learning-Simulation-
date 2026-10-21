@@ -20,13 +20,6 @@
     "withoutSources": 0,
     "withReviewed": 2
   },
-  "excel-pivot": {
-    "sections": 8,
-    "withSources": 5,
-    "exempt": 3,
-    "withoutSources": 0,
-    "withReviewed": 0
-  },
   "sql-pq": {
     "sections": 11,
     "withSources": 10,

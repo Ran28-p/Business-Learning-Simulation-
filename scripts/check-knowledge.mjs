@@ -22,7 +22,6 @@ const MODULES = [
   { key: 'spt', file: 'apps/spt/data/knowledge-spt.js', global: 'KNOWLEDGE_CONTENT_SPT' },
   { key: 'accounting', file: 'apps/accounting/data/knowledge-accounting.js', global: 'KNOWLEDGE_CONTENT_ACCOUNTING' },
   { key: 'excel', file: 'apps/excel/data/knowledge-excel.js', global: 'KNOWLEDGE_CONTENT_EXCEL' },
-  { key: 'excel-pivot', file: 'apps/excel/data/knowledge-excel-pivot-dashboard.js', global: 'KNOWLEDGE_CONTENT_EXCEL_PIVOT_DASHBOARD' },
   { key: 'sql-pq', file: 'apps/sql-pq/data/knowledge-sqlpq.js', global: 'KNOWLEDGE_CONTENT_SQLPQ' },
 ];
 

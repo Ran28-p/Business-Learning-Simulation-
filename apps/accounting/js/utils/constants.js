@@ -37,9 +37,3 @@ export const MODES = {
   BELAJAR: 'Belajar',
   UJIAN: 'Ujian'
 };
-
-export const COMPANY_LEVELS = {
-  JASA: 1,
-  DAGANG: 2,
-  MANUFAKTUR: 3
-};

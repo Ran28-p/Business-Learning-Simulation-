@@ -18,7 +18,8 @@ Progress disimpan di `localStorage` key `spt_tax_career_progress`.
 ## File
 - `index.html` — shell UI
 - `style.css` — gaya mengikuti token SPT
-- `app.js` — logika latihan & skor
+- `app.js` — logika latihan & skor (inti: state, penyimpanan, hub, belajar & latihan soal)
+- `app-cf.js` — modul Commercial-Fiscal; `app-aud.js` — modul Auditor Pajak + bootstrap. Ketiganya classic script yang dimuat berurutan dan berbagi fungsi lewat `window.__TaxCareerApp` (dipecah dari satu `app.js`)
 - `data/tracks.js` — materi Learn + tautan ke 1771 / modul pajak
 - `data/questions.js` — bank kasus
 

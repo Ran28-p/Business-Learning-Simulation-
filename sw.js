@@ -8,7 +8,7 @@
 // 2. Apapun di bawah ./apps/ → tiap modul punya service worker sendiri
 //    dengan scope masing-masing; root SW ini hanya menjaga shell hub.
 
-const CACHE_NAME = 'portal-shell-v13-gamehub-quiz'; // bumped: Game Hub = Kuis Langsung; mesin XP/misi dihapus (index.html, js/portal-*.js, cloud-sync)
+const CACHE_NAME = 'portal-shell-v14-gamehub-quiz'; // bumped: csv-utils.js baru (tag <script> baru di game-hub & pengajar); folder game-hub/live dihapus
 
 const APP_SHELL_LOCAL = [
     './',

@@ -18,7 +18,7 @@
 //   v11 — tambah semua halaman entri sub-modul ke precache install supaya app benar-benar
 //         bisa dibuka offline sejak pertama kali install, bukan baru ter-cache setelah
 //         user pernah online membuka modul tersebut satu kali
-const CACHE_NAME = 'sim-spt-shell-v24c-gamehub'; // bumped: redesign UI (design-system.css, ds-modules.css)
+const CACHE_NAME = 'sim-spt-shell-v24d-gamehub'; // bumped: app-main.js & tax_career/app.js dipecah, html-utils.js baru (tag <script> baru di HTML)
 
 // File dari domain sendiri — wajib berhasil di-cache saat install.
 const APP_SHELL_LOCAL = [

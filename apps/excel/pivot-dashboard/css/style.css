@@ -224,4 +224,3 @@ table.pd-pivot-table td.pd-total, table.pd-pivot-table th.pd-total { background:
 .pd-chart-card:hover .pd-bar { filter: saturate(1.08); }
 @media (max-width: 820px) { .pd-shell { padding-top: 18px; } .pd-card--controls { position: static; } }
 @media (prefers-reduced-motion: reduce) { .pd-tab, .pd-data-table tbody tr, .pd-pivot-table tbody tr, .pd-bar { transition: none; } }
-

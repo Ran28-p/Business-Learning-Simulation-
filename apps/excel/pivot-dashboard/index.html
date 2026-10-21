@@ -26,14 +26,14 @@
     </div>
   </header>
 
-  <nav class="pd-tabs" role="tablist">
-    <button class="pd-tab pd-tab--active" data-pd-tab="data" type="button">1. Data Sumber</button>
-    <button class="pd-tab" data-pd-tab="pivot" type="button">2. Pivot Table</button>
-    <button class="pd-tab" data-pd-tab="dashboard" type="button">3. Dashboard</button>
+  <nav class="pd-tabs" role="tablist" aria-label="Bagian latihan Excel">
+    <button class="pd-tab pd-tab--active" id="pdTabData" role="tab" aria-selected="true" aria-controls="pdPanelData" data-pd-tab="data" type="button">1. Data Sumber</button>
+    <button class="pd-tab" id="pdTabPivot" role="tab" aria-selected="false" aria-controls="pdPanelPivot" data-pd-tab="pivot" type="button">2. Pivot Table</button>
+    <button class="pd-tab" id="pdTabDashboard" role="tab" aria-selected="false" aria-controls="pdPanelDashboard" data-pd-tab="dashboard" type="button">3. Dashboard</button>
   </nav>
 
   <!-- TAB 1: DATA -->
-  <section class="pd-panel pd-panel--active" data-pd-panel="data">
+  <section class="pd-panel pd-panel--active" id="pdPanelData" role="tabpanel" aria-labelledby="pdTabData" data-pd-panel="data">
     <div class="pd-card">
       <h2>Dataset Penjualan Fiktif</h2>
       <p>Dataset ini dibuat otomatis (180+ baris transaksi, Januari–Juni 2025) supaya kamu bisa langsung praktik tanpa perlu data sungguhan. Struktur kolomnya sengaja dibuat seperti data mentah khas sebelum diringkas dengan Pivot Table.</p>
@@ -44,7 +44,7 @@
   </section>
 
   <!-- TAB 2: PIVOT TABLE -->
-  <section class="pd-panel" data-pd-panel="pivot">
+  <section class="pd-panel" id="pdPanelPivot" role="tabpanel" aria-labelledby="pdTabPivot" data-pd-panel="pivot">
     <div class="pd-grid">
       <div class="pd-card pd-card--controls">
         <h2>Susun Pivot Table-mu</h2>
@@ -88,7 +88,7 @@
   </section>
 
   <!-- TAB 3: DASHBOARD -->
-  <section class="pd-panel" data-pd-panel="dashboard">
+  <section class="pd-panel" id="pdPanelDashboard" role="tabpanel" aria-labelledby="pdTabDashboard" data-pd-panel="dashboard">
     <div class="pd-card">
       <div class="pd-dash-toolbar">
         <h2>Dashboard Penjualan</h2>
@@ -114,6 +114,7 @@
       <ul id="pdDashExerciseList"></ul>
     </div>
   </section>
+
 </div>
 
 <script src="../../../vendor/hyperformula/hyperformula.full.js"></script>

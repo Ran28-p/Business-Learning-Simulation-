@@ -42,6 +42,7 @@ section('B. Pembuat soal');
     eq(LQ.validateQuiz(q), [], theme + ': semua valid');
     eq(new Set(q.map((x) => x.q)).size, 25, theme + ': tanpa soal kembar');
     check(q.every((x) => x.o.length === 4 && x.e), theme + ': 4 pilihan + pembahasan');
+    if (theme === 'sqlpq') check(q.filter((x) => x.g).every((x) => !/\bkat\b|\bwil\b|\bjml\b|\bpid\b|\bberurutan\b|COUNT\(v\)|Tabel n\(v\)/i.test(x.q)), 'SQL: nama kolom dan tabel ditulis lengkap');
   }
   const a = LQ.buildQuiz({ theme: 'pajak', count: 20, seed: 1 }).map((x) => x.q).join('|'), b = LQ.buildQuiz({ theme: 'pajak', count: 20, seed: 2 }).map((x) => x.q).join('|');
   check(a !== b, 'seed berbeda → set soal berbeda (generate ulang variatif)');
@@ -140,6 +141,24 @@ section('B3. Tema Excel & SQL/Power Query — jawaban dicocokkan ke mesin NYATA 
 }
 
 /* ============ C ============ */
+section('B4. Bank esai & penilaian rubrik');
+{
+  const essays = {};
+  for (const theme of ['pajak', 'akuntansi', 'excel', 'sqlpq', 'campuran']) {
+    essays[theme] = LQ.buildEssayQuiz({ theme, count: 100, seed: 17 });
+    eq(essays[theme].length, theme === 'campuran' ? 20 : 5, theme + ': jumlah sesuai bank esai');
+    eq(LQ.validateQuiz(essays[theme]), [], theme + ': seluruh soal esai valid');
+    check(essays[theme].every((q) => q.type === 'essay' && q.o === undefined && q.a === undefined && LQ.scoreEssay(q, q.answer).complete), theme + ': kunci jawaban memenuhi rubrik tanpa opsi');
+  }
+  check(LQ.validateQuiz([essays.pajak[0], LQ.buildQuiz({ theme: 'pajak', count: 1, seed: 3 })[0]]).some((x) => /mode soal/.test(x)), 'mode esai dan pilihan ganda tidak dapat dicampur');
+  const scored = LQ.scoreEssay({ rubric: [{ label: 'A', keywords: ['aset bertambah'] }, { label: 'B', keywords: ['liabilitas meningkat'] }, { label: 'C', keywords: ['ekuitas tetap'] }] }, 'Aset bertambah; liabilitas meningkat.');
+  eq([scored.matched, scored.total, scored.points, scored.complete], [2, 3, 667, false], 'skor parsial dibagi merata menurut kriteria');
+  eq(LQ.scoreEssay({ rubric: [{ label: 'A', keywords: ['aset'] }] }, 'asetnya bertambah').points, 0, 'kata kunci harus cocok sebagai frasa utuh');
+  eq(LQ.scoreEssay(essays.pajak[0], '').points, 0, 'jawaban kosong mendapat nol');
+  eq(LQ.scoreEssayAll(essays.pajak, { 0: { siswa: { text: essays.pajak[0].answer } } }).siswa.total, 1000, 'skor esai dihitung dari semua jawaban tersimpan');
+  check(LQ.sanitizeQuestion({ type: 'essay', q: 'Apa?', answer: '', rubric: [] }) === null, 'sanitasi menolak kunci atau rubrik esai yang rusak');
+}
+
 section('C. Skor & papan peringkat');
 {
   eq(LQ.points(true, 0, 20000), 1000, 'tercepat = 1000');
@@ -246,6 +265,35 @@ section('D2. Layar siswa: soal/reveal yang tiba SETELAH meta tetap memicu render
   if (noQ.length) check(noQ.every((k) => !withQ.some((w) => w[0] === k[0])), 'kunci render saat soal BELUM ada ≠ kunci saat soal sudah ada (kalau sama, layar macet "Memuat soal…")');
   check(Player.viewKey({ status: 'question', qIndex: 0, board: [], question: null }) !== Player.viewKey({ status: 'question', qIndex: 0, board: [], question: { q: 'x' } }), 'viewKey membedakan ada/tidaknya soal');
   check(Player.viewKey({ status: 'reveal', qIndex: 0, board: [], reveal: null }) !== Player.viewKey({ status: 'reveal', qIndex: 0, board: [], reveal: { a: 0 } }), 'viewKey membedakan ada/tidaknya reveal (termasuk jawaban 0)');
+}
+
+section('D3. Alur esai (jawaban teks, penilaian otomatis, reveal aman)');
+{
+  let clock = 7_000_000; const core = DB.makeCore({ clock: () => clock });
+  const teacher = DB.memory(core, 'TE'), student = DB.memory(core, 'SE');
+  const quiz = LQ.buildEssayQuiz({ theme: 'pajak', count: 1, seed: 8 });
+  const host = new Host(teacher, { theme: 'pajak', timer: 30 }), code = await host.create();
+  const player = new Player(student); await player.join(code, 'Siswa');
+  await host.start(quiz);
+  const room = core.data.liveRooms[code];
+  eq(room.meta.mode, 'essay', 'mode esai dibagikan untuk label hasil');
+  eq(room.questions[0], { type: 'essay', q: quiz[0].q }, 'soal publik hanya berisi tipe dan pertanyaan');
+  check(!JSON.stringify(room.questions).includes(quiz[0].answer) && !JSON.stringify(room.questions).includes('keywords'), 'kunci dan rubrik tidak ikut data soal publik');
+  eq(room.key[0].answer, quiz[0].answer, 'kunci lengkap tersimpan pada jalur guru');
+  check(player.view().question.type === 'essay' && player.view().question.answer === undefined && player.view().reveal === null, 'siswa tidak menerima kunci sebelum reveal');
+  eq((await player.submitEssay('   ')).why, 'jawaban kosong', 'jawaban esai kosong ditolak');
+  eq((await player.submitEssay('x'.repeat(LQ.LIM.essay + 1))).why, 'jawaban terlalu panjang', 'jawaban melebihi batas ditolak');
+  eq((await player.submit(0)).why, 'soal ini meminta jawaban esai', 'pilihan ganda ditolak pada soal esai');
+  const sent = await player.submitEssay(quiz[0].answer);
+  check(sent.ok && room.answers[0].SE.text === quiz[0].answer && room.answers[0].SE.c === undefined, 'jawaban dikirim satu kali sebagai teks');
+  eq(player.view().mode, 'essay', 'siswa menerima mode tanpa menerima kunci');
+  eq(host.view().board[0].total, 1000, 'guru memberi skor penuh untuk jawaban yang memenuhi rubrik');
+  await host.reveal();
+  eq(room.meta.status, 'reveal', 'reveal esai mengubah fase ruang');
+  eq(player.view().reveal.answer, quiz[0].answer, 'contoh jawaban baru diterima setelah reveal');
+  eq([player.view().correct, player.view().gained], [true, 1000], 'siswa melihat skor esai setelah reveal');
+  eq(host.view().answers.SE.text, quiz[0].answer, 'guru dapat memeriksa jawaban teks siswa');
+  await host.close();
 }
 
 

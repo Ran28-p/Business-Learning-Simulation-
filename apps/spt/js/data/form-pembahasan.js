@@ -38,11 +38,7 @@
         { re: /^Penghasilan Tidak Teratur/, rumus: 'Penghasilan yang tidak berulang (mis. keuntungan penjualan aset) dikeluarkan dari dasar angsuran PPh 25 tahun berikutnya.', dasar: 'UU PPh Pasal 25', jebakan: 'Ikut memasukkannya ke dasar angsuran sehingga angsuran terlalu besar.' }
     ];
 
-    function esc(s) {
-        return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, function (ch) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
-        });
-    }
+    function esc(s) { return escapeHTML(s); } // escapeHTML: js/shared/html-utils.js
     function lookup(label) {
         for (var i = 0; i < R.length; i++) if (R[i].re.test(String(label))) return R[i];
         return null;

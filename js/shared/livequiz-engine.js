@@ -3,7 +3,7 @@
 (function (root) {
   'use strict';
   var ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // tanpa 0/O/1/I agar tak salah baca
-  var LIM = { q: 400, opt: 150, exp: 600, name: 24, title: 100, maxQ: 100, minTimer: 5, maxTimer: 300 };
+  var LIM = { q: 400, opt: 150, exp: 600, essay: 2000, essayAnswer: 2000, name: 24, title: 100, maxQ: 100, minTimer: 5, maxTimer: 300 };
   var THEMES = [
     { id: 'pajak', label: 'Pajak', icon: '🧾', desc: 'PPh, PPN, PTKP, tarif, pemotongan & pelaporan' },
     { id: 'akuntansi', label: 'Akuntansi', icon: '📒', desc: 'Persamaan akuntansi, jurnal, persediaan, penyusutan, rasio' },
@@ -35,6 +35,17 @@
     if (!x || typeof x !== 'object') return ['bukan objek'];
     if (typeof x.q !== 'string' || !x.q.trim()) errs.push('pertanyaan kosong');
     else if (x.q.length > LIM.q) errs.push('pertanyaan terlalu panjang');
+    if (x.type === 'essay') {
+      if (typeof x.answer !== 'string' || !x.answer.trim()) errs.push('kunci jawaban esai kosong');
+      else if (x.answer.length > LIM.essayAnswer) errs.push('kunci jawaban esai terlalu panjang');
+      if (!Array.isArray(x.rubric) || x.rubric.length < 2 || x.rubric.length > 8) errs.push('rubrik esai harus memiliki 2–8 kriteria');
+      else x.rubric.forEach(function (criterion) {
+        if (!criterion || typeof criterion.label !== 'string' || !criterion.label.trim() || criterion.label.length > 120) errs.push('label kriteria esai tidak valid');
+        if (!Array.isArray(criterion.keywords) || !criterion.keywords.length || criterion.keywords.length > 12 || criterion.keywords.some(function (word) { return typeof word !== 'string' || !word.trim() || word.length > 80; })) errs.push('kata kunci kriteria esai tidak valid');
+      });
+      if (x.e != null && (typeof x.e !== 'string' || x.e.length > LIM.exp)) errs.push('pembahasan terlalu panjang');
+      return errs;
+    }
     if (!Array.isArray(x.o) || x.o.length < 2 || x.o.length > 4) errs.push('butuh 2–4 pilihan');
     else {
       var seen = {};
@@ -50,6 +61,13 @@
   }
   function sanitizeQuestion(x) {
     if (!x || typeof x !== 'object') return null;
+    if (x.type === 'essay') {
+      var rubric = Array.isArray(x.rubric) ? x.rubric.slice(0, 8).map(function (criterion) {
+        return { label: String(criterion && criterion.label || '').trim().slice(0, 120), keywords: Array.isArray(criterion && criterion.keywords) ? criterion.keywords.slice(0, 12).map(function (word) { return String(word || '').trim().slice(0, 80); }) : [] };
+      }) : [];
+      var essay = { type: 'essay', q: String(x.q == null ? '' : x.q).trim().slice(0, LIM.q), answer: String(x.answer == null ? '' : x.answer).trim().slice(0, LIM.essayAnswer), rubric: rubric, e: String(x.e == null ? '' : x.e).trim().slice(0, LIM.exp), t: String(x.t || '').slice(0, 40) };
+      return validateQuestion(essay).length ? null : essay;
+    }
     var o = Array.isArray(x.o) ? x.o.slice(0, 4).map(function (s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim().slice(0, LIM.opt); }) : [];
     var out = { q: String(x.q == null ? '' : x.q).replace(/\s+/g, ' ').trim().slice(0, LIM.q), o: o, a: Number(x.a), e: String(x.e == null ? '' : x.e).trim().slice(0, LIM.exp), t: String(x.t || '').slice(0, 40) };
     return validateQuestion(out).length ? null : out;
@@ -58,8 +76,91 @@
     if (!Array.isArray(qs) || !qs.length) return ['belum ada soal'];
     if (qs.length > LIM.maxQ) return ['maksimal ' + LIM.maxQ + ' soal'];
     var errs = [];
-    qs.forEach(function (x, i) { validateQuestion(x).forEach(function (e) { errs.push('Soal ' + (i + 1) + ': ' + e); }); });
+    var essay = qs[0] && qs[0].type === 'essay';
+    qs.forEach(function (x, i) {
+      if (!!(x && x.type === 'essay') !== !!essay) errs.push('mode soal tidak boleh dicampur');
+      validateQuestion(x).forEach(function (e) { errs.push('Soal ' + (i + 1) + ': ' + e); });
+    });
     return errs;
+  }
+
+  var ESSAY_BANK = {
+    pajak: [
+      { q: 'Jelaskan hubungan penghasilan neto, Penghasilan Tidak Kena Pajak (PTKP), dan Penghasilan Kena Pajak (PKP) orang pribadi.', answer: 'PKP dihitung dari penghasilan neto setelah dikurangi PTKP yang berlaku. Jika hasilnya negatif, PKP menjadi nihil. PPh terutang kemudian dihitung atas PKP sesuai tarif dan ketentuan pajak yang berlaku.', rubric: [{ label: 'Penghasilan neto menjadi dasar penghitungan', keywords: ['penghasilan neto', 'neto'] }, { label: 'PTKP mengurangi penghasilan neto', keywords: ['dikurangi ptkp', 'neto dikurangi ptkp', 'penghasilan neto setelah dikurangi'] }, { label: 'Hasilnya adalah PKP dan menjadi dasar pajak terutang', keywords: ['penghasilan kena pajak', 'pkp'] }], e: 'Gunakan PTKP sesuai status dan ketentuan yang berlaku pada tahun pajak terkait.', t: 'PPh orang pribadi' },
+      { q: 'Uraikan alur pemotongan PPh Pasal 21 atas penghasilan pegawai dan jelaskan fungsi bukti potong bagi pegawai.', answer: 'Pemberi kerja menghitung PPh Pasal 21 atas penghasilan pegawai sesuai ketentuan periode pajak, memotong pajak tersebut, menyetorkannya, dan melaporkannya. Bukti potong mencatat penghasilan serta pajak yang telah dipotong dan digunakan pegawai dalam pelaporan pajak tahunannya.', rubric: [{ label: 'Pemberi kerja menghitung pajak sesuai ketentuan', keywords: ['pemberi kerja menghitung', 'dihitung pemberi kerja', 'menghitung pph pasal 21'] }, { label: 'Pajak dipotong dan disetorkan atau dilaporkan', keywords: ['memotong pajak', 'menyetorkannya', 'melaporkannya', 'dipotong dan disetorkan'] }, { label: 'Bukti potong menjadi catatan untuk pelaporan tahunan', keywords: ['bukti potong', 'pelaporan pajak tahunan', 'spt tahunan'] }], e: 'Bukti potong mendukung pencocokan pajak yang telah dipotong dengan kewajiban tahunan pegawai.', t: 'PPh Pasal 21' },
+      { q: 'Jelaskan perbedaan PPN keluaran dan PPN masukan, serta cara umum menentukan PPN yang masih harus dibayar Pengusaha Kena Pajak.', answer: 'PPN keluaran timbul atas penyerahan kena pajak oleh Pengusaha Kena Pajak. PPN masukan timbul atas perolehan yang pajaknya dapat dikreditkan. Secara umum, PPN kurang bayar adalah PPN keluaran dikurangi PPN masukan yang dapat dikreditkan dalam masa pajak tersebut.', rubric: [{ label: 'PPN keluaran terkait penyerahan kena pajak', keywords: ['ppn keluaran', 'penyerahan kena pajak'] }, { label: 'PPN masukan berasal dari perolehan dan dapat dikreditkan sesuai syarat', keywords: ['ppn masukan', 'dapat dikreditkan'] }, { label: 'Kurang bayar adalah keluaran dikurangi masukan yang dapat dikreditkan', keywords: ['keluaran dikurangi masukan', 'ppn keluaran dikurangi ppn masukan', 'selisih ppn keluaran'] }], e: 'Pengkreditan PPN masukan mengikuti persyaratan perpajakan yang berlaku.', t: 'PPN' },
+      { q: 'Mengapa bukti transaksi dan pencatatan pajak perlu direkonsiliasi dengan laporan keuangan sebelum pelaporan pajak?', answer: 'Rekonsiliasi membantu memastikan transaksi, dasar pengenaan, dan pajak yang dilaporkan didukung bukti yang memadai. Proses ini menemukan selisih antara pencatatan akuntansi dan perlakuan pajak, sehingga kesalahan dapat diperiksa dan dikoreksi sebelum pelaporan.', rubric: [{ label: 'Memastikan angka didukung bukti transaksi', keywords: ['bukti transaksi', 'didukung bukti', 'dokumen pendukung'] }, { label: 'Menemukan selisih pencatatan akuntansi dan pajak', keywords: ['selisih antara pencatatan akuntansi dan perlakuan pajak', 'selisih akuntansi dan pajak', 'perbedaan pencatatan', 'rekonsiliasi fiskal'] }, { label: 'Memungkinkan pemeriksaan dan koreksi sebelum pelaporan', keywords: ['dikoreksi sebelum pelaporan', 'koreksi sebelum pelaporan', 'mencegah kesalahan pelaporan'] }], e: 'Rekonsiliasi memperkuat ketepatan dan keterlacakan pelaporan.', t: 'Administrasi pajak' },
+      { q: 'Jelaskan mengapa pajak yang bersifat final pada umumnya tidak diperhitungkan sebagai kredit terhadap PPh tahunan yang dikenakan dengan tarif umum.', answer: 'Pajak final menyelesaikan kewajiban pajak atas penghasilan tertentu sesuai ketentuan finalnya. Karena kewajiban atas penghasilan tersebut telah diselesaikan secara final, pajaknya pada umumnya tidak menjadi kredit untuk mengurangi PPh tahunan yang dihitung dengan tarif umum.', rubric: [{ label: 'Pajak final menyelesaikan kewajiban atas penghasilan tertentu', keywords: ['menyelesaikan kewajiban pajak', 'kewajiban pajak final', 'bersifat final'] }, { label: 'Penghasilan final memiliki perlakuan tersendiri', keywords: ['penghasilan tertentu', 'perlakuan tersendiri', 'dikenakan pajak final'] }, { label: 'Pajaknya pada umumnya bukan kredit PPh tarif umum', keywords: ['bukan kredit', 'tidak dapat dikreditkan', 'tidak menjadi kredit'] }], e: 'Periksa ketentuan khusus untuk jenis penghasilan terkait sebelum menerapkan perlakuan final.', t: 'PPh final' }
+    ],
+    accounting: [
+      { q: 'Jelaskan persamaan dasar akuntansi dan dampak penerimaan pinjaman tunai terhadap persamaan tersebut.', answer: 'Persamaan dasar akuntansi adalah aset sama dengan liabilitas ditambah ekuitas. Saat perusahaan menerima pinjaman tunai, aset berupa kas bertambah dan liabilitas berupa utang bertambah dengan jumlah yang sama; ekuitas tidak berubah saat penerimaan pinjaman.', rubric: [{ label: 'Persamaan aset sama dengan liabilitas ditambah ekuitas', keywords: ['aset sama dengan liabilitas ditambah ekuitas', 'aset = liabilitas + ekuitas'] }, { label: 'Kas atau aset bertambah', keywords: ['kas bertambah', 'aset bertambah'] }, { label: 'Utang atau liabilitas bertambah dengan jumlah sama', keywords: ['utang bertambah', 'liabilitas bertambah'] }], e: 'Penerimaan pinjaman bukan pendapatan karena menimbulkan kewajiban pembayaran.', t: 'Persamaan akuntansi' },
+      { q: 'Bandingkan basis akrual dengan basis kas dalam menentukan kapan pendapatan dan beban dicatat.', answer: 'Basis akrual mencatat pendapatan saat diperoleh dan beban saat terjadi, meskipun kas belum diterima atau dibayar. Basis kas mencatat penerimaan dan beban ketika kas diterima atau dibayarkan.', rubric: [{ label: 'Akrual mencatat pendapatan saat diperoleh', keywords: ['pendapatan saat diperoleh', 'pendapatan diperoleh'] }, { label: 'Akrual mencatat beban saat terjadi', keywords: ['beban saat terjadi', 'beban terjadi'] }, { label: 'Basis kas mengikuti penerimaan atau pembayaran kas', keywords: ['kas diterima atau dibayarkan', 'kas diterima', 'kas dibayarkan'] }], e: 'Perbedaan waktu pencatatan dapat membuat laba berbeda dari arus kas pada periode yang sama.', t: 'Basis pencatatan' },
+      { q: 'Sebuah mesin berharga perolehan Rp120.000.000, memiliki nilai residu Rp20.000.000, dan umur manfaat 5 tahun. Hitung penyusutan garis lurus per tahun dan tunjukkan rumusnya.', answer: 'Penyusutan per tahun = (harga perolehan − nilai residu) ÷ umur manfaat = (Rp120.000.000 − Rp20.000.000) ÷ 5 = Rp20.000.000 per tahun.', rubric: [{ label: 'Mengurangi nilai residu dari harga perolehan', keywords: ['harga perolehan dikurangi nilai residu', 'rp120.000.000 rp20.000.000', '100.000.000'] }, { label: 'Membagi jumlah yang dapat disusutkan dengan umur manfaat', keywords: ['dibagi umur manfaat', 'umur manfaat', 'dibagi 5 tahun', 'dibagi lima tahun'] }, { label: 'Hasil Rp20.000.000 per tahun', keywords: ['rp20.000.000', '20.000.000', '20 juta'] }], e: 'Metode garis lurus membebankan jumlah yang sama setiap tahun selama umur manfaat.', t: 'Penyusutan' },
+      { q: 'Jelaskan cara menghitung harga pokok penjualan (HPP) pada perusahaan dagang dengan metode periodik.', answer: 'HPP dihitung dengan menambahkan persediaan awal dan pembelian bersih, kemudian mengurangi persediaan akhir. Rumusnya: HPP = persediaan awal + pembelian bersih − persediaan akhir.', rubric: [{ label: 'Memulai dari persediaan awal', keywords: ['persediaan awal'] }, { label: 'Menambahkan pembelian bersih', keywords: ['pembelian bersih', 'ditambah pembelian'] }, { label: 'Mengurangi persediaan akhir', keywords: ['dikurangi persediaan akhir', 'persediaan akhir'] }], e: 'Pastikan retur, potongan, dan biaya angkut pembelian telah diperhitungkan dalam pembelian bersih sesuai kasus.', t: 'Persediaan' },
+      { q: 'Perusahaan membayar sewa tiga bulan di muka. Jelaskan pencatatan awal dan penyesuaian pada akhir bulan pertama dengan basis akrual.', answer: 'Saat pembayaran, perusahaan mencatat sewa dibayar di muka sebagai aset dan mengurangi kas. Pada akhir bulan pertama, perusahaan mengakui beban sewa untuk satu bulan dan mengurangi saldo aset sewa dibayar di muka sebesar bagian yang telah digunakan.', rubric: [{ label: 'Pembayaran awal dicatat sebagai aset dibayar di muka', keywords: ['aset dibayar di muka', 'sewa dibayar di muka sebagai aset'] }, { label: 'Kas berkurang saat pembayaran', keywords: ['kas berkurang', 'mengurangi kas'] }, { label: 'Satu bulan diakui sebagai beban dan aset dibayar di muka berkurang', keywords: ['beban sewa', 'aset sewa dibayar di muka berkurang', 'mengurangi saldo sewa dibayar di muka'] }], e: 'Penyesuaian mengakui bagian manfaat sewa yang sudah digunakan.', t: 'Jurnal penyesuaian' }
+    ],
+    excel: [
+      { q: 'Jelaskan perbedaan referensi relatif dan absolut pada Excel. Berikan contoh saat rumus disalin ke sel lain.', answer: 'Referensi relatif, seperti A1, berubah mengikuti perpindahan rumus saat disalin. Referensi absolut, seperti $A$1, mengunci kolom dan baris sehingga tetap menunjuk sel yang sama saat rumus disalin.', rubric: [{ label: 'Referensi relatif berubah saat rumus disalin', keywords: ['berubah mengikuti perpindahan rumus saat disalin', 'berubah saat disalin', 'bergeser saat disalin', 'referensi relatif berubah'] }, { label: 'Referensi absolut menggunakan tanda dolar', keywords: ['$a$1', 'tanda dolar', 'tanda $'] }, { label: 'Referensi absolut mengunci kolom dan baris', keywords: ['mengunci kolom dan baris', 'kolom dan baris tetap', 'tetap menunjuk sel'] }], e: 'Contoh referensi absolut adalah $A$1; referensi campuran dapat mengunci hanya kolom atau baris.', t: 'Referensi sel' },
+      { q: 'Jelaskan fungsi SUMIF dan arti setiap argumen pada rumus =SUMIF(A2:A10,"Utara",B2:B10).', answer: 'SUMIF menjumlahkan nilai pada rentang jumlah jika sel terkait pada rentang kriteria memenuhi satu kriteria. A2:A10 adalah rentang kriteria, "Utara" adalah kriteria, dan B2:B10 adalah rentang yang dijumlahkan.', rubric: [{ label: 'SUMIF menjumlahkan nilai berdasarkan satu kriteria', keywords: ['menjumlahkan berdasarkan kriteria', 'menjumlahkan nilai berdasarkan', 'sumif menjumlahkan'] }, { label: 'A2:A10 adalah rentang kriteria', keywords: ['rentang kriteria', 'range kriteria'] }, { label: 'Utara adalah kriteria dan B2:B10 adalah rentang jumlah', keywords: ['utara adalah kriteria', 'b2:b10', 'rentang yang dijumlahkan'] }], e: 'Urutan argumen SUMIF adalah rentang kriteria, kriteria, lalu rentang jumlah (opsional).', t: 'SUMIF' },
+      { q: 'Apa hasil rumus =IF(B2>=75,"Lulus","Perlu perbaikan") ketika B2 bernilai 72? Jelaskan alasannya.', answer: 'Hasilnya adalah "Perlu perbaikan" karena 72 tidak lebih besar atau sama dengan 75, sehingga kondisi IF bernilai salah dan argumen ketiga dikembalikan.', rubric: [{ label: 'Menyatakan hasil Perlu perbaikan', keywords: ['perlu perbaikan'] }, { label: 'Menjelaskan 72 tidak memenuhi syarat minimal 75', keywords: ['72 kurang dari 75', '72 tidak memenuhi', 'tidak lebih besar atau sama dengan 75'] }, { label: 'Menghubungkan kondisi salah dengan argumen ketiga IF', keywords: ['kondisi salah', 'argumen ketiga', 'nilai jika salah'] }], e: 'Fungsi IF mengembalikan argumen kedua jika kondisi benar dan argumen ketiga jika kondisi salah.', t: 'Fungsi IF' },
+      { q: 'Jelaskan mengapa VLOOKUP dengan pencocokan persis memakai argumen FALSE atau 0, dan apa arti #N/A.', answer: 'Argumen FALSE atau 0 meminta VLOOKUP mencari kecocokan persis pada kolom pertama tabel. Galat #N/A berarti nilai yang dicari tidak ditemukan dalam rentang pencarian.', rubric: [{ label: 'FALSE atau 0 meminta pencocokan persis', keywords: ['pencocokan persis', 'kecocokan persis', 'false atau 0'] }, { label: 'Pencarian dilakukan pada kolom pertama rentang tabel', keywords: ['kolom pertama', 'kolom paling kiri'] }, { label: '#N/A berarti nilai tidak ditemukan', keywords: ['tidak ditemukan', 'nilai tidak ditemukan', '#n/a'] }], e: 'Untuk pencarian persis, argumen terakhir VLOOKUP dapat diisi FALSE atau 0.', t: 'VLOOKUP' },
+      { q: 'Sebutkan dua langkah menyiapkan data sumber agar PivotTable menghasilkan ringkasan yang dapat dipercaya.', answer: 'Gunakan satu baris judul kolom yang unik, hindari baris atau kolom kosong di tengah data, dan pastikan setiap kolom memiliki tipe data yang konsisten. Setelah data sumber diperbarui, segarkan PivotTable.', rubric: [{ label: 'Menggunakan judul kolom yang unik', keywords: ['judul kolom yang unik', 'judul kolom unik', 'header unik', 'nama kolom berbeda'] }, { label: 'Menghindari baris atau kolom kosong di tengah data', keywords: ['hindari baris atau kolom kosong', 'tanpa baris kosong', 'menghindari baris kosong', 'tanpa kolom kosong'] }, { label: 'Menjaga tipe data konsisten atau menyegarkan PivotTable', keywords: ['tipe data konsisten', 'refresh pivot', 'segarkan pivottable'] }], e: 'Data berbentuk tabel dengan satu baris tajuk memudahkan PivotTable mengenali rentang sumber.', t: 'PivotTable' }
+    ],
+    sqlpq: [
+      { q: 'Jelaskan perbedaan WHERE dan HAVING dalam query yang menggunakan GROUP BY.', answer: 'WHERE menyaring baris sebelum pengelompokan dilakukan. HAVING menyaring kelompok setelah GROUP BY, biasanya berdasarkan hasil fungsi agregat seperti SUM atau COUNT.', rubric: [{ label: 'WHERE menyaring baris sebelum pengelompokan', keywords: ['sebelum pengelompokan', 'sebelum group by', 'menyaring baris'] }, { label: 'HAVING menyaring kelompok setelah pengelompokan', keywords: ['setelah pengelompokan', 'setelah group by', 'menyaring kelompok'] }, { label: 'HAVING dapat memakai fungsi agregat', keywords: ['fungsi agregat', 'sum atau count', 'hasil agregat'] }], e: 'Urutan logis: WHERE, GROUP BY, lalu HAVING.', t: 'WHERE & HAVING' },
+      { q: 'Jelaskan hasil LEFT JOIN ketika sebuah baris pada tabel kiri tidak memiliki pasangan pada tabel kanan.', answer: 'LEFT JOIN tetap mempertahankan baris dari tabel kiri. Kolom yang berasal dari tabel kanan bernilai NULL jika tidak ada baris pasangan yang memenuhi kondisi JOIN.', rubric: [{ label: 'Baris tabel kiri tetap dipertahankan', keywords: ['mempertahankan baris dari tabel kiri', 'mempertahankan baris kiri', 'semua baris tabel kiri', 'baris kiri tetap'] }, { label: 'Kolom tabel kanan bernilai NULL tanpa pasangan', keywords: ['kolom kanan bernilai null', 'bernilai null', 'null jika tidak ada pasangan'] }], e: 'LEFT JOIN berbeda dari INNER JOIN yang hanya menghasilkan baris dengan pasangan cocok.', t: 'LEFT JOIN' },
+      { q: 'Bandingkan COUNT(*) dengan COUNT(nama_kolom) ketika kolom tersebut berisi nilai NULL.', answer: 'COUNT(*) menghitung semua baris, termasuk baris yang memiliki NULL. COUNT(nama_kolom) hanya menghitung nilai bukan NULL pada kolom tersebut.', rubric: [{ label: 'COUNT(*) menghitung semua baris', keywords: ['semua baris', 'termasuk null', 'menghitung baris'] }, { label: 'COUNT(kolom) mengabaikan nilai NULL', keywords: ['mengabaikan null', 'bukan null', 'nilai non-null', 'nilai bukan null'] }], e: 'Gunakan COUNT(*) untuk jumlah baris dan COUNT(kolom) untuk jumlah nilai non-NULL.', t: 'COUNT & NULL' },
+      { q: 'Tabel penjualan memiliki kolom wilayah dan jumlah. Jelaskan langkah query untuk menghitung total jumlah per wilayah.', answer: 'Pilih kolom wilayah dan SUM(jumlah), lalu kelompokkan baris dengan GROUP BY wilayah. Fungsi SUM menjumlahkan nilai jumlah pada setiap kelompok wilayah.', rubric: [{ label: 'Mengelompokkan data berdasarkan wilayah', keywords: ['group by wilayah', 'kelompokkan berdasarkan wilayah', 'per wilayah'] }, { label: 'Menjumlahkan kolom jumlah dengan SUM', keywords: ['sum(jumlah)', 'sum jumlah', 'menjumlahkan kolom jumlah'] }], e: 'GROUP BY menghasilkan satu kelompok untuk setiap nilai wilayah.', t: 'GROUP BY & SUM' },
+      { q: 'Jelaskan perbedaan Append Queries dan Merge Queries pada Power Query.', answer: 'Append Queries menambahkan baris dari satu tabel ke tabel lain berdasarkan nama kolom yang sesuai. Merge Queries mencocokkan baris dari dua tabel berdasarkan satu atau lebih kolom kunci dan menambahkan kolom dari tabel yang digabungkan.', rubric: [{ label: 'Append menumpuk atau menambahkan baris', keywords: ['menambahkan baris', 'menumpuk baris', 'baris dari tabel'] }, { label: 'Merge mencocokkan baris menggunakan kolom kunci', keywords: ['mencocokkan baris', 'kolom kunci', 'berdasarkan kunci'] }, { label: 'Merge menambahkan kolom, berbeda dari Append', keywords: ['menambahkan kolom', 'append menambah baris', 'merge menambah kolom'] }], e: 'Append menggabungkan struktur baris; Merge menggabungkan data berdasarkan kunci.', t: 'Power Query' }
+    ]
+  };
+
+  function essayPool(theme) {
+    if (theme === 'campuran') return ESSAY_BANK.pajak.concat(ESSAY_BANK.accounting, ESSAY_BANK.excel, ESSAY_BANK.sqlpq);
+    if (theme === 'akuntansi') return ESSAY_BANK.accounting;
+    return ESSAY_BANK[theme] || [];
+  }
+  function buildEssayQuiz(opts) {
+    var r = rng(opts.seed == null ? Date.now() : opts.seed), pool = essayPool(opts.theme);
+    if (!pool.length) return [];
+    return shuffle(r, pool).slice(0, Math.max(1, Math.min(pool.length, Math.round(opts.count || pool.length)))).map(function (q) {
+      return { type: 'essay', q: q.q, answer: q.answer, rubric: q.rubric.map(function (c) { return { label: c.label, keywords: c.keywords.slice() }; }), e: q.e, t: q.t };
+    });
+  }
+  function regenerateEssayOne(opts) {
+    var avoid = {};
+    (opts.existing || []).forEach(function (q) { avoid[String(q.q).toLowerCase()] = true; });
+    var pool = essayPool(opts.theme).filter(function (q) { return !avoid[q.q.toLowerCase()]; });
+    return pool.length ? buildEssayQuiz({ theme: opts.theme, count: pool.length, seed: opts.seed }).filter(function (q) { return !avoid[q.q.toLowerCase()]; })[0] || null : null;
+  }
+  function normalizeEssayText(text) {
+    return String(text == null ? '' : text).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+  }
+  function scoreEssay(question, response) {
+    var text = normalizeEssayText(response), rubric = question && question.rubric || [], matched = 0, criteria = [];
+    rubric.forEach(function (criterion) {
+      var found = (criterion.keywords || []).some(function (keyword) {
+        var phrase = normalizeEssayText(keyword);
+        return phrase && (' ' + text + ' ').indexOf(' ' + phrase + ' ') >= 0;
+      });
+      if (found) matched++;
+      criteria.push({ label: criterion.label, matched: found });
+    });
+    return { points: rubric.length ? Math.round(matched * 1000 / rubric.length) : 0, matched: matched, total: rubric.length, complete: rubric.length > 0 && matched === rubric.length, criteria: criteria };
+  }
+  function scoreEssayAll(quiz, answers) {
+    var out = {};
+    Object.keys(answers || {}).forEach(function (i) {
+      var q = quiz && quiz[Number(i)];
+      if (!q || q.type !== 'essay') return;
+      Object.keys(answers[i] || {}).forEach(function (uid) {
+        var a = answers[i][uid], result = scoreEssay(q, a && a.text);
+        var s = out[uid] || (out[uid] = { total: 0, correct: 0, ms: 0 });
+        s.total += result.points;
+        if (result.complete) s.correct++;
+      });
+    });
+    return out;
   }
 
   /* ---------- sumber statis ---------- */
@@ -256,42 +357,42 @@
   /* ---------- SQL: generator (dicocokkan ke SQLite asli — sql.js — di tes) ---------- */
   var KATS = ['Alat', 'Buku', 'Cat', 'Dus'], WILS = ['Jawa', 'Bali', 'Riau'], NAMA = ['Ani', 'Budi', 'Cici', 'Dedi'];
   function jualRows(r, n) { var rows = []; for (var i = 0; i < n; i++) rows.push([pick(r, KATS.slice(0, 3)), pick(r, WILS), int(r, 1, 9) * 10]); return rows; }
-  function jualTxt(rows) { return 'jual(kat, wil, jml): ' + rows.map(function (x) { return '(' + x[0] + ', ' + x[1] + ', ' + x[2] + ')'; }).join(' '); }
-  function jualSetup(rows) { return ['CREATE TABLE jual(kat TEXT, wil TEXT, jml INTEGER)'].concat(rows.map(function (x) { return "INSERT INTO jual VALUES ('" + x[0] + "','" + x[1] + "'," + x[2] + ')'; })); }
+  function jualTxt(rows) { return 'jual(kategori, wilayah, jumlah): ' + rows.map(function (x) { return '(' + x[0] + ', ' + x[1] + ', ' + x[2] + ')'; }).join(' '); }
+  function jualSetup(rows) { return ['CREATE TABLE jual(kategori TEXT, wilayah TEXT, jumlah INTEGER)'].concat(rows.map(function (x) { return "INSERT INTO jual VALUES ('" + x[0] + "','" + x[1] + "'," + x[2] + ')'; })); }
   function sq(q, opts, e, t, setup, sql, ans) { return { q: q, o: opts.o, a: opts.a, e: e, t: t, v: { k: 'sql', setup: setup, sql: sql, answer: String(ans) } }; }
   GEN.sqlpq = [
-    function (r) { var rows = jualRows(r, 6), kat = pick(r, KATS.slice(0, 3)), th = pick(r, [20, 30, 40, 50]), sql = "SELECT COUNT(*) FROM jual WHERE kat = '" + kat + "' AND jml > " + th, c = rows.filter(function (x) { return x[0] === kat && x[2] > th; }).length;
+    function (r) { var rows = jualRows(r, 6), kat = pick(r, KATS.slice(0, 3)), th = pick(r, [20, 30, 40, 50]), sql = "SELECT COUNT(*) FROM jual WHERE kategori = '" + kat + "' AND jumlah > " + th, c = rows.filter(function (x) { return x[0] === kat && x[2] > th; }).length;
       var o = numOpts(r, c, [c + 1, c + 2, Math.max(0, c - 1), rows.filter(function (x) { return x[0] === kat; }).length], String);
-      return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'WHERE menyaring baris kat=' + kat + ' dan jml>' + th + ', COUNT(*) menghitung baris lolos = ' + c + '.', 'SELECT & COUNT', jualSetup(rows), sql, c); },
-    function (r) { var rows = jualRows(r, 6), wil = pick(r, WILS), sql = "SELECT SUM(jml) FROM jual WHERE wil = '" + wil + "'", c = rows.filter(function (x) { return x[1] === wil; }).reduce(function (a, x) { return a + x[2]; }, 0); if (c === 0) return null;
+      return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'WHERE menyaring baris dengan kategori ' + kat + ' dan jumlah lebih dari ' + th + ', COUNT(*) menghitung baris yang lolos = ' + c + '.', 'SELECT & COUNT', jualSetup(rows), sql, c); },
+    function (r) { var rows = jualRows(r, 6), wil = pick(r, WILS), sql = "SELECT SUM(jumlah) FROM jual WHERE wilayah = '" + wil + "'", c = rows.filter(function (x) { return x[1] === wil; }).reduce(function (a, x) { return a + x[2]; }, 0); if (c === 0) return null;
       var o = numOpts(r, c, [c + 10, c - 10, rows.reduce(function (a, x) { return a + x[2]; }, 0), c + 20], String);
-      return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'Hanya baris wil=' + wil + ' yang dijumlahkan: ' + c + '.', 'SUM & WHERE', jualSetup(rows), sql, c); },
-    function (r) { var rows = jualRows(r, 6), tot = rows.reduce(function (a, x) { return a + x[2]; }, 0), adj = (6 - tot / 10 % 6) % 6; rows[5][2] += adj * 10; if (rows[5][2] > 150) return null; tot += adj * 10; var c = tot / 6, sql = 'SELECT AVG(jml) FROM jual';
+      return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'Hanya baris dengan wilayah ' + wil + ' yang dijumlahkan: ' + c + '.', 'SUM & WHERE', jualSetup(rows), sql, c); },
+    function (r) { var rows = jualRows(r, 6), tot = rows.reduce(function (a, x) { return a + x[2]; }, 0), adj = (6 - tot / 10 % 6) % 6; rows[5][2] += adj * 10; if (rows[5][2] > 150) return null; tot += adj * 10; var c = tot / 6, sql = 'SELECT AVG(jumlah) FROM jual';
       var o = numOpts(r, c, [c + 10, c - 10, tot, c + 5], String);
       return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'AVG = jumlah ÷ banyak baris = ' + tot + ' ÷ 6 = ' + c + '.', 'AVG', jualSetup(rows), sql, c); },
     function (r) { var rows = jualRows(r, 6), th = pick(r, [40, 60, 80, 100]), sums = {}; rows.forEach(function (x) { sums[x[0]] = (sums[x[0]] || 0) + x[2]; });
-      var c = Object.keys(sums).filter(function (k) { return sums[k] > th; }).length, sql = 'SELECT COUNT(*) FROM (SELECT kat FROM jual GROUP BY kat HAVING SUM(jml) > ' + th + ')';
+      var c = Object.keys(sums).filter(function (k) { return sums[k] > th; }).length, sql = 'SELECT COUNT(*) FROM (SELECT kategori FROM jual GROUP BY kategori HAVING SUM(jumlah) > ' + th + ')';
       var o = numOpts(r, c, [c + 1, c + 2, Math.max(0, c - 1), Object.keys(sums).length], String);
-      return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'GROUP BY membentuk grup per kat, HAVING menyaring GRUP yang totalnya > ' + th + '. Jumlah grup lolos = ' + c + '.', 'GROUP BY & HAVING', jualSetup(rows), sql, c); },
+      return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'GROUP BY membentuk grup per kategori, HAVING menyaring grup dengan total jumlah lebih dari ' + th + '. Jumlah grup yang lolos = ' + c + '.', 'GROUP BY & HAVING', jualSetup(rows), sql, c); },
     function (r) { var rows = jualRows(r, 6), sums = {}; rows.forEach(function (x) { sums[x[0]] = (sums[x[0]] || 0) + x[2]; });
       var ks = Object.keys(sums).sort(function (a, b) { return sums[b] - sums[a]; }); if (ks.length < 2 || sums[ks[0]] === sums[ks[1]]) return null;
-      var sql = 'SELECT kat FROM jual GROUP BY kat ORDER BY SUM(jml) DESC LIMIT 1', o = strOpts(r, ks[0], KATS.filter(function (k) { return k !== ks[0]; })); if (!o) return null;
-      return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'Total per kat: ' + ks.map(function (k) { return k + '=' + sums[k]; }).join(', ') + '. ORDER BY ... DESC LIMIT 1 mengambil yang terbesar: ' + ks[0] + '.', 'ORDER BY & LIMIT', jualSetup(rows), sql, ks[0]); },
-    function (r) { var rows = jualRows(r, 6), th = pick(r, [20, 30, 40]), sql = 'SELECT COUNT(DISTINCT wil) FROM jual WHERE jml >= ' + th, c = new Set(rows.filter(function (x) { return x[2] >= th; }).map(function (x) { return x[1]; })).size; if (c === 0) return null;
+      var sql = 'SELECT kategori FROM jual GROUP BY kategori ORDER BY SUM(jumlah) DESC LIMIT 1', o = strOpts(r, ks[0], KATS.filter(function (k) { return k !== ks[0]; })); if (!o) return null;
+      return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'Total jumlah per kategori: ' + ks.map(function (k) { return k + '=' + sums[k]; }).join(', ') + '. ORDER BY ... DESC LIMIT 1 mengambil kategori dengan total terbesar: ' + ks[0] + '.', 'ORDER BY & LIMIT', jualSetup(rows), sql, ks[0]); },
+    function (r) { var rows = jualRows(r, 6), th = pick(r, [20, 30, 40]), sql = 'SELECT COUNT(DISTINCT wilayah) FROM jual WHERE jumlah >= ' + th, c = new Set(rows.filter(function (x) { return x[2] >= th; }).map(function (x) { return x[1]; })).size; if (c === 0) return null;
       var o = numOpts(r, c, [c + 1, c + 2, rows.filter(function (x) { return x[2] >= th; }).length, 0], String);
-      return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'DISTINCT menghitung nilai wil yang berbeda di antara baris dengan jml>=' + th + ': ' + c + '.', 'DISTINCT', jualSetup(rows), sql, c); },
+      return sq('Tabel ' + jualTxt(rows) + '. Hasil query: ' + sql + ' ?', o, 'DISTINCT menghitung banyak wilayah berbeda pada baris dengan jumlah minimal ' + th + ': ' + c + '.', 'DISTINCT', jualSetup(rows), sql, c); },
     function (r) { var pids = []; for (var i = 0; i < 6; i++) pids.push(int(r, 1, 5)); var left = r() < 0.5, nm = NAMA.slice(0, 4);
       var cnt = {}; pids.forEach(function (x) { cnt[x] = (cnt[x] || 0) + 1; });
       var c = left ? nm.reduce(function (a, _, i) { return a + Math.max(1, cnt[i + 1] || 0); }, 0) : pids.filter(function (x) { return x <= 4; }).length;
-      var sql = left ? 'SELECT COUNT(*) FROM p LEFT JOIN o ON o.pid = p.id' : 'SELECT COUNT(*) FROM o JOIN p ON o.pid = p.id';
-      var setup = ['CREATE TABLE p(id INTEGER, nama TEXT)', 'CREATE TABLE o(id INTEGER, pid INTEGER)'].concat(nm.map(function (n, i) { return "INSERT INTO p VALUES (" + (i + 1) + ",'" + n + "')"; })).concat(pids.map(function (x, i) { return 'INSERT INTO o VALUES (' + (i + 1) + ',' + x + ')'; }));
+      var sql = left ? 'SELECT COUNT(*) FROM p LEFT JOIN o ON o.id_pelanggan = p.id_pelanggan' : 'SELECT COUNT(*) FROM o JOIN p ON o.id_pelanggan = p.id_pelanggan';
+      var setup = ['CREATE TABLE p(id_pelanggan INTEGER, nama TEXT)', 'CREATE TABLE o(id_pelanggan INTEGER, nomor_pesanan INTEGER)'].concat(nm.map(function (n, i) { return "INSERT INTO p VALUES (" + (i + 1) + ",'" + n + "')"; })).concat(pids.map(function (x, i) { return 'INSERT INTO o VALUES (' + x + ',' + (i + 1) + ')'; }));
       var o = numOpts(r, c, [c + 1, c - 1, 6, 4], String);
-      return sq('Tabel p(id): 1..4 (Ani, Budi, Cici, Dedi). Tabel o(pid, berurutan): ' + pids.join(', ') + ' (pid 5 tidak ada di p). Hasil: ' + sql + ' ?', o, left ? 'LEFT JOIN menjaga SEMUA baris p; p tanpa pesanan tetap muncul 1 kali (NULL di sisi o).' : 'JOIN (INNER) hanya baris o yang pid-nya ada di p; pid 5 tidak cocok sehingga dibuang.', left ? 'LEFT JOIN' : 'INNER JOIN', setup, sql, c); },
+      return sq('Tabel p(id_pelanggan, nama): (1, Ani) (2, Budi) (3, Cici) (4, Dedi). Tabel o(id_pelanggan, nomor_pesanan): ' + pids.map(function (pid, i) { return '(' + pid + ', ' + (i + 1) + ')'; }).join(' ') + '. Catatan: id_pelanggan 5 tidak terdapat di tabel p. Hasil: ' + sql + ' ?', o, left ? 'LEFT JOIN mempertahankan semua baris tabel p; pelanggan tanpa pesanan tetap muncul satu kali dengan nilai NULL pada tabel o.' : 'JOIN (INNER JOIN) hanya menghitung pesanan yang id_pelanggannya cocok dengan tabel p; id_pelanggan 5 tidak cocok sehingga tidak dihitung.', left ? 'LEFT JOIN' : 'INNER JOIN', setup, sql, c); },
     function (r) { var vals = []; for (var i = 0; i < 5; i++) vals.push(r() < 0.4 ? null : int(r, 1, 9) * 10); var c = vals.filter(function (x) { return x !== null; }).length; if (c === 5 || c === 0) return null;
-      var star = r() < 0.5, sql = star ? 'SELECT COUNT(*) FROM n' : 'SELECT COUNT(v) FROM n', ans = star ? 5 : c;
-      var setup = ['CREATE TABLE n(v INTEGER)'].concat(vals.map(function (x) { return 'INSERT INTO n VALUES (' + (x === null ? 'NULL' : x) + ')'; }));
+      var star = r() < 0.5, sql = star ? 'SELECT COUNT(*) FROM n' : 'SELECT COUNT(nilai) FROM n', ans = star ? 5 : c;
+      var setup = ['CREATE TABLE n(nilai INTEGER)'].concat(vals.map(function (x) { return 'INSERT INTO n VALUES (' + (x === null ? 'NULL' : x) + ')'; }));
       var o = numOpts(r, ans, [5, c, ans + 1, Math.max(0, ans - 1)], String);
-      return sq('Tabel n(v) berisi: ' + vals.map(function (x) { return x === null ? 'NULL' : x; }).join(', ') + '. Hasil query: ' + sql + ' ?', o, star ? 'COUNT(*) menghitung SEMUA baris, termasuk yang berisi NULL = 5.' : 'COUNT(v) hanya menghitung nilai yang BUKAN NULL = ' + c + '.', 'NULL', setup, sql, ans); }
+      return sq('Tabel n(nilai) berisi: ' + vals.map(function (x) { return x === null ? 'NULL' : x; }).join(', ') + '. Hasil query: ' + sql + ' ?', o, star ? 'COUNT(*) menghitung semua baris, termasuk baris yang berisi NULL = 5.' : 'COUNT(nilai) hanya menghitung nilai yang bukan NULL = ' + c + '.', 'NULL', setup, sql, ans); }
   ];
 
   var EXCEL_STATIC = [
@@ -431,5 +532,6 @@
 
   root.LiveQuiz = { ALPHABET: ALPHABET, LIM: LIM, THEMES: THEMES, rng: rng, makeCode: makeCode, normCode: normCode, validCode: validCode, clampTimer: clampTimer, cleanName: cleanName, rp: rp, pph17: pph17,
     validateQuestion: validateQuestion, sanitizeQuestion: sanitizeQuestion, validateQuiz: validateQuiz, fromModulPajak: fromModulPajak, fromTaxCareer: fromTaxCareer,
-    buildQuiz: buildQuiz, regenerateOne: regenerateOne, points: points, scoreAll: scoreAll, leaderboard: leaderboard, GRACE_MS: GRACE_MS, GENERATORS: GEN, STATIC: STATIC_BY };
+    buildQuiz: buildQuiz, regenerateOne: regenerateOne, buildEssayQuiz: buildEssayQuiz, regenerateEssayOne: regenerateEssayOne, scoreEssay: scoreEssay, scoreEssayAll: scoreEssayAll,
+    points: points, scoreAll: scoreAll, leaderboard: leaderboard, GRACE_MS: GRACE_MS, GENERATORS: GEN, STATIC: STATIC_BY };
 })(typeof window !== 'undefined' ? window : globalThis);

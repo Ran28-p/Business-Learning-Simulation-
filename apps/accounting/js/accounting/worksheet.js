@@ -4,11 +4,6 @@
 import { generateWorksheet } from './engine.js';
 import { formatNumber } from '../utils/formatters.js';
 
-export function buildWorksheetRows() {
-  const { rows } = generateWorksheet();
-  return rows;
-}
-
 export function renderWorksheetHTML() {
   const { rows, totals, netIncome } = generateWorksheet();
 

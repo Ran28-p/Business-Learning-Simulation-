@@ -17,22 +17,19 @@ import {
 } from './components.js';
 import { showModal, closeModal, showToast } from './modals.js';
 import {
-  validateJournal,
   readJournalRows,
   submitUserJournal,
   getExpectedJournal,
   exportSessionState,
-  importSessionState,
   getCurrentLevel,
   hasUserJournal
 } from '../accounting/journal.js';
 import {
-  validateAdjustments,
   readAdjustmentRows,
   submitUserAdjustmentJournal,
   hasUserAdjustmentJournal
 } from '../accounting/adjustments.js';
-import { validateClosing, readClosingRows } from '../accounting/closing.js';
+import { readClosingRows } from '../accounting/closing.js';
 import {
   rewardJournalSuccess,
   rewardLedgerPost,
@@ -40,33 +37,26 @@ import {
   getScoreSummary
 } from '../business/gamification.js';
 import {
-  changeLevel, changeMode, isExamMode, isLearningMode,
-  isExamActive, canUseHint, canShowCorrection,
+  changeLevel, changeMode,
+  isExamActive, canUseHint,
   startExam, finishExam, cancelExam, submitExamAnswer,
-  getExamState, renderExamReportHTML
+  renderExamReportHTML
 } from '../business/modeManager.js';
 import { getJournalData, setJournalData, getXP, getUserLevel, getMode, resetAppState } from '../business/appState.js';
-import { formatNumber } from '../utils/formatters.js';
 import {
   validateJournal as veValidateJournal,
   validateAdjustmentJournal,
   validateClosingJournal,
   validateLedgerPosting,
-  validateWorksheet,
-  validateFinancialStatements,
   renderValidationHTML
 } from '../accounting/validationEngine.js';
 import {
   assess,
   recordHint,
   recordRetry,
-  startAttempt,
   newScenario,
-  loadProgress,
-  getProgress,
   resetProgress,
-  renderAssessmentHTML,
-  renderProgressSummaryHTML
+  renderAssessmentHTML
 } from '../business/scoringEngine.js';
 import { generateTutorLessons, renderTutorHTML } from '../business/aiTutor.js';
 import {

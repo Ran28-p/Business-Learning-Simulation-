@@ -75,7 +75,6 @@ for (const [f, g] of [
   ['apps/spt/data/knowledge-spt.js', 'KNOWLEDGE_CONTENT_SPT'],
   ['apps/accounting/data/knowledge-accounting.js', 'KNOWLEDGE_CONTENT_ACCOUNTING'],
   ['apps/excel/data/knowledge-excel.js', 'KNOWLEDGE_CONTENT_EXCEL'],
-  ['apps/excel/data/knowledge-excel-pivot-dashboard.js', 'KNOWLEDGE_CONTENT_EXCEL_PIVOT_DASHBOARD'],
   ['apps/sql-pq/data/knowledge-sqlpq.js', 'KNOWLEDGE_CONTENT_SQLPQ'],
 ]) {
   const sb = { window: {}, console }; vm.createContext(sb);

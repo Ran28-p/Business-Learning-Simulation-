@@ -450,7 +450,7 @@ window.KNOWLEDGE_CONTENT_EXCEL = {
 <p class="kb-lead">Pivot Table adalah fitur Excel untuk meringkas, mengelompokkan, dan menganalisis data mentah dalam jumlah besar menjadi tabel ringkas yang mudah dibaca — tanpa perlu menulis satu pun rumus manual.</p>
 <p>Bayangkan 1.000 baris data transaksi (tanggal, wilayah, produk, jumlah). Untuk tahu "total per wilayah" manual butuh SUMIF per wilayah. Pivot Table melakukan ini otomatis — cukup <em>drag-and-drop</em> field ke area Baris, Kolom, atau Nilai.</p>
 <div class="kb-tip"><span class="kb-callout-title">💡 Kapan Memakai Pivot Table</span>Gunakan saat: (1) data banyak baris, (2) perlu ringkasan per kategori, (3) ingin cepat ganti sudut pandang tanpa tulis ulang rumus.</div>
-<div class="kb-example"><span class="kb-callout-title">🎯 Latihan</span>Buka latihan <strong>Pivot Table &amp; Dashboard</strong> di tombol header. Lihat data mentah di tab "1. Data Sumber" — tiap baris adalah satu transaksi.</div>`,
+<div class="kb-example"><span class="kb-callout-title">🎯 Latihan</span>Siapkan data mentah di Excel: tiap baris adalah satu transaksi, lalu coba buat Pivot Table dari data itu.</div>`,
           sources: [
             { type: 'vendor', ref: 'Microsoft Support — Create a PivotTable to analyze worksheet data', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
           ]

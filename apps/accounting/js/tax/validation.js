@@ -62,12 +62,6 @@ export function validatePartnerForm({ name, type, taxStatus, npwp }) {
   return { valid: errors.length === 0, errors };
 }
 
-export function validateInvoiceNumberUnique(invoiceNumber, existingInvoices) {
-  const dup = existingInvoices.some(i => i.invoiceNumber === invoiceNumber);
-  if (dup) return { valid: false, errors: ['Nomor invoice tidak boleh duplikat.'] };
-  return { valid: true, errors: [] };
-}
-
 export function renderErrorListHTML(errors) {
   return `<ul style="margin:0; padding-left:20px; color:var(--danger);">${errors.map(e => `<li style="margin-bottom:6px;">${e}</li>`).join('')}</ul>`;
 }

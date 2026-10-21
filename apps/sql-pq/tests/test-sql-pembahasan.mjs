@@ -22,7 +22,6 @@ section('Diagnosis vs pesan error SQLite nyata');
 const errOf = (sql) => { try { E.run(sql); return null; } catch (e) { return e.message; } };
 const hasTitle = (msg, re) => P.errorHints(msg).some((h) => re.test(h.judul));
 await E.ensureLoaded();
-const tbl = E.listTables ? E.listTables()[0] : null;
 check(hasTitle(errOf('SELECT foo_tidak_ada FROM sqlite_master'), /kolom tidak ditemukan/i), 'no such column');
 check(hasTitle(errOf('SELECT * FROM tabel_tidak_ada'), /tabel tidak ditemukan/i), 'no such table');
 check(hasTitle(errOf('SELECT FROM sqlite_master'), /sintaks/i), 'syntax error');

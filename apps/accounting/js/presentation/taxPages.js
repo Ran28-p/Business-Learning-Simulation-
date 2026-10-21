@@ -4,11 +4,10 @@
  */
 import {
   getCompany, getVatRates, getPartners, getProducts, getInvoices, getPurchases,
-  getJournalEntries, getMode
+  getJournalEntries
 } from '../tax/taxState.js';
-import { getActiveVatRatePercent } from '../tax/vatEngine.js';
-import { buildTaxLedgers, summarizePajakKeluaran, summarizePajakMasukan, computeRekonsiliasi } from '../tax/journalEngine.js';
-import { TAX_STATUS, VAT_TREATMENT_LABEL, PAYMENT_STATUS_LABEL, CREDIT_STATUS_LABEL, TAX_MODE, EDUCATIONAL_NOTE_COMPANY_NONPKP, EDUCATIONAL_NOTE_NONPKP_BUYER, EDUCATIONAL_NOTE_CREDIT } from '../tax/taxConstants.js';
+import { buildTaxLedgers, summarizePajakKeluaran, computeRekonsiliasi } from '../tax/journalEngine.js';
+import { TAX_STATUS, VAT_TREATMENT_LABEL, PAYMENT_STATUS_LABEL, CREDIT_STATUS_LABEL, EDUCATIONAL_NOTE_COMPANY_NONPKP, EDUCATIONAL_NOTE_NONPKP_BUYER } from '../tax/taxConstants.js';
 import { TAX_CASE_STUDIES } from '../../data/taxCaseStudies.js';
 import { formatRupiah } from '../utils/formatters.js';
 

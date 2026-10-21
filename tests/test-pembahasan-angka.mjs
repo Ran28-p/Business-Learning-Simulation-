@@ -93,7 +93,6 @@ t([3e6, 2e6, 4e6, 5e6, 12e6, 6e6].every((n) => hasNum(pj, n)), 'materi penyesuai
 t(0.03 * 200e6 - 1.5e6 === 4.5e6 && inText(pu, 4.5e6) && inText(pu, 6e6), 'piutang: 3% × 200 juta − 1,5 juta = 4,5 juta');
 
 // ── 9. Konsistensi laporan keuangan contoh CV Mitra Sejahtera (materi Accounting)
-const lr = ACC['laba-rugi'] || '';
 t(610 - 350 === 260 && 90 + 36 + 8 + 15 + 11 === 160 && 260 - 160 === 100 && 100 * 0.22 === 22 && 100 - 22 === 78, 'laba rugi contoh: 260 → 100 → 22 pajak → 78');
 t(300 + 50 + 28 - 28 === 350 || 300 + 78 - 28 === 350, 'ekuitas akhir contoh = 350');
 t(190 + 45 + 60 + 5 === 300 && 300 + (120 - 30) === 390 && 40 + 350 === 390, 'neraca contoh seimbang (390)');

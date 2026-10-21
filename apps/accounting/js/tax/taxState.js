@@ -186,10 +186,6 @@ export function persistTaxState() {
 
 /* ─── Getters ─── */
 
-export function getTaxState() {
-  return state;
-}
-
 export function getMode() {
   return state.mode;
 }
@@ -240,12 +236,6 @@ export function updateCompany(patch) {
 
 export function addVatRate(rate) {
   state.vatRates.push(rate);
-  persistTaxState();
-}
-
-export function updateVatRate(id, patch) {
-  const r = state.vatRates.find(v => v.id === id);
-  if (r) Object.assign(r, patch);
   persistTaxState();
 }
 
@@ -357,22 +347,4 @@ export function setLatihanCase(caseId) {
 export function setLatihanResult(result) {
   state.latihan.lastResult = result;
   persistTaxState();
-}
-
-/**
- * Wipes only the tax/invoicing module's transactional data (keeps company
- * profile & VAT rate configuration intact) — used by "Reset Data" scoped
- * to this module if the user wants a fresh operational start.
- */
-export function resetTaxTransactions() {
-  state.partners = [];
-  state.products = [];
-  state.invoices = [];
-  state.purchases = [];
-  state.journalEntries = [];
-  state.counters = { invoiceSeq: {}, partnerSeq: 0, productSeq: 0, purchaseSeq: 0 };
-  state.latihan = { currentCaseId: null, lastResult: null };
-  persistTaxState();
-  // Isi ulang data demo agar form invoice tetap bisa dipakai
-  ensureDemoData({ persist: true });
 }

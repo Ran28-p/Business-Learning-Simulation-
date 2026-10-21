@@ -109,6 +109,9 @@
           "theme": {
             ".validate": "newData.isString() && newData.val().length <= 40"
           },
+          "mode": {
+            ".validate": "newData.isString() && newData.val().matches(/^(choice|essay)$/)"
+          },
           "title": {
             ".validate": "newData.isString() && newData.val().length <= 100"
           },
@@ -122,9 +125,12 @@
         "questions": {
           ".read": "auth != null",
           "$i": {
-            ".validate": "$i.matches(/^[0-9]{1,2}$/) && newData.hasChildren(['q', 'o'])",
+            ".validate": "$i.matches(/^[0-9]{1,2}$/) && newData.hasChild('q') && ((newData.child('type').val() === 'essay' && !newData.hasChild('o')) || (!newData.hasChild('type') && newData.hasChild('o')))",
             "q": {
               ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 400"
+            },
+            "type": {
+              ".validate": "newData.isString() && newData.val() === 'essay'"
             },
             "o": {
               "$k": {
@@ -139,7 +145,35 @@
         "key": {
           ".read": "auth != null && root.child('liveRooms/'+$code+'/meta/host').val() === auth.uid",
           "$i": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3"
+            ".validate": "(newData.isNumber() && newData.val() >= 0 && newData.val() <= 3) || (newData.hasChildren(['type', 'answer', 'rubric']) && newData.child('type').val() === 'essay' && newData.child('answer').isString() && newData.child('answer').val().length >= 1 && newData.child('answer').val().length <= 2000 && newData.child('rubric').numChildren() >= 2 && newData.child('rubric').numChildren() <= 8 && (!newData.hasChild('e') || (newData.child('e').isString() && newData.child('e').val().length <= 600)))",
+            "type": {
+              ".validate": "newData.isString() && newData.val() === 'essay'"
+            },
+            "answer": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 2000"
+            },
+            "rubric": {
+              "$k": {
+                ".validate": "$k.matches(/^[0-7]$/) && newData.hasChildren(['label', 'keywords'])",
+                "label": {
+                  ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 120"
+                },
+                "keywords": {
+                  "$n": {
+                    ".validate": "$n.matches(/^[0-9]{1,2}$/) && newData.isString() && newData.val().length >= 1 && newData.val().length <= 80"
+                  }
+                },
+                "$other": {
+                  ".validate": false
+                }
+              }
+            },
+            "e": {
+              ".validate": "newData.isString() && newData.val().length <= 600"
+            },
+            "$other": {
+              ".validate": false
+            }
           }
         },
         "starts": {
@@ -151,9 +185,28 @@
         "reveal": {
           ".read": "auth != null",
           "$i": {
-            ".validate": "$i.matches(/^[0-9]{1,2}$/) && newData.hasChildren(['a'])",
+            ".validate": "$i.matches(/^[0-9]{1,2}$/) && ((newData.hasChild('a') && !newData.hasChild('answer')) || (newData.hasChildren(['answer', 'rubric']) && newData.child('answer').isString() && newData.child('answer').val().length <= 2000))",
             "a": {
               ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3"
+            },
+            "answer": {
+              ".validate": "newData.isString() && newData.val().length <= 2000"
+            },
+            "rubric": {
+              "$k": {
+                ".validate": "$k.matches(/^[0-7]$/) && newData.hasChildren(['label', 'keywords'])",
+                "label": {
+                  ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 120"
+                },
+                "keywords": {
+                  "$n": {
+                    ".validate": "$n.matches(/^[0-9]{1,2}$/) && newData.isString() && newData.val().length >= 1 && newData.val().length <= 80"
+                  }
+                },
+                "$other": {
+                  ".validate": false
+                }
+              }
             },
             "e": {
               ".validate": "newData.isString() && newData.val().length <= 600"
@@ -184,11 +237,14 @@
           "$i": {
             ".validate": "$i.matches(/^[0-9]{1,2}$/)",
             "$uid": {
-              ".read": "auth != null && auth.uid === $uid",
-              ".write": "auth != null && auth.uid === $uid && !data.exists() && root.child('liveRooms/'+$code+'/meta/status').val() === 'question' && root.child('liveRooms/'+$code+'/starts/'+$i).exists()",
-              ".validate": "newData.hasChildren(['c', 't'])",
+              ".read": "auth != null && (auth.uid === $uid || root.child('liveRooms/'+$code+'/meta/host').val() === auth.uid)",
+              ".write": "auth != null && auth.uid === $uid && !data.exists() && root.child('liveRooms/'+$code+'/meta/status').val() === 'question' && root.child('liveRooms/'+$code+'/starts/'+$i).exists() && root.child('liveRooms/'+$code+'/starts/'+$i).val() + root.child('liveRooms/'+$code+'/meta/timer').val() * 1000 + 1500 >= now && ((root.child('liveRooms/'+$code+'/questions/'+$i+'/type').val() === 'essay' && newData.hasChild('text') && !newData.hasChild('c')) || (!root.child('liveRooms/'+$code+'/questions/'+$i+'/type').exists() && newData.hasChild('c') && !newData.hasChild('text')))",
+              ".validate": "(newData.hasChildren(['c', 't']) && !newData.hasChild('text')) || (newData.hasChildren(['text', 't']) && !newData.hasChild('c'))",
               "c": {
                 ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3"
+              },
+              "text": {
+                ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 2000"
               },
               "t": {
                 ".validate": "newData.isNumber() && newData.val() <= now"

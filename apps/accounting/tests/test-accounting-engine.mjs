@@ -17,7 +17,7 @@ import {
   submitUserJournal, postToLedger, generateTrialBalance,
   buildAdjustmentJournal, submitUserAdjustmentJournal, generateAdjustedTrialBalance,
   generateWorksheet, generateFinancialStatements, generateClosingEntries,
-  generatePostClosingTrialBalance, getExpectedJournal, validateUserJournal,
+  getExpectedJournal, validateUserJournal,
   runFullCycle,
 } from '../js/accounting/engine.js';
 import { validateJournal } from '../js/accounting/validationEngine.js';

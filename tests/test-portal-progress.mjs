@@ -2,13 +2,13 @@
 // Tiga lapis:
 //   A. SINKRON — key & rumus di aggregator dibandingkan LANGSUNG dengan kode sumber tiap modul
 //      (kalau sebuah modul mengganti key/skema progresnya, test ini gagal).
-//   B. DATA NYATA — progres dihasilkan oleh engine asli (SQL progress-manager, Excel progress-manager)
-//      lalu dibaca aggregator, bukan fixture tulisan tangan.
+//   B. DATA NYATA — progres dihasilkan oleh engine asli (SQL progress-manager) lalu dibaca aggregator.
+//      Excel memakai fixture bentuk data 'efpg:progress' (engine progress-manager Excel sudah dihapus).
 //   C. EKSPOR/IMPOR — round-trip, merge vs replace, keamanan (allowlist, ukuran, data rusak), atomik.
 // Tanpa dependency; jalankan:  node tests/test-portal-progress.mjs
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -44,7 +44,8 @@ section('A. Key & skema sinkron dengan kode sumber modul');
   eq([...PP.MODULES.find((m) => m.id === 'spt').keys].sort(), [...sptKeys].sort(), 'key SPT di aggregator = BACKUP_KEYS di apps/spt/js/shared/backup-utils.js');
   check(src('apps/spt/tax_career/app.js').includes('const STORAGE_KEY = "spt_tax_career_progress"'), 'key Tax Career sama dengan di tax_career/app.js');
   check(src('apps/spt/faktur_bupot/script.js').includes("FK_HISTORY_KEY = 'simspt_faktur_history_v1'") && src('apps/spt/faktur_bupot/script.js').includes("BP_HISTORY_KEY = 'simspt_bupot_history_v1'"), 'key riwayat Faktur/Bupot sama dengan di faktur_bupot/script.js');
-  check(/localStorage\.setItem\('spt_simulator_data'/.test(src('apps/spt/js/app-main.js')) && /updatedAt/.test(src('apps/spt/js/app-main.js')), 'SPT masih menyimpan spt_simulator_data dengan updatedAt');
+  const sptApp = readdirSync(join(ROOT, 'apps/spt/js')).filter((f) => /^app-.*\.js$/.test(f)).sort().map((f) => src('apps/spt/js/' + f)).join('\n'); // app-main.js dipecah per tanggung jawab
+  check(/localStorage\.setItem\('spt_simulator_data'/.test(sptApp) && /updatedAt/.test(sptApp), 'SPT masih menyimpan spt_simulator_data dengan updatedAt');
   // Accounting
   const c = src('apps/accounting/js/utils/constants.js');
   check(c.includes("APP_STATE: 'ACT_MASTER_STATE'") && c.includes("TAX_STATE: 'ACT_MASTER_TAX_STATE'"), 'key ACT_MASTER_STATE & ACT_MASTER_TAX_STATE sama dengan constants.js');
@@ -54,12 +55,10 @@ section('A. Key & skema sinkron dengan kode sumber modul');
   const sp = src('apps/accounting/js/business/scoringEngine.js');
   check(['attemptCount', 'correctCount', 'bestGrade', 'bestScore', 'history'].every((f) => sp.includes(f + ':')), 'field ACT_MASTER_PROGRESS yang dibaca aggregator masih ada di scoringEngine.js');
   check(/Math\.floor\(state\.xp \/ 100\) \+ 1/.test(src('apps/accounting/js/business/appState.js')), 'level Accounting = floor(xp/100)+1 (dipakai sebagai fallback)');
-  // Excel
-  check(src('apps/excel/js/storage-manager.js').includes("const NAMESPACE = 'efpg'") && src('apps/excel/js/progress-manager.js').includes("const PROGRESS_KEY = 'progress'"), "key Excel 'efpg:progress' sama dengan storage-manager/progress-manager");
   // SQL
   const spm = src('apps/sql-pq/js/progress-manager.js');
   check(spm.includes("'sqlpq_progress_v1'") || spm.includes('"sqlpq_progress_v1"'), 'key SQL progress sama dengan progress-manager.js');
-  check(src('apps/sql-pq/js/app.js').includes('"sqlpq_dataset_history_v1"'), 'key riwayat dataset SQL sama dengan app.js');
+  check(src('apps/sql-pq/js/app-dataset.js').includes('"sqlpq_dataset_history_v1"'), 'key riwayat dataset SQL sama dengan app.js');
   // Allowlist TIDAK boleh memuat sesi login / tema / state sementara
   const forbidden = ['unified_portal_session', 'portal_display_name', 'theme', 'sqlpq_theme', 'spt_pending_name', 'spt_pending_email', 'ACT_MASTER_SESSION', 'hasVisited_ActMasterPro', 'preferredPaperSize'];
   check(forbidden.every((k) => !PP.ALL_KEYS.includes(k)), 'allowlist tidak memuat sesi login, tema, atau state sementara');
@@ -95,20 +94,23 @@ section('B. Ringkasan dari data yang dihasilkan engine asli');
     eq(byId(PP.summarize(globalThis.localStorage), 'sqlpq').level, SQ.getLevel(), `SQL: level konsisten pada XP ${xp}`);
   }
 
-  // --- Excel: pakai progress-manager.js asli (ES module) ---
+  // --- Excel: fixture bentuk data 'efpg:progress' (dulu dihasilkan progress-manager.js; modul itu sudah dihapus) ---
   const mem = new Map();
   globalThis.localStorage = globalThis.window.localStorage = { getItem: (k) => (mem.has(k) ? mem.get(k) : null), setItem: (k, v) => mem.set(k, String(v)), removeItem: (k) => mem.delete(k), key: (i) => [...mem.keys()][i] ?? null, get length() { return mem.size; } };
-  const ex = await import(pathToFileURL(join(ROOT, 'apps/excel/js/progress-manager.js')).href);
   eq(byId(PP.summarize(globalThis.localStorage), 'excel').started, false, 'Excel: tanpa data → belum dimulai');
-  const Q = (title, fn, points) => ({ title, acceptedFunctions: [fn], points });
-  ex.recordAttempt({ question: Q('Total penjualan', 'SUM', 10), status: 'correct' });
-  ex.recordAttempt({ question: Q('Rata-rata', 'AVERAGE', 10), status: 'correct', hintsUsed: 1 });
-  ex.recordAttempt({ question: Q('Cek IF', 'IF', 20), status: 'wrong' });
-  ex.recordAttempt({ question: Q('Hitung COUNT', 'COUNT', 10), status: 'correct' });
-  const real = ex.getStats();
+  const tw = (ms) => new Date(Date.now() - ms).toISOString();
+  const real = { soalDikerjakan: 4, jawabanBenar: 3, jawabanSalah: 1, xp: 27, levelAktif: 1, badges: ['excel_beginner'],
+    rumusDipelajari: { SUM: { dikerjakan: 1, benar: 1 }, AVERAGE: { dikerjakan: 1, benar: 1 }, IF: { dikerjakan: 1, benar: 0 }, COUNT: { dikerjakan: 1, benar: 1 } },
+    riwayat: [
+      { waktu: tw(0), soalTitle: 'Hitung COUNT', fungsi: 'COUNT', status: 'correct', xp: 10 },
+      { waktu: tw(1), soalTitle: 'Cek IF', fungsi: 'IF', status: 'wrong', xp: 0 },
+      { waktu: tw(1), soalTitle: 'Rata-rata', fungsi: 'AVERAGE', status: 'correct', xp: 7 },
+      { waktu: tw(10), soalTitle: 'Total penjualan', fungsi: 'SUM', status: 'correct', xp: 10 },
+    ] };
+  globalThis.localStorage.setItem('efpg:progress', JSON.stringify(real));
   const exSum = byId(PP.summarize(globalThis.localStorage), 'excel');
-  eq([exSum.xp, exSum.level, exSum.activities], [real.xp, real.levelAktif, real.soalDikerjakan], 'Excel: XP/level soal/aktivitas sama dengan getStats() engine asli');
-  eq(exSum.scorePct, ex.successRate(real), 'Excel: akurasi sama dengan successRate() engine asli');
+  eq([exSum.xp, exSum.level, exSum.activities], [27, 1, 4], 'Excel: XP/level soal/aktivitas sesuai fixture (xp 27, level 1, 4 soal)');
+  eq(exSum.scorePct, 75, 'Excel: akurasi = round(3/4*100) = 75');
   eq(exSum.activities, 4, 'Excel: 4 soal dikerjakan');
   check(exSum.highlights.some((h) => /3 fungsi rumus dikuasai/.test(h)), 'Excel: SUM, AVERAGE, COUNT dikuasai; IF (salah) tidak dihitung');
   check(Date.now() - exSum.lastActive < 5 * 60 * 1000 && exSum.lastActive <= Date.now() + 1000, 'Excel: lastActive ≈ sekarang (riwayat engine berurutan terbaru-dulu)');

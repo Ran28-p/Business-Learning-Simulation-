@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id" data-app="excel">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Belajar VBA Interaktif — Excel</title>
+  <meta name="description" content="Belajar VBA Excel dengan latihan makro, lembar kerja contoh, petunjuk, dan koreksi otomatis.">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="../../../css/responsive-foundation.css">
+  <link rel="stylesheet" href="../../../css/design-system.css">
+  <link rel="stylesheet" href="../../../css/ds-modules.css">
+  <script src="../../../js/shared/theme.js"></script>
+</head>
+<body>
+  <main class="xl-shell">
+    <header class="xl-header">
+      <div>
+        <a class="xl-back" href="../index.html">Kembali ke modul Excel</a>
+        <h1>Belajar VBA Interaktif</h1>
+        <p>Pelajari cara membuat makro Excel, membaca dan menulis sel, memakai perulangan, serta menguji logika VBA.</p>
+      </div>
+      <div class="xl-header-actions app-header__meta">
+        <div class="xl-score" id="xlScore" role="status" aria-live="polite">0 dari 4 latihan selesai</div>
+      </div>
+    </header>
+
+    <div class="xl-course">
+      <aside class="xl-course-nav" aria-label="Daftar pelajaran VBA">
+        <h2>Jalur Belajar VBA</h2>
+        <ol id="xlLessonList"></ol>
+      </aside>
+
+      <section class="xl-workspace">
+        <article class="xl-card xl-lesson-card" id="xlLesson">
+          <div class="xl-lesson-meta">
+            <span id="xlLessonNumber"></span>
+            <span id="xlLessonTopic"></span>
+          </div>
+          <h2 id="xlLessonTitle"></h2>
+          <p id="xlLessonDescription"></p>
+          <div class="xl-learning-note" id="xlLessonNote"></div>
+        </article>
+
+        <section class="xl-card xl-workbook" aria-labelledby="xlWorkbookTitle">
+          <div class="xl-workbook-title">
+            <h2 id="xlWorkbookTitle">Buku Kerja Praktik</h2>
+            <span>Penjualan.xlsx</span>
+          </div>
+          <div class="xl-sheet-tabs" role="tablist" aria-label="Lembar buku kerja">
+            <button type="button" class="xl-sheet-tab xl-sheet-tab--active" id="xlSheetDataTab" role="tab" aria-selected="true" aria-controls="xlSheetData">Data Penjualan</button>
+            <button type="button" class="xl-sheet-tab" id="xlSheetMacroTab" role="tab" aria-selected="false" aria-controls="xlSheetMacro">Catatan Makro</button>
+          </div>
+          <div class="xl-sheet-wrap" id="xlSheetData" role="tabpanel" aria-labelledby="xlSheetDataTab">
+            <table class="xl-grid" id="xlDataGrid" aria-label="Data contoh untuk latihan VBA"></table>
+          </div>
+          <div class="xl-sheet-wrap" id="xlSheetMacro" role="tabpanel" aria-labelledby="xlSheetMacroTab" hidden>
+            <div class="xl-macro-note">
+              <strong>Makro berjalan di Excel desktop.</strong>
+              <p>Editor latihan di halaman ini memeriksa pola kode. Kode tidak dijalankan di browser.</p>
+              <p>Gunakan salinan workbook latihan. Simpan makro dengan format <code>.xlsm</code>.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="xl-card xl-editor-card" aria-labelledby="xlEditorTitle">
+          <div class="xl-editor-heading">
+            <div>
+              <h2 id="xlEditorTitle">Editor VBA</h2>
+              <p id="xlTask"></p>
+            </div>
+            <span class="xl-language-tag">Visual Basic for Applications</span>
+          </div>
+          <label class="xl-label" for="xlVbaAnswer">Kode makro
+            <textarea id="xlVbaAnswer" rows="11" spellcheck="false" autocomplete="off" aria-describedby="xlCodeHint"></textarea>
+          </label>
+          <p class="xl-hint" id="xlCodeHint"></p>
+          <div class="xl-actions">
+            <button class="xl-button xl-button--primary" id="xlCheckVba" type="button">Jalankan koreksi</button>
+            <button class="xl-button" id="xlShowHint" type="button">Tampilkan petunjuk</button>
+            <button class="xl-button" id="xlResetCode" type="button">Reset kode</button>
+          </div>
+          <p class="xl-feedback" id="xlFeedback" role="status" aria-live="polite"></p>
+          <div class="xl-output" id="xlOutput" aria-live="polite" hidden></div>
+          <div class="xl-course-actions">
+            <button class="xl-button" id="xlPrevious" type="button">Pelajaran sebelumnya</button>
+            <button class="xl-button xl-button--primary" id="xlNext" type="button">Pelajaran berikutnya</button>
+          </div>
+        </section>
+      </section>
+    </div>
+
+  </main>
+  <script src="js/app.js"></script>
+  <script src="../../../js/shared/app-shell.js"></script>
+</body>
+</html>

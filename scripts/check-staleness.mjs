@@ -38,7 +38,7 @@ const idx = buildIndex(reg);
 // ── kumpulkan teks sumber
 const SOURCES = [
   'apps/spt/data/knowledge-spt.js', 'apps/accounting/data/knowledge-accounting.js', 'apps/excel/data/knowledge-excel.js',
-  'apps/excel/data/knowledge-excel-pivot-dashboard.js', 'apps/sql-pq/data/knowledge-sqlpq.js',
+  'apps/sql-pq/data/knowledge-sqlpq.js',
   'apps/spt/modul_pajak/questions.json', 'apps/spt/tax_career/data/questions.js', 'apps/spt/tax_career/data/questions-pembahasan.js',
   'apps/spt/js/data/form-pembahasan.js', 'apps/spt/js/data/kasus-spt.js',
   'apps/accounting/js/business/aiTutor.js', 'apps/accounting/js/accounting/validationEngine.js',

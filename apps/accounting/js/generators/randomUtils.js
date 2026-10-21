@@ -13,11 +13,6 @@ export function randChoice(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-/** Round to nearest thousand (typical Indonesian accounting practice). */
-export function roundToThousand(n) {
-  return Math.round(n / 1000) * 1000;
-}
-
 /**
  * Generate a random amount within [min, max], rounded to nearest step.
  * @param {number} min

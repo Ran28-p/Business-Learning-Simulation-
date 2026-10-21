@@ -3,7 +3,6 @@
  */
 import {
   buildJournal,
-  validateUserJournal,
   getExpectedJournal,
   submitUserJournal,
   hasUserJournal,
@@ -12,7 +11,6 @@ import {
   importSessionState,
   getCurrentLevel
 } from './engine.js';
-import { parseAmount } from '../utils/formatters.js';
 
 export function readJournalRows(tbody) {
   const rows = tbody.querySelectorAll('tr');
@@ -29,15 +27,6 @@ export function readJournalRows(tbody) {
     });
   });
   return entries;
-}
-
-export function validateJournal(entries) {
-  const normalised = entries.map(e => ({
-    account: e.account,
-    debit: parseAmount(e.debit),
-    credit: parseAmount(e.credit)
-  }));
-  return validateUserJournal(normalised);
 }
 
 export {
