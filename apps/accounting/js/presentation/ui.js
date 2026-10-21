@@ -122,6 +122,15 @@ function handleCheckJournal() {
   updateScoreDisplay({ score: assessment.finalScore, grade: assessment.grade + ' (' + assessment.gradeLabel + ')' });
 }
 
+function _journalDateToInput(label) {
+  const match = /^(\d{1,2})\s+([A-Za-z]+)$/.exec(String(label || '').trim());
+  const months = { jan: '01', feb: '02', mar: '03', apr: '04', mei: '05', jun: '06', jul: '07', agu: '08', sep: '09', okt: '10', nov: '11', des: '12' };
+  const month = match && months[match[2].toLowerCase()];
+  const year = exportSessionState().periodLabel.match(/\b\d{4}\b/);
+  if (!match || !month || !year) return '';
+  return `${year[0]}-${month}-${match[1].padStart(2, '0')}`;
+}
+
 function handleCheckAdjustment() {
   const tbody = document.querySelector('#adjTable tbody');
   if (!tbody) return;
@@ -216,9 +225,11 @@ function handleAutoPostLedger() {
       const lastRow = tbody.lastElementChild;
       if (!lastRow) return;
       const select = lastRow.querySelector('select');
+      const dateInput = lastRow.querySelector('input[type="date"]');
       const debitInput = lastRow.querySelector('.debit-input');
       const creditInput = lastRow.querySelector('.kredit-input');
       if (select) select.value = line.account;
+      if (dateInput) dateInput.value = _journalDateToInput(line.date);
       if (debitInput) debitInput.value = line.debit || 0;
       if (creditInput) creditInput.value = line.credit || 0;
     });

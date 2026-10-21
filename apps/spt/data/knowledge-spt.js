@@ -483,7 +483,7 @@ Royalti Rp12.000.000 kepada penerima tanpa NPWP: 30% × 12.000.000 = <strong>Rp3
 <ul>
 <li><strong>Sewa tanah/bangunan</strong> bukan PPh 23, melainkan PPh final Pasal 4 ayat (2) 10%.</li>
 <li><strong>Honorarium orang pribadi</strong> (pekerjaan bebas) umumnya PPh 21, bukan PPh 23.</li>
-<li>Rekanan yang punya Surat Keterangan PP 23/2018 (final UMKM) yang masih berlaku tidak dipotong PPh 23.</li>
+<li>Jangan anggap Surat Keterangan lama otomatis membebaskan pemotongan. Verifikasi apakah penerima masih memenuhi skema PPh Final UMKM menurut PP 55/2022 sebagaimana diubah PP 20/2026, masa berlakunya, dan dokumen yang sah.</li>
 <li>Dasar pemotongan adalah nilai sebelum PPN; PPN tidak ikut dipotong.</li>
 </ul></div>`,
           sources: [
@@ -531,7 +531,7 @@ Royalti Rp12.000.000 kepada penerima tanpa NPWP: 30% × 12.000.000 = <strong>Rp3
 <div class="kb-table-wrap"><table class="kb-table">
 <thead><tr><th>Jenis</th><th>Kapan (umum)</th><th>Besaran</th></tr></thead>
 <tbody>
-<tr><td>Denda SPT Masa PPN</td><td>Terlambat lapor (setelah tanggal 20 bulan berikutnya)</td><td>Rp500.000 per SPT (Pasal 7 ayat (1))</td></tr>
+<tr><td>Denda SPT Masa PPN</td><td>Terlambat lapor (setelah akhir bulan berikutnya)</td><td>Rp500.000 per SPT (Pasal 7 ayat (1))</td></tr>
 <tr><td>Denda SPT Masa lain</td><td>Terlambat lapor</td><td>Rp100.000 per SPT</td></tr>
 <tr><td>Denda SPT Tahunan Badan</td><td>Terlambat lapor (setelah 30 April)</td><td>Rp1.000.000 per SPT</td></tr>
 <tr><td>Denda SPT Tahunan OP</td><td>Terlambat lapor (setelah 31 Maret)</td><td>Rp100.000 per SPT</td></tr>
@@ -539,9 +539,12 @@ Royalti Rp12.000.000 kepada penerima tanpa NPWP: 30% × 12.000.000 = <strong>Rp3
 <tr><td>Sanksi kenaikan / bunga pada ketetapan</td><td>Pada SKPKB/SKPKBT dan pembetulan (Pasal 8, 13, 15)</td><td>Tergantung pasal dan jenis pelanggaran</td></tr>
 </tbody></table></div>
 <div class="kb-warning"><span class="kb-callout-title">⚠️</span>Sejak UU HPP, bunga tidak lagi flat 2% per bulan, tetapi mengikuti suku bunga acuan yang berubah — cek tarif bulan berjalan di pajak.go.id, jangan pakai angka usang. Denda Pasal 7 bersifat nominal tetap, bukan persentase.</div>
+<p>Untuk tenggat umum, PPh yang dipotong/disetor sendiri (termasuk PPh 21, 23, dan 25) dibayar paling lambat tanggal 15 bulan berikutnya; SPT Masa PPh umumnya dilaporkan paling lambat 20 hari setelah masa berakhir; SPT Masa PPN umumnya dilaporkan paling lambat akhir bulan berikutnya. Jenis pajak tertentu, hari libur, dan ketentuan khusus dapat mengubah tenggat.</p>
 <div class="kb-tip"><span class="kb-callout-title">💡</span>Pengecualian denda (mis. WP OP meninggal tanpa warisan, kegagalan sistem administrasi, keadaan memaksa) diatur dalam PMK 81/2024.</div>`,
           sources: [
             { type: 'uu', ref: 'UU 6/1983 (KUP) s.t.d.t.d. UU 7/2021 (HPP)' },
+            { type: 'pmk', ref: 'PMK 81/2024 Pasal 94-95 (tenggat bayar dan lapor)', url: 'https://peraturan.bpk.go.id/Details/306614/pmk-no-81-tahun-2024' },
+            { type: 'pmk', ref: 'PMK 81/2024 sebagaimana diubah terakhir dengan PMK 1/2026', url: 'https://peraturan.bpk.go.id/Details/342160/pmk-no-1-tahun-2026' },
             { type: 'pmk', ref: 'PMK 81/2024 Pasal 179 ayat (3) (pengecualian denda keterlambatan SPT)', url: 'https://news.ddtc.co.id/berita/nasional/1808428/sederet-kondisi-yang-bikin-wp-tidak-kena-denda-telat-lapor-spt-masa' },
             { type: 'lain', ref: 'DJP — Pengenaan Sanksi Pajak Secara Otomatis (pajak.go.id)', url: 'https://pajak.go.id/en/node/94652' }
           ],

@@ -265,6 +265,8 @@ section('D2. Layar siswa: soal/reveal yang tiba SETELAH meta tetap memicu render
   if (noQ.length) check(noQ.every((k) => !withQ.some((w) => w[0] === k[0])), 'kunci render saat soal BELUM ada ≠ kunci saat soal sudah ada (kalau sama, layar macet "Memuat soal…")');
   check(Player.viewKey({ status: 'question', qIndex: 0, board: [], question: null }) !== Player.viewKey({ status: 'question', qIndex: 0, board: [], question: { q: 'x' } }), 'viewKey membedakan ada/tidaknya soal');
   check(Player.viewKey({ status: 'reveal', qIndex: 0, board: [], reveal: null }) !== Player.viewKey({ status: 'reveal', qIndex: 0, board: [], reveal: { a: 0 } }), 'viewKey membedakan ada/tidaknya reveal (termasuk jawaban 0)');
+  const revealView = { status: 'reveal', qIndex: 0, myChoice: 0, question: { q: 'x' }, reveal: { a: 0 }, gained: 500, me: { total: 500, rank: 1 }, playerCount: 2, board: [{}, {}] };
+  check(Player.viewKey(revealView) !== Player.viewKey({ ...revealView, me: { total: 500, rank: 2 } }), 'viewKey memicu render ulang saat peringkat siswa berubah');
 }
 
 section('D3. Alur esai (jawaban teks, penilaian otomatis, reveal aman)');

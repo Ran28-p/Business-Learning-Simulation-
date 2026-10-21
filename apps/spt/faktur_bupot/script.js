@@ -126,7 +126,7 @@ function computeFaktur() {
   } else if (barangMewah) {
     ppn = dpp * 0.12;
     ppnbm = dpp * (ppnbmRate / 100);
-    catatan = 'Barang/Jasa Mewah: tarif PPN penuh 12% + PPnBM ' + ppnbmRate + '% (Pasal 8 UU PPN & PPnBM).';
+    catatan = 'BKP mewah yang dikenai PPnBM: tarif PPN penuh 12% + PPnBM ' + ppnbmRate + '% (Pasal 8 UU PPN & PPnBM).';
   } else {
     // DPP Nilai Lain: PPN = DPP x 12% x 11/12 = tarif efektif 11% (PMK 131/2024)
     ppn = dpp * 12 * 11 / 12 / 100;
@@ -402,7 +402,7 @@ function renderBupot() {
 
   const nomor = generateNomorBupot(jenis, formulir);
 
-  document.getElementById('bp-law-box').innerHTML = `<strong>Dasar hukum objek terpilih:</strong> ${dasarHukumHTML}<br><strong>Payung hukum tata cara:</strong> PER-24/PJ/2021 (Bukti Pemotongan/Pemungutan Unifikasi) &amp; PMK 81/2024 jo. PER-11/PJ/2025 (Coretax).`;
+  document.getElementById('bp-law-box').innerHTML = `<strong>Dasar hukum objek terpilih:</strong> ${dasarHukumHTML}<br><strong>Payung hukum tata cara:</strong> PER-24/PJ/2021 (Bukti Pemotongan/Pemungutan Unifikasi) &amp; PMK 81/2024 sebagaimana diubah terakhir dengan PMK 1/2026 jo. PER-11/PJ/2025 (Coretax).`;
 
   document.getElementById('bp-preview').innerHTML = `
     <div class="paper">

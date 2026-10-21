@@ -103,6 +103,16 @@ near('PPh Badan — peredaran di atas 50M: tarif normal 22% penuh', badanRaksasa
 
 check('PPh Badan — PKP nol/rugi: PPh terutang 0', TaxEngine.hitungPPhBadan(1000000000, 0).pphTerutang, 0);
 
+// --- Kredit pajak Form 1771 ---
+check('Skema normal menerima kredit PPh 24 luar negeri', TaxEngine.isKreditPajak1771Dikreditkan('PPh 24', 'normal'), true);
+check('Skema normal tidak menerima setoran PPh Final UMKM', TaxEngine.isKreditPajak1771Dikreditkan('PPh Final UMKM', 'normal'), false);
+check('Skema normal tidak menghitung jenis kredit kosong', TaxEngine.isKreditPajak1771Dikreditkan('', 'normal'), false);
+check('Skema UMKM menerima setoran PPh Final UMKM', TaxEngine.isKreditPajak1771Dikreditkan('PPh Final UMKM', 'umkm'), true);
+check('Skema UMKM tidak menerima kredit PPh 23', TaxEngine.isKreditPajak1771Dikreditkan('PPh 23', 'umkm'), false);
+check('PPh 24 mengurangi dasar angsuran PPh 25', TaxEngine.isKreditPajak1771PengurangAngsuran('PPh 24'), true);
+check('PPh 25 tidak mengurangi dasar angsuran PPh 25', TaxEngine.isKreditPajak1771PengurangAngsuran('PPh 25'), false);
+check('Setoran PPh Final UMKM tidak mengurangi dasar angsuran PPh 25', TaxEngine.isKreditPajak1771PengurangAngsuran('PPh Final UMKM'), false);
+
 // --- hitungPPhFinalUMKM (PP 55/2022 — 0,5% x peredaran bruto) ---
 near('PPh Final UMKM 0,5% dari peredaran bruto 500jt', TaxEngine.hitungPPhFinalUMKM(500000000), 2500000);
 check('PPh Final UMKM — peredaran 0 -> PPh 0', TaxEngine.hitungPPhFinalUMKM(0), 0);

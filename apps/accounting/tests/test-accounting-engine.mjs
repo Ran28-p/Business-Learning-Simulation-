@@ -20,7 +20,12 @@ import {
   getExpectedJournal, validateUserJournal,
   runFullCycle,
 } from '../js/accounting/engine.js';
-import { validateJournal } from '../js/accounting/validationEngine.js';
+import {
+  validateJournal,
+  validateAdjustmentJournal,
+  validateLedgerPosting,
+  validateClosingJournal
+} from '../js/accounting/validationEngine.js';
 
 let pass = 0;
 let fail = 0;
@@ -161,6 +166,22 @@ section('validateJournal(): pemeriksaan berbasis skor terhadap answer key');
   const r = validateJournal(userEntries);
   checkTrue('jurnal identik dengan answer key -> valid=true', r.valid === true, { score: r.score, summary: r.summary });
   checkTrue('jurnal identik dengan answer key -> skor >= 80/100', r.score >= 80, { score: r.score });
+
+  const monthNumbers = { Jan: '01', Feb: '02', Mar: '03', Apr: '04', Mei: '05', Jun: '06', Jul: '07', Agu: '08', Sep: '09', Okt: '10', Nov: '11', Des: '12' };
+  const isoDateEntries = userEntries.map(line => {
+    const [, day, month] = /^(\d{1,2})\s+([A-Za-z]+)$/.exec(line.date);
+    return { ...line, date: `2026-${monthNumbers[month]}-${day.padStart(2, '0')}` };
+  });
+  checkTrue('jurnal dengan tanggal ISO dari input tanggal diterima', validateJournal(isoDateEntries).valid);
+
+  const wrongDateEntries = userEntries.map((line, i) => ({
+    ...line,
+    date: i === 0 ? '2099-12-31' : line.date
+  }));
+  const wrongDateResult = validateJournal(wrongDateEntries);
+  checkTrue('jurnal dengan tanggal transaksi salah -> valid=false', !wrongDateResult.valid);
+  checkTrue('tanggal salah -> ada umpan balik komponen date',
+    wrongDateResult.items.some(item => item.field === 'date' && item.severity === 'error'));
 }
 
 {
@@ -186,8 +207,8 @@ section('validateJournal(): pemeriksaan berbasis skor terhadap answer key');
     { account: 'Akun Yang Tidak Ada Di Bagan', debit: 100000, credit: 0 },
     { account: 'Kas', debit: 0, credit: 100000 },
   ]);
-  checkTrue('akun di luar bagan akun -> ada warning account',
-    r.items.some((i) => i.field === 'account' && i.severity === 'warning'));
+  checkTrue('akun di luar bagan akun -> ada error account',
+    r.items.some((i) => i.field === 'account' && i.severity === 'error'));
 }
 
 // ============================================================================
@@ -203,11 +224,37 @@ for (const level of [1, 2, 3]) {
   submitUserJournal(journal.lines);
   postToLedger();
   generateTrialBalance();
+  checkTrue(`level ${level}: posting sesuai jurnal diterima`, validateLedgerPosting().valid);
+
+  const wrongPostedJournal = journal.lines.map(line => ({ ...line }));
+  const postedDebit = wrongPostedJournal.find(line => line.debit > 0);
+  const postedCredit = wrongPostedJournal.find(line => line.credit > 0);
+  if (postedDebit && postedCredit) {
+    postedDebit.debit += 1;
+    postedCredit.credit += 1;
+    submitUserJournal(wrongPostedJournal);
+    postToLedger();
+    checkTrue(`level ${level}: posting balans dengan nominal salah ditolak`, !validateLedgerPosting().valid);
+    submitUserJournal(journal.lines);
+    postToLedger();
+  }
 
   const adjJournal = buildAdjustmentJournal();
   const totalD = adjJournal.reduce((s, l) => s + (Number(l.debit) || 0), 0);
   const totalK = adjJournal.reduce((s, l) => s + (Number(l.credit) || 0), 0);
   checkTrue(`level ${level}: jurnal penyesuaian balans (D=${totalD}, K=${totalK})`, totalD === totalK);
+  const validAdjustment = validateAdjustmentJournal(adjJournal);
+  checkTrue(`level ${level}: jurnal penyesuaian sesuai kunci diterima`, validAdjustment.valid);
+
+  const wrongAdjustment = adjJournal.map(line => ({ ...line }));
+  const firstDebit = wrongAdjustment.find(line => line.debit > 0);
+  const firstCredit = wrongAdjustment.find(line => line.credit > 0);
+  if (firstDebit && firstCredit) {
+    firstDebit.debit += 1;
+    firstCredit.credit += 1;
+    const invalidAdjustment = validateAdjustmentJournal(wrongAdjustment);
+    checkTrue(`level ${level}: jurnal penyesuaian seimbang tetapi nominal salah ditolak`, !invalidAdjustment.valid);
+  }
 
   submitUserAdjustmentJournal(adjJournal);
   generateAdjustedTrialBalance();
@@ -217,6 +264,16 @@ for (const level of [1, 2, 3]) {
   const closingD = closing.entries.reduce((s, l) => s + (Number(l.debit) || 0), 0);
   const closingK = closing.entries.reduce((s, l) => s + (Number(l.credit) || 0), 0);
   checkTrue(`level ${level}: jurnal penutup balans (D=${closingD}, K=${closingK})`, closingD === closingK);
+  checkTrue(`level ${level}: jurnal penutup sesuai kunci diterima`, validateClosingJournal(closing.entries).valid);
+
+  const wrongClosing = closing.entries.map(line => ({ ...line }));
+  const closingDebit = wrongClosing.find(line => line.debit > 0);
+  const closingCredit = wrongClosing.find(line => line.credit > 0);
+  if (closingDebit && closingCredit) {
+    closingDebit.debit += 1;
+    closingCredit.credit += 1;
+    checkTrue(`level ${level}: jurnal penutup balans dengan nominal salah ditolak`, !validateClosingJournal(wrongClosing).valid);
+  }
 }
 
 console.log(`\n========== RESULTS: ${pass} passed, ${fail} failed ==========\n`);

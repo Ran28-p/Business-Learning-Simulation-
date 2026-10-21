@@ -1011,10 +1011,11 @@
             <!-- TAB 3: LAMPIRAN III — KREDIT PAJAK -->
             <div class="card form1770-sheet" id="f1771-tab-3" style="display:none;">
                 <h4 class="form1770-sheet-title">LAMPIRAN III — Kredit Pajak Dalam Negeri</h4>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Termasuk PPh 22/23/24 yang dipotong/dipungut pihak lain, PPh Pasal 25 (angsuran bulanan), atau setoran sendiri PPh Final UMKM — sesuai skema yang berlaku pada badan ini.</p>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Masukkan PPh 22/23/24, PPh 25, atau setoran PPh Final UMKM. Jenis kredit yang tidak sesuai skema tidak mengurangi pajak terutang.</p>
 
                 <div id="f1771-kreditpajak-rows"></div>
                 <button type="button" class="btn btn-outline" style="margin-top: 8px;" onclick="addKreditPajakRow1771()">+ Tambah Kredit Pajak</button>
+                <p id="f1771-kredit-warning" role="status" hidden style="font-size: 0.85rem; color: var(--danger); margin-top: 10px;"></p>
 
                 <div class="form1770-row form1770-row-computed" style="margin-top: 16px;">
                     <div class="form1770-row-label"><strong>Total Kredit Pajak</strong></div>
@@ -1115,7 +1116,7 @@
                         <div class="form1770-computed-value" id="f1771-angsuranPPhDihitung">Rp 0</div>
                     </div>
                     <div class="form1770-row form1770-row-computed">
-                        <div class="form1770-row-label">14.e Kredit Pajak Dalam Negeri yang Diperhitungkan (tidak termasuk PPh 24 & angsuran PPh 25)</div>
+                        <div class="form1770-row-label">14.e Kredit Pajak yang Diperhitungkan (termasuk PPh 24; tidak termasuk angsuran PPh 25 dan setoran PPh Final)</div>
                         <div class="form1770-computed-value" id="f1771-angsuranKreditDN">Rp 0</div>
                     </div>
                     <div class="form1770-row form1770-row-computed form1770-row-final">

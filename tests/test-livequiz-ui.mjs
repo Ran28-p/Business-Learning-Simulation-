@@ -14,10 +14,11 @@ async function until(fn, label, ms = 6000) { const t0 = Date.now(); for (;;) { l
 
 const store = new Map(), wins = [];
 function sharedStorage() { return { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem(k, v) { store.set(k, String(v)); wins.forEach((w) => { try { w.dispatchEvent(new w.StorageEvent('storage', { key: k })); } catch {} }); }, removeItem: (k) => store.delete(k) }; }
-async function open(name, search = '') {
-  const url = pathToFileURL(join(ROOT, 'apps/game-hub/index.html')).href + search;
-  const dom = await JSDOM.fromFile(join(ROOT, 'apps/game-hub/index.html'), { url, runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true,
-    beforeParse(w) { Object.defineProperty(w, 'localStorage', { value: sharedStorage() }); w.fetch = () => Promise.reject(new Error('offline')); w.confirm = () => true; w.scrollTo = () => {}; w.__chromaFrame = new Uint8ClampedArray([0, 220, 0, 255, 22, 12, 21, 255]); Object.defineProperty(w.HTMLVideoElement.prototype, 'videoWidth', { configurable: true, get() { return 2; } }); Object.defineProperty(w.HTMLVideoElement.prototype, 'videoHeight', { configurable: true, get() { return 1; } }); Object.defineProperty(w.HTMLMediaElement.prototype, 'readyState', { configurable: true, get() { return 2; } }); w.HTMLCanvasElement.prototype.getContext = () => ({ drawImage() {}, getImageData() { return { data: w.__chromaFrame }; }, putImageData() {} }); w.HTMLMediaElement.prototype.play = () => Promise.resolve(); wins.push(w); w.__name = name; w.URL.createObjectURL = () => 'blob:x'; } });
+async function open(name, search = '', page = 'apps/game-hub/index.html') {
+  const entry = join(ROOT, page);
+  const url = pathToFileURL(entry).href + search;
+  const dom = await JSDOM.fromFile(entry, { url, runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true,
+    beforeParse(w) { Object.defineProperty(w, 'localStorage', { value: sharedStorage() }); w.fetch = () => Promise.reject(new Error('offline')); w.confirm = () => true; w.scrollTo = () => {}; w.__audioEvents = []; w.AudioContext = class { constructor() { this.currentTime = 0; this.destination = {}; this.state = 'suspended'; } createOscillator() { const oscillator = { frequency: { setValueAtTime(value) { oscillator.value = value; } }, connect() {}, start() { w.__audioEvents.push({ type: 'tone', frequency: oscillator.value }); }, stop() {} }; return oscillator; } createGain() { return { gain: { setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} }; } resume() { this.state = 'running'; return Promise.resolve(); } }; w.Audio = class { constructor(src) { this.src = src; this.currentTime = 0; this.volume = 1; } play() { w.__audioEvents.push({ type: 'file', src: this.src }); return Promise.resolve(); } }; w.__chromaFrame = new Uint8ClampedArray([0, 220, 0, 255, 22, 12, 21, 255]); Object.defineProperty(w.HTMLVideoElement.prototype, 'videoWidth', { configurable: true, get() { return 2; } }); Object.defineProperty(w.HTMLVideoElement.prototype, 'videoHeight', { configurable: true, get() { return 1; } }); Object.defineProperty(w.HTMLMediaElement.prototype, 'readyState', { configurable: true, get() { return 2; } }); w.HTMLCanvasElement.prototype.getContext = () => ({ drawImage() {}, getImageData() { return { data: w.__chromaFrame }; }, putImageData() {} }); w.HTMLMediaElement.prototype.play = () => Promise.resolve(); wins.push(w); w.__name = name; w.URL.createObjectURL = () => 'blob:x'; } });
   await until(() => dom.window.document.readyState === 'complete' && dom.window.LiveQuiz && dom.window.document.getElementById('btn-role-teacher'), name + ' siap');
   await sleep(50); return dom.window;
 }
@@ -71,6 +72,11 @@ await until(() => /1 \/ 1 sudah menjawab/.test($(T, 'v-host').textContent) || /A
 await until(() => $(S, 'v-play').querySelector('.lq-result.is-ok, .lq-result.is-no'), 'reveal otomatis (semua sudah menjawab)');
 check(/Papan peringkat/.test($(S, 'v-play').textContent) && /Anda/.test($(S, 'v-play').textContent), 'siswa melihat papan peringkat & posisinya');
 check(!!$(T, 'v-host').querySelector('.lq-ans.is-right'), 'guru melihat kunci setelah reveal');
+const firstAnswerWasCorrect = !!$(S, 'v-play').querySelector('.lq-result.is-ok');
+check(firstAnswerWasCorrect
+  ? S.__audioEvents.filter((event) => event.type === 'tone').length >= 2
+  : S.__audioEvents.some((event) => event.type === 'file' && /\/apps\/game-hub\/assets\/sounds\/buzzer\.mp3$/.test(event.src)),
+  'jawaban benar/salah memutar efek suara yang sesuai');
 
 console.log('=== UI: sampai selesai ===');
 for (let i = 1; i < 5; i++) {
@@ -87,6 +93,9 @@ check(/Peringkat #1/.test($(S, 'v-play').textContent), 'siswa tunggal = peringka
 let blobText = ''; T.Blob = class { constructor(p) { blobText = p.join(''); } }; click([...T.document.querySelectorAll('#v-host .lq-btn')].find((b) => /CSV/.test(b.textContent)));
 check(/Peringkat/.test(blobText) && /"Ani"/.test(blobText), 'CSV berisi hasil');
 check(!T.document.querySelector('.lq-banner').textContent || T.document.querySelector('.lq-banner').hidden, 'tanpa pesan galat');
+const Alt = await open('alternate-entry', '', 'apps/game-hub/live/index.html');
+check(!!Alt.GameHubAudio && !!Alt.document.querySelector('script[src="../js/audio-feedback.js"]'), 'entry point alternatif memuat mesin efek audio');
+Alt.close();
 
 console.log(`\n${failed ? '✗' : '✓'} test-livequiz-ui: ${passed} lulus, ${failed} gagal`);
 process.exit(failed ? 1 : 0);

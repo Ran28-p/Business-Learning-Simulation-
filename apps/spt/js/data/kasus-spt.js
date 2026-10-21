@@ -563,6 +563,7 @@ PEMEGANG SAHAM & PENGURUS (Lampiran V & VI):
             {
                 id: 'f1771-3',
                 title: 'CV Berkah Mandiri Sejahtera — Perdagangan (Skema UMKM Final)',
+                tahunPajak: 2026,
                 narrative: `CV Berkah Mandiri Sejahtera adalah usaha dagang kecil di Yogyakarta yang memilih memakai skema PPh Final UMKM (PP 55/2022), karena peredaran bruto masih jauh di bawah Rp4,8 miliar. (Catatan edukasi: berdasarkan ketentuan peralihan PP 20/2026, CV yang sebelumnya memakai skema ini masih dapat memakainya sampai akhir Tahun Pajak 2026; setelah itu CV kembali ke tarif umum / Pasal 31E.) Selama tahun pajak berjalan:
 
 - Peredaran usaha bruto setahun: Rp 1.200.000.000

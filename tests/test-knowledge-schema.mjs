@@ -71,6 +71,7 @@ check(H.formatReviewed('2026-10') === 'Okt 2026' && H.formatReviewed('bad') === 
 check(H.safeUrl('https://a.go.id/b') !== '' && H.safeUrl('ftp://a') === '' && H.safeUrl('https://a b') === '', 'safeUrl');
 
 section('Konten nyata semua modul lolos skema');
+let excelContent = null;
 for (const [f, g] of [
   ['apps/spt/data/knowledge-spt.js', 'KNOWLEDGE_CONTENT_SPT'],
   ['apps/accounting/data/knowledge-accounting.js', 'KNOWLEDGE_CONTENT_ACCOUNTING'],
@@ -81,7 +82,15 @@ for (const [f, g] of [
   vm.runInContext(readFileSync(join(ROOT, f), 'utf8'), sb);
   const r = v(sb.window[g]);
   check(r.errors.length === 0, `${g} lolos skema${r.errors.length ? ': ' + r.errors[0] : ''}`);
+  if (g === 'KNOWLEDGE_CONTENT_EXCEL') excelContent = sb.window[g];
 }
+const vbaChapter = excelContent && excelContent.chapters.find((chapter) => chapter.id === 'vba-excel');
+const vbaCodeExamples = vbaChapter
+  ? (vbaChapter.sections.map((item) => item.body.match(/class="kb-code"/g) || []).flat().length)
+  : 0;
+check(Boolean(vbaChapter), 'bab VBA tersedia di Modul Pengetahuan Excel');
+check(vbaCodeExamples >= 24, `bab VBA memuat minimal 24 contoh kode (ditemukan ${vbaCodeExamples})`);
+check(vbaChapter && vbaChapter.sections.every((item) => item.sources && item.sources.length), 'setiap subbab VBA memiliki sumber');
 
 console.log(`\n${passed} lolos, ${failed} gagal`);
 process.exit(failed ? 1 : 0);

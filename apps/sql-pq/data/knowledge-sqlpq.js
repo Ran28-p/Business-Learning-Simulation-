@@ -118,7 +118,7 @@ Query ini memberi peringkat sales rep <em>di dalam masing-masing wilayah</em> (b
 <ul>
 <li><strong>Hindari <code>SELECT *</code></strong> di query produksi — sebutkan kolom yang benar-benar dibutuhkan agar lebih cepat dan hasilnya jelas maksudnya.</li>
 <li><strong>Filter sedini mungkin</strong> — taruh kondisi di WHERE (bukan menyaring belakangan di aplikasi) supaya database hanya memproses baris yang relevan.</li>
-<li><strong>Pahami kapan pakai JOIN vs Subquery</strong> — keduanya sering bisa mencapai hasil sama, tapi JOIN umumnya lebih mudah dioptimalkan oleh database engine untuk data besar.</li>
+<li><strong>Pilih JOIN atau Subquery berdasarkan makna dan keterbacaan</strong> — optimizer dapat mengubah bentuk eksekusi, jadi jangan menganggap salah satu selalu lebih cepat. Periksa execution plan dan ukur dengan data yang representatif.</li>
 <li><strong>Hati-hati JOIN tanpa syarat yang tepat</strong> — JOIN dengan kondisi yang salah/kurang lengkap bisa menghasilkan duplikasi baris tanpa disadari (mis. lupa menyertakan kolom tahun saat JOIN data multi-tahun).</li>
 <li><strong>Gunakan alias tabel yang jelas</strong> (mis. <code>p</code> untuk <code>pelanggan</code>, <code>o</code> untuk <code>pesanan</code>) supaya query dengan banyak JOIN tetap mudah dibaca.</li>
 <li><strong>Uji dengan LIMIT saat eksplorasi</strong> — sebelum menjalankan query ke jutaan baris, uji dulu dengan <code>LIMIT 10-100</code> untuk memastikan logikanya benar.</li>
@@ -180,6 +180,7 @@ Query ini memberi peringkat sales rep <em>di dalam masing-masing wilayah</em> (b
           heading: '2.1 Power Query: Konsep ETL',
           body: `
 <p class="kb-lead">Power Query adalah alat di Excel/Power BI untuk melakukan <strong>ETL</strong> — mengambil data dari berbagai sumber, membersihkan/mengubah bentuknya, lalu memuatnya ke tempat kerja (worksheet, data model) — semuanya lewat antarmuka visual tanpa perlu menulis kode di sebagian besar kasus.</p>
+<div class="kb-warning"><span class="kb-callout-title">⚠️ Batas simulator</span>Latihan Power Query di aplikasi ini memakai mesin simulasi JavaScript, bukan aplikasi Microsoft Power Query. Sintaks M pada materi adalah contoh; konektor, refresh sumber nyata, query folding, pengaturan privasi, dan perilaku produk Microsoft tidak dijalankan di simulator.</div>
 <div class="kb-table-wrap"><table class="kb-table">
 <thead><tr><th>Tahap</th><th>Kepanjangan</th><th>Contoh di Power Query</th></tr></thead>
 <tbody>
@@ -220,7 +221,7 @@ Query ini memberi peringkat sales rep <em>di dalam masing-masing wilayah</em> (b
           body: `
 <p class="kb-lead">Setiap langkah yang kamu klik di Power Query Editor sebenarnya menghasilkan kode di balik layar, ditulis dalam bahasa <strong>M (Power Query Formula Language)</strong> — bisa dilihat dan diedit lewat panel "Advanced Editor".</p>
 <div class="kb-formula">let<br>&nbsp;&nbsp;Sumber = Excel.CurrentWorkbook(){[Name="TabelPenjualan"]}[Content],<br>&nbsp;&nbsp;Disaring = Table.SelectRows(Sumber, each [Tahun] = 2025),<br>&nbsp;&nbsp;Dikelompokkan = Table.Group(Disaring, {"Wilayah"}, {{"Total", each List.Sum([Total]), type number}})<br>in<br>&nbsp;&nbsp;Dikelompokkan</div>
-<p>Struktur dasar kode M selalu berbentuk <code>let ... in ...</code>: bagian <code>let</code> berisi daftar langkah (masing-masing menghasilkan sebuah nilai/tabel baru berdasarkan langkah sebelumnya), dan <code>in</code> menentukan langkah mana yang jadi hasil akhir.</p>
+<p>Banyak query M bertahap memakai struktur <code>let ... in ...</code>: bagian <code>let</code> mendefinisikan langkah/nilai, dan <code>in</code> menentukan hasil akhir. M bersifat <strong>case-sensitive</strong>, jadi perbedaan huruf besar-kecil pada nama fungsi, variabel, dan identifier dapat berpengaruh.</p>
 <div class="kb-table-wrap"><table class="kb-table">
 <thead><tr><th>Fungsi M Umum</th><th>Setara Konsepnya</th></tr></thead>
 <tbody>
@@ -233,12 +234,50 @@ Query ini memberi peringkat sales rep <em>di dalam masing-masing wilayah</em> (b
 </table></div>
 <div class="kb-tip"><span class="kb-callout-title">💡 Tidak Wajib Menulis M dari Nol</span>Kebanyakan pengguna Power Query tidak pernah menulis kode M langsung — cukup memakai antarmuka klik-klik di Editor, dan M dihasilkan otomatis. Memahami dasarnya tetap berguna untuk membaca/memperbaiki langkah transformasi yang sudah ada, atau menyesuaikan sedikit logika yang tidak tersedia lewat menu.</div>`,
           sources: [
-            { type: 'vendor', ref: 'Microsoft Learn — Power Query M formula language reference', note: 'rujukan dokumentasi resmi; isi materi belum ditinjau baris per baris' }
-          ]
+            { type: 'vendor', ref: 'Microsoft Learn — Power Query M formula language reference', url: 'https://learn.microsoft.com/en-us/powerquery-m/' }
+          ],
+          reviewed: '2026-10'
+        },
+        {
+          id: 'query-folding',
+          heading: '2.4 Query Folding & Kinerja',
+          body: `
+<p class="kb-lead"><strong>Query folding</strong> adalah proses Power Query menerjemahkan transformasi M menjadi operasi yang dijalankan langsung oleh sumber data, bila konektor dan langkah transformasi mendukungnya.</p>
+<ul>
+<li>Jika langkah dapat di-fold, sumber data bisa menyaring atau mengolah data sebelum hasil dikirim ke Power Query.</li>
+<li>Jika tidak dapat di-fold, sebagian atau seluruh transformasi dikerjakan oleh mesin Power Query setelah data diambil.</li>
+<li>Folding bergantung pada sumber, konektor, dan urutan langkah. Jangan menganggap semua langkah akan di-fold atau bahwa folding otomatis membuat kueri lebih cepat.</li>
+<li>Periksa indikator folding atau opsi <em>View Native Query</em> bila tersedia di produk/konektor yang digunakan; opsi tersebut tidak tersedia untuk semua sumber dan tahap.</li>
+</ul>
+<div class="kb-tip"><span class="kb-callout-title">💡 Praktik aman</span>Uji refresh dengan volume data representatif, periksa langkah yang berjalan di sumber, dan ukur waktu serta jumlah data yang dipindahkan. Urutan langkah dapat memengaruhi folding; hasilnya tidak dapat dibuktikan oleh simulator aplikasi ini.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — Understanding Query Evaluation and Query Folding in Power Query', url: 'https://learn.microsoft.com/en-us/power-query/query-folding-basics' }
+          ],
+          reviewed: '2026-10'
+        },
+        {
+          id: 'privacy-levels',
+          heading: '2.5 Privasi Sumber Data',
+          body: `
+<p class="kb-lead">Saat menggabungkan beberapa sumber, pengaturan <strong>privacy level</strong> membantu Power Query mencegah data dari satu sumber terkirim tanpa sengaja ke sumber lain melalui evaluasi atau query folding.</p>
+<div class="kb-table-wrap"><table class="kb-table">
+<thead><tr><th>Level</th><th>Makna umum</th></tr></thead>
+<tbody>
+<tr><td><strong>Public</strong></td><td>Data boleh dibagikan dengan sumber lain sesuai kebijakan organisasi.</td></tr>
+<tr><td><strong>Organizational</strong></td><td>Data hanya boleh dibagikan dalam batas sumber tepercaya organisasi.</td></tr>
+<tr><td><strong>Private</strong></td><td>Data sensitif diisolasi; jangan menganggapnya aman untuk digabungkan atau dikirim ke sumber lain.</td></tr>
+</tbody>
+</table></div>
+<div class="kb-warning"><span class="kb-callout-title">⚠️ Jangan menonaktifkan demi menghilangkan error</span>Ketidakcocokan level privasi dapat memblokir kombinasi sumber. Tinjau sumber dan klasifikasinya dahulu; jangan menurunkan atau menonaktifkan perlindungan tanpa persetujuan kebijakan data organisasi. Pengaturan dan ketersediaannya bergantung pada produk Power Query.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — Privacy Levels in Power Query', url: 'https://learn.microsoft.com/en-us/power-query/privacy-levels' },
+            { type: 'vendor', ref: 'Microsoft Learn — Behind the scenes of the Data Privacy Firewall', url: 'https://learn.microsoft.com/en-us/power-query/data-privacy-firewall' }
+          ],
+          reviewed: '2026-10'
         },
         {
           id: 'contoh-kasus',
-          heading: '2.4 Contoh Kasus Nyata Transformasi Data',
+          heading: '2.6 Contoh Kasus Nyata Transformasi Data',
           body: `
 <div class="kb-example"><span class="kb-callout-title">Kasus — Menggabungkan Data Penjualan & Master Produk</span>
 Tim penjualan punya dua sumber data terpisah: (1) tabel transaksi harian (hanya berisi kode produk &amp; qty terjual) dan (2) tabel master produk (kode produk, nama produk, kategori, harga). Laporan yang diminta manajemen butuh nama produk dan kategori yang readable, bukan sekadar kode.<br><br>

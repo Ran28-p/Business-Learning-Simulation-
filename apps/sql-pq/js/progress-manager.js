@@ -53,12 +53,18 @@
     }
   }
 
-  function todayStr() { return new Date().toISOString().slice(0, 10); }
+  function dateKey(date) {
+    const year = String(date.getFullYear()).padStart(4, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 
   function touchStreak() {
-    const today = todayStr();
+    const now = new Date();
+    const today = dateKey(now);
     if (state.lastActiveDate === today) return state.streak;
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const yesterday = dateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
     if (state.lastActiveDate === yesterday) state.streak += 1;
     else state.streak = 1;
     state.lastActiveDate = today;
@@ -157,10 +163,15 @@
   function importJson(jsonString, mode) {
     let incoming;
     try { incoming = JSON.parse(jsonString); } catch (e) { throw new Error("File bukan JSON yang valid."); }
-    if (typeof incoming !== "object" || incoming === null || typeof incoming.xp !== "number") {
+    if (!isRecord(incoming) || typeof incoming.xp !== "number" || !Number.isFinite(incoming.xp) || incoming.xp < 0) {
       throw new Error("File ini bukan file progress SQL & Power Query Simulator yang valid.");
     }
-    incoming = Object.assign(defaultState(), incoming);
+    validateImportedState(incoming);
+    const normalized = defaultState();
+    Object.keys(normalized).forEach((key) => {
+      if (Object.prototype.hasOwnProperty.call(incoming, key)) normalized[key] = incoming[key];
+    });
+    incoming = normalized;
 
     if (mode === "replace") {
       state = incoming;
@@ -184,6 +195,58 @@
     // device's current daily-usage streak, not something meaningful to sum.
     persist();
     return { mode: "merge" };
+  }
+
+  function isRecord(value) {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+  }
+
+  function validateImportedState(value) {
+    const validCount = (n) => Number.isInteger(n) && Number.isFinite(n) && n >= 0;
+    ["streak", "totalAnswered", "totalCorrect"].forEach((key) => {
+      if (Object.prototype.hasOwnProperty.call(value, key) && !validCount(value[key])) {
+        throw new Error(`Data progress tidak valid: ${key}.`);
+      }
+    });
+    if ((value.totalCorrect || 0) > (value.totalAnswered || 0)) {
+      throw new Error("Data progress tidak valid: jumlah jawaban benar melebihi total jawaban.");
+    }
+    if (Object.prototype.hasOwnProperty.call(value, "lastActiveDate")
+      && value.lastActiveDate !== null
+      && (typeof value.lastActiveDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value.lastActiveDate))) {
+      throw new Error("Data progress tidak valid: lastActiveDate.");
+    }
+
+    const mapFields = {
+      completedLessons: (v) => typeof v === "boolean",
+      completedQuestions: (v) => typeof v === "boolean",
+      wrongAttempts: validCount,
+      hintUsage: validCount
+    };
+    Object.entries(mapFields).forEach(([key, isValidValue]) => {
+      if (!Object.prototype.hasOwnProperty.call(value, key)) return;
+      const map = value[key];
+      if (!isRecord(map) || Object.values(map).some((item) => !isValidValue(item))) {
+        throw new Error(`Data progress tidak valid: ${key}.`);
+      }
+    });
+
+    if (Object.prototype.hasOwnProperty.call(value, "history")) {
+      if (!Array.isArray(value.history) || value.history.some((entry) =>
+        !isRecord(entry) || !Number.isFinite(entry.ts) || typeof entry.type !== "string"
+        || (entry.label != null && typeof entry.label !== "string")
+        || (entry.correct != null && typeof entry.correct !== "boolean")
+        || (entry.xpDelta != null && (!Number.isFinite(entry.xpDelta) || entry.xpDelta < 0)))) {
+        throw new Error("Data progress tidak valid: history.");
+      }
+    }
+    if (Object.prototype.hasOwnProperty.call(value, "challengeAttempts")) {
+      if (!Array.isArray(value.challengeAttempts) || value.challengeAttempts.some((entry) =>
+        !isRecord(entry) || !Number.isFinite(entry.ts) || !Number.isFinite(entry.score)
+        || entry.score < 0 || entry.score > 100 || typeof entry.band !== "string")) {
+        throw new Error("Data progress tidak valid: challengeAttempts.");
+      }
+    }
   }
 
   function getState() { return state; }

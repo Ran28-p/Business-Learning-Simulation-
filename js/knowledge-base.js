@@ -198,6 +198,7 @@
     '.print-body li{margin-bottom:3pt;}',
     '.print-body strong{color:#0f172a;font-weight:700;}',
     '.print-body code{font-family:ui-monospace,Consolas,"SFMono-Regular",Menlo,monospace;font-size:10pt;background:#f1f5f9;padding:0.5pt 3pt;border-radius:2pt;}',
+    '.print-body .kb-code{font:8pt/1.45 ui-monospace,Consolas,"SFMono-Regular",Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#f8fafc;border:0.75pt solid #cbd5e1;border-radius:4pt;padding:7pt 8pt;margin:6pt 0 9pt;break-inside:avoid;}',
     '.print-body .kb-legal{font-size:9pt;color:#64748b;font-style:italic;}',
     '.print-doc-disclaimer{font-family:Arial,Helvetica,sans-serif;font-size:9pt;color:#475569;border:0.75pt solid #cbd5e1;background:#f8fafc;border-radius:3pt;padding:5pt 8pt;margin:0 0 12pt;}',
     '.print-section .kb-sources{font-family:Arial,Helvetica,sans-serif;font-size:9pt;color:#475569;border-top:0.75pt dashed #94a3b8;margin-top:8pt;padding-top:5pt;break-inside:avoid;}',
@@ -342,7 +343,7 @@
       // mencegah elemen atomik terpotong.
       pagebreak: {
         mode: ['css', 'legacy'],
-        avoid: ['tr', '.kb-tip', '.kb-warning', '.kb-example', '.kb-formula', '.kb-journal', '.kb-quickfact-item', '.print-chapter-title', '.print-section-title']
+        avoid: ['tr', '.kb-tip', '.kb-warning', '.kb-example', '.kb-formula', '.kb-code', '.kb-journal', '.kb-quickfact-item', '.print-chapter-title', '.print-section-title']
       }
     })
       .then(function () {

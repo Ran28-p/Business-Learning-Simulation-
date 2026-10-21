@@ -106,8 +106,8 @@ KREDIT PAJAK:
 - Kredit pajak luar negeri Pasal 24 (lihat di atas): Rp 297.500.000
 - PPh Pasal 25 (angsuran bulanan) yang sudah disetor sendiri, Rp 200.000.000/bulan sepanjang tahun: Rp 2.400.000.000
 
-Petunjuk PENTING: peredaran usaha di atas Rp50 miliar → TIDAK dapat fasilitas Pasal 31E, tarif flat 22%. Dasar penghitungan Angsuran PPh 25 tahun depan (Angka 20) HARUS mengeluarkan penghasilan tidak teratur/insidental (laba penjualan aset tetap), dan kredit yang diperhitungkan di Angka 20/21 hanya kredit DALAM NEGERI (bukan PPh 24 luar negeri, bukan angsuran PPh 25 sendiri).`,
-        jawaban: { a1: 12250000000, a2: 1750000000, a4: 0, a5: 200000000, a6: 0, a7: 0, b9: 0, b11: 3124000000, b12: 0, c14: 0, c15: 547500000, d18a: 2400000000, d18b: 0, f20: 13950000000, f21: 234916000 }
+Petunjuk PENTING: peredaran usaha di atas Rp50 miliar → TIDAK dapat fasilitas Pasal 31E, tarif flat 22%. Dasar penghitungan Angsuran PPh 25 tahun depan (Angka 20) HARUS mengeluarkan penghasilan tidak teratur/insidental (laba penjualan aset tetap), dan kredit yang diperhitungkan mencakup kredit PPh 22/23/24 yang dapat diperhitungkan; jangan mengurangi lagi angsuran PPh 25 yang sudah dibayar sendiri.`,
+        jawaban: { a1: 12250000000, a2: 1750000000, a4: 0, a5: 200000000, a6: 0, a7: 0, b9: 0, b11: 3124000000, b12: 0, c14: 0, c15: 547500000, d18a: 2400000000, d18b: 0, f20: 13950000000, f21: 210125000 }
     },
     {
         id: 'induk-4',

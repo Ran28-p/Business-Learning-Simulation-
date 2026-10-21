@@ -8,7 +8,7 @@
   var P = {
   "TC-001": {
     "konsep": "PPh 21 atas gaji pegawai tetap dijalankan sebagai satu alur kepatuhan: hitung (TER Jan–Nov, progresif di masa terakhir), potong dari gaji, setor ke kas negara, lapor SPT Masa, dan serahkan bukti potong ke pegawai.",
-    "dasar": "UU 7/1983 (PPh) Pasal 21; PP 58/2023; PMK 168/2023; batas setor tanggal 10 dan lapor tanggal 20 bulan berikutnya (PMK 242/PMK.03/2014, dari pengetahuan umum)",
+    "dasar": "UU 7/1983 (PPh) Pasal 21; PP 58/2023; PMK 168/2023; PMK 81/2024 sebagaimana diubah terakhir dengan PMK 1/2026, Pasal 94 dan 95",
     "salah": [
       "Yang wajib memotong adalah pemberi kerja. Karyawan hanya menerima bukti potong untuk dipakai di SPT Tahunan.",
       "PPh 21 dipotong tiap masa pajak; menunda sampai akhir tahun melanggar kewajiban dan berisiko sanksi.",
@@ -44,7 +44,7 @@
     "ingat": "Final = beban penerima selesai; pemotong tetap potong–setor–lapor–bukti potong."
   },
   "TC-004": {
-    "konsep": "PPh 25 adalah angsuran bulanan PPh tahun berjalan, dihitung dari PPh terutang pada SPT Tahunan tahun lalu setelah dikurangi kredit pajak, dibagi 12. Angsuran yang sudah dibayar dikreditkan di SPT Tahunan.",
+    "konsep": "PPh 25 adalah angsuran bulanan PPh tahun berjalan. Dasarnya memperhitungkan PPh terutang tahun lalu setelah dikurangi kredit yang dapat diperhitungkan, termasuk PPh 21/22/23/24; angsuran PPh 25 sendiri tidak dikurangkan lagi. Angsuran yang dibayar menjadi kredit di SPT Tahunan.",
     "dasar": "UU 7/1983 (PPh) Pasal 25",
     "langkah": [
       "Angsuran = (PPh terutang tahun lalu − kredit pajak) ÷ 12",
@@ -296,11 +296,11 @@
     "ingat": "PPh dari DPP, bukan dari total tagihan."
   },
   "TAD-002": {
-    "konsep": "Masa pajak PPh 23 mengikuti saat pembayaran/terutang (Maret). Melaporkannya di masa April adalah salah periode dan berpotensi terlambat.",
-    "dasar": "UU KUP Pasal 7 ayat (1); batas setor tanggal 10 dan lapor tanggal 20 bulan berikutnya (PMK 242/PMK.03/2014, dari pengetahuan umum)",
+    "konsep": "Transaksi PPh 23 yang menjadi kewajiban pada Maret harus masuk SPT Masa Maret. Pelaporan di masa April adalah salah masa; keterlambatan bergantung pada apakah SPT Maret dilaporkan melewati tenggatnya.",
+    "dasar": "UU KUP Pasal 7 ayat (1); PMK 81/2024 sebagaimana diubah terakhir dengan PMK 1/2026, Pasal 94 dan 95",
     "langkah": [
-      "Pemotongan Maret → setor paling lambat 10 April, lapor paling lambat 20 April",
-      "Dilaporkan di masa April → terlambat; denda SPT Masa Rp100.000 per SPT"
+      "Pemotongan masa Maret → setor paling lambat 15 April dan lapor SPT Masa Maret paling lambat 20 April",
+      "Jika SPT Masa Maret sudah dilaporkan tepat waktu tanpa transaksi ini, sampaikan pembetulan. Jika SPT Maret belum dilaporkan sampai tenggatnya, ada risiko terlambat lapor."
     ],
     "salah": [
       "Dilapor saja tidak cukup; masa pajaknya harus benar.",

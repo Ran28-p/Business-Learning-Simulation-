@@ -420,12 +420,12 @@ window.TAX_CAREER_QUESTIONS = [
     question: "Risiko utama?",
     options: [
       "Tidak ada, asalkan dilapor",
-      "Salah periode pelaporan — berpotensi dianggap terlambat/tidak sesuai masa",
+      "Salah masa; SPT Masa Maret perlu dibetulkan, sedangkan terlambat lapor bergantung pada tenggat SPT Maret",
       "Otomatis final",
       "Hanya masalah PPN"
     ],
-    answer: "Salah periode pelaporan — berpotensi dianggap terlambat/tidak sesuai masa",
-    explanation: "Kepatuhan masa sensitif terhadap periode. Salah masa = temuan klasik auditor internal/reviewer."
+    answer: "Salah masa; SPT Masa Maret perlu dibetulkan, sedangkan terlambat lapor bergantung pada tenggat SPT Maret",
+    explanation: "Transaksi Maret harus masuk SPT Masa Maret. Jika SPT Maret sudah dilaporkan tepat waktu tanpa transaksi ini, benahi dengan SPT pembetulan; jika belum dilaporkan sampai 20 April, ada risiko terlambat lapor. Setoran PPh 23 umumnya paling lambat 15 April."
   },
   {
     id: "TAD-003",

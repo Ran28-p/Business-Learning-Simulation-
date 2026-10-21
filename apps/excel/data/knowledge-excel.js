@@ -1,11 +1,11 @@
 /**
- * Konten Modul Pengetahuan — Excel: Panduan Lengkap Rumus Excel
+ * Konten Modul Pengetahuan — Excel: Rumus Excel & VBA
  * Dipakai lewat: KnowledgeBase.open(window.KNOWLEDGE_CONTENT_EXCEL)
  * Halaman utama apps/excel/index.html
  */
 window.KNOWLEDGE_CONTENT_EXCEL = {
   title: 'Modul Pengetahuan — Microsoft Excel',
-  subtitle: 'Panduan lengkap rumus Excel dari dasar hingga mahir — agregasi, logika, teks, tanggal & lookup',
+  subtitle: 'Panduan rumus Excel dan VBA desktop — agregasi, logika, teks, tanggal, lookup & otomasi',
   appAccent: '#1D6F42',
   chapters: [
     {
@@ -718,6 +718,475 @@ window.KNOWLEDGE_CONTENT_EXCEL = {
 </ul>`,
           sources: [ { type: 'pmk', ref: 'PMK 101/PMK.010/2016 (PTKP)', note: 'nilai PTKP berlaku saat ini' }, { type: 'lain', ref: 'Bisnis.com — Wacana Kenaikan Batas PTKP (6 Okt 2026)', note: 'penyesuaian PTKP masih wacana; belum ada besaran/tanggal berlaku', url: 'https://ekonomi.bisnis.com/read/20261006/259/2009928/wacana-kenaikan-batas-ptkp-bersakit-sakit-dahulu-bersenang-senang-kemudian' } ],
           reviewed: '2026-10'
+        }
+      ]
+    },
+    {
+      id: 'vba-excel',
+      title: '12. VBA Excel — Makro & Otomasi',
+      sections: [
+        {
+          id: 'vba-dasar-makro',
+          heading: '12.1 Dasar VBA, prosedur, dan variabel',
+          body: `
+<p class="kb-lead">VBA (Visual Basic for Applications) mengotomasi Excel desktop lewat prosedur <code>Sub</code>. Materi ini berisi contoh siap dicoba; editor VBA pada latihan interaktif hanya mensimulasikan kode, bukan menjalankannya.</p>
+<ol>
+<li>Buka Excel desktop, simpan salinan kerja sebagai <code>.xlsm</code>, lalu tekan <strong>Alt+F11</strong>.</li>
+<li>Pilih <strong>Insert → Module</strong>, tempel satu contoh makro, lalu jalankan dengan <strong>F5</strong>.</li>
+<li>Aktifkan makro hanya pada file yang dipercaya. Jangan memilih pengaturan keamanan yang mengaktifkan semua makro.</li>
+</ol>
+<div class="kb-warning"><span class="kb-callout-title">⚠️ Sebelum menjalankan</span>Uji di salinan workbook. Sesuaikan nama sheet, alamat sel, dan kolom dengan file sendiri. Simpan sebagai <code>.xlsm</code> agar kode makro tetap tersimpan; Excel untuk web tidak menjalankan VBA.</div>
+<p><strong>Contoh 1 — makro paling sederhana</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub SapaPengguna()
+    MsgBox "Halo! Makro VBA berhasil dijalankan.", vbInformation, "Belajar VBA"
+End Sub</code></pre>
+<p><strong>Contoh 2 — variabel, konstanta, dan perhitungan</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub HitungNilaiAkhir()
+    Const BATAS_LULUS As Double = 75
+    Dim nilai As Double
+    Dim status As String
+
+    nilai = 82
+    If nilai &gt;= BATAS_LULUS Then
+        status = "Lulus"
+    Else
+        status = "Belum lulus"
+    End If
+    MsgBox status, vbInformation, "Hasil"
+End Sub</code></pre>
+<p><strong>Contoh 3 — meminta teks dengan aman</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub MintaNama()
+    Dim jawaban As Variant
+
+    jawaban = Application.InputBox("Masukkan nama:", "Input nama", Type:=2)
+    If VarType(jawaban) = vbBoolean Then Exit Sub
+    If Len(Trim$(CStr(jawaban))) = 0 Then
+        MsgBox "Nama tidak boleh kosong.", vbExclamation
+        Exit Sub
+    End If
+    MsgBox "Halo, " &amp; Trim$(CStr(jawaban)) &amp; "!", vbInformation
+End Sub</code></pre>
+<p><strong>Contoh 4 — tanggal dan waktu otomatis</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub CatatWaktu()
+    With ThisWorkbook.Worksheets("Data")
+        .Range("A2").Value = Date
+        .Range("B2").Value = Now
+        .Range("A2").NumberFormat = "dd/mm/yyyy"
+        .Range("B2").NumberFormat = "dd/mm/yyyy hh:mm"
+    End With
+End Sub</code></pre>
+<p>Ganti nama sheet <code>Data</code> jika berbeda. Gunakan <code>ThisWorkbook</code> untuk workbook tempat kode disimpan, bukan workbook lain yang kebetulan aktif.</p>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — Range object (Excel)', note: 'Contoh objek, properti, dan metode Excel VBA', url: 'https://learn.microsoft.com/office/vba/api/excel.range(object)' },
+            { type: 'vendor', ref: 'Microsoft Learn — File format reference for Excel', note: 'Daftar format file Excel, termasuk format workbook yang mendukung makro', url: 'https://learn.microsoft.com/office/compatibility/office-file-format-reference#file-formats-that-are-supported-in-excel' },
+            { type: 'vendor', ref: 'Microsoft Learn — Macros from the internet are blocked by default in Office', note: 'Jalankan makro hanya pada file yang dipercaya', url: 'https://learn.microsoft.com/microsoft-365-apps/security/internet-macros-blocked#guidance-on-allowing-vba-macros-to-run-in-files-you-trust' }
+          ]
+        },
+        {
+          id: 'vba-range-loop',
+          heading: '12.2 Membaca, menulis, dan mengulang rentang',
+          body: `
+<p><strong>Contoh 5 — menyalin nilai antarsel</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub SalinNamaKeLaporan()
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Worksheets("Data")
+
+    ws.Range("B2").Value = ws.Range("A2").Value
+End Sub</code></pre>
+<p><strong>Contoh 6 — memberi nomor untuk setiap baris berisi data</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub NomoriData()
+    Dim ws As Worksheet
+    Dim sel As Range
+    Dim nomor As Long
+    Set ws = ThisWorkbook.Worksheets("Data")
+    nomor = 1
+
+    For Each sel In ws.Range("A2:A11")
+        If Len(Trim$(CStr(sel.Value))) &gt; 0 Then
+            sel.Offset(0, 1).Value = nomor
+            nomor = nomor + 1
+        End If
+    Next sel
+End Sub</code></pre>
+<p><strong>Contoh 7 — menemukan baris terakhir yang terisi</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub TampilkanBarisTerakhir()
+    Dim ws As Worksheet
+    Dim barisTerakhir As Long
+    Set ws = ThisWorkbook.Worksheets("Data")
+
+    barisTerakhir = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+    If barisTerakhir &lt; 2 Then
+        MsgBox "Belum ada data di kolom A.", vbInformation
+        Exit Sub
+    End If
+    MsgBox "Data terakhir ada di baris " &amp; barisTerakhir, vbInformation
+End Sub</code></pre>
+<p><strong>Contoh 8 — menghitung total tiap baris sampai baris terakhir</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub HitungTotalBaris()
+    Dim ws As Worksheet
+    Dim baris As Long
+    Dim barisTerakhir As Long
+    Set ws = ThisWorkbook.Worksheets("Data")
+    barisTerakhir = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+    If barisTerakhir &lt; 2 Then Exit Sub
+
+    For baris = 2 To barisTerakhir
+        ws.Cells(baris, "D").Value = _
+            ws.Cells(baris, "B").Value * ws.Cells(baris, "C").Value
+    Next baris
+End Sub</code></pre>
+<p>Contoh 8 menganggap kolom B berisi jumlah, C berisi harga satuan, dan D adalah kolom total. Pastikan kedua kolom berisi angka, bukan teks.</p>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — Range object (Excel)', note: 'Properti Range, Cells, Rows, dan metode End', url: 'https://learn.microsoft.com/en-us/office/vba/api/excel.range' },
+            { type: 'vendor', ref: 'Microsoft Learn — For...Next statement', note: 'Sintaks perulangan VBA', url: 'https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/fornext-statement' }
+          ]
+        },
+        {
+          id: 'vba-logika-pencarian',
+          heading: '12.3 Kondisi, pencarian, dan pemeriksaan data',
+          body: `
+<p><strong>Contoh 9 — memberi status lulus berdasarkan nilai</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub TandaiKelulusan()
+    Dim ws As Worksheet
+    Dim baris As Long
+    Dim terakhir As Long
+    Set ws = ThisWorkbook.Worksheets("Nilai")
+    terakhir = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+    If terakhir &lt; 2 Then Exit Sub
+
+    For baris = 2 To terakhir
+        If IsNumeric(ws.Cells(baris, "B").Value) Then
+            If CDbl(ws.Cells(baris, "B").Value) &gt;= 75 Then
+                ws.Cells(baris, "C").Value = "Lulus"
+            Else
+                ws.Cells(baris, "C").Value = "Remedial"
+            End If
+        Else
+            ws.Cells(baris, "C").Value = "Periksa nilai"
+        End If
+    Next baris
+End Sub</code></pre>
+<p><strong>Contoh 10 — memilih kategori dengan Select Case</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub KategoriNilai()
+    Dim nilai As Double
+    Dim kategori As String
+    nilai = 86
+
+    Select Case nilai
+        Case Is &gt;= 90: kategori = "A"
+        Case Is &gt;= 80: kategori = "B"
+        Case Is &gt;= 70: kategori = "C"
+        Case Else: kategori = "D"
+    End Select
+    MsgBox "Kategori: " &amp; kategori, vbInformation
+End Sub</code></pre>
+<p><strong>Contoh 11 — mencari kode dengan Find</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub CariKodeProduk()
+    Dim ws As Worksheet
+    Dim hasil As Range
+    Set ws = ThisWorkbook.Worksheets("Produk")
+
+    Set hasil = ws.Columns("A").Find( _
+        What:="PRD-001", _
+        After:=ws.Cells(ws.Rows.Count, "A"), _
+        LookIn:=xlValues, _
+        LookAt:=xlWhole, _
+        SearchOrder:=xlByRows, _
+        SearchDirection:=xlNext, _
+        MatchCase:=False)
+
+    If hasil Is Nothing Then
+        MsgBox "Kode tidak ditemukan.", vbInformation
+    Else
+        MsgBox "Produk ditemukan di baris " &amp; hasil.Row &amp; ".", vbInformation
+    End If
+End Sub</code></pre>
+<p><strong>Contoh 12 — menyorot kode duplikat</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub SorotKodeDuplikat()
+    Dim ws As Worksheet
+    Dim sel As Range
+    Dim terakhir As Long
+    Set ws = ThisWorkbook.Worksheets("Data")
+    terakhir = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+    If terakhir &lt; 2 Then Exit Sub
+    ws.Range("A2:A" &amp; terakhir).Interior.Pattern = xlNone
+
+    For Each sel In ws.Range("A2:A" &amp; terakhir)
+        If Len(Trim$(CStr(sel.Value))) &gt; 0 Then
+            If Application.WorksheetFunction.CountIf( _
+                ws.Range("A2:A" &amp; terakhir), sel.Value) &gt; 1 Then
+                sel.Interior.Color = RGB(255, 220, 220)
+            End If
+        End If
+    Next sel
+End Sub</code></pre>
+<p>Contoh 11 mencari kecocokan persis. Contoh 12 menghapus warna latar lama hanya pada rentang yang diperiksa, lalu menandai nilai yang muncul lebih dari sekali.</p>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — If...Then...Else statement', note: 'Percabangan kondisi VBA', url: 'https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/ifthenelse-statement' },
+            { type: 'vendor', ref: 'Microsoft Learn — Range.Find method (Excel)', note: 'Argumen pencarian dan hasil Nothing jika tidak ditemukan', url: 'https://learn.microsoft.com/en-us/office/vba/api/excel.range.find' },
+            { type: 'vendor', ref: 'Microsoft Learn — WorksheetFunction object (Excel)', note: 'Memanggil fungsi lembar kerja dari VBA', url: 'https://learn.microsoft.com/en-us/office/vba/api/excel.worksheetfunction' }
+          ]
+        },
+        {
+          id: 'vba-format-workbook',
+          heading: '12.4 Format dan kelola worksheet',
+          body: `
+<p><strong>Contoh 13 — format judul, angka, dan lebar kolom</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub FormatLaporan()
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Worksheets("Laporan")
+
+    With ws.Range("A1:D1")
+        .Font.Bold = True
+        .Interior.Color = RGB(31, 78, 121)
+        .Font.Color = RGB(255, 255, 255)
+    End With
+    ws.Range("D2:D100").NumberFormat = "#,##0.00"
+    ws.Columns("A:D").AutoFit
+End Sub</code></pre>
+<p><strong>Contoh 14 — kosongkan input tanpa menghapus format</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub BersihkanFormInput()
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Worksheets("Form")
+
+    ws.Range("B2:B10,D2:D10").ClearContents
+    MsgBox "Isi form sudah dibersihkan; format sel tetap ada.", vbInformation
+End Sub</code></pre>
+<p><strong>Contoh 15 — menyalin sheet template untuk laporan baru</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub SalinTemplateLaporan()
+    Dim wsTemplate As Worksheet
+    Set wsTemplate = ThisWorkbook.Worksheets("Template")
+
+    wsTemplate.Copy After:=ThisWorkbook.Worksheets( _
+        ThisWorkbook.Worksheets.Count)
+    ActiveSheet.Name = "Laporan " &amp; Format(Date, "yyyymmdd")
+End Sub</code></pre>
+<p>Jalankan contoh 15 paling banyak sekali sehari agar nama sheet tidak bentrok. Excel menolak nama duplikat; hapus atau ganti nama sheet laporan lama secara manual sebelum mengulang.</p>
+<p><strong>Contoh 16 — tampilkan daftar nama worksheet</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub TampilkanDaftarSheet()
+    Dim ws As Worksheet
+    Dim daftar As String
+
+    For Each ws In ThisWorkbook.Worksheets
+        daftar = daftar &amp; ws.Name &amp; vbCrLf
+    Next ws
+    MsgBox daftar, vbInformation, "Sheet dalam workbook"
+End Sub</code></pre>
+<p>Gunakan <code>ThisWorkbook.Worksheets</code> untuk workbook makro. <code>ActiveSheet</code> dapat berubah saat pengguna berpindah sheet; contoh 15 menggunakannya hanya setelah perintah <code>Copy</code> membuat salinan sebagai sheet aktif.</p>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — Worksheet object (Excel)', note: 'Objek worksheet, koleksi, dan properti', url: 'https://learn.microsoft.com/en-us/office/vba/api/excel.worksheet' },
+            { type: 'vendor', ref: 'Microsoft Learn — Worksheet.Copy method (Excel)', note: 'Menyalin worksheet dalam workbook', url: 'https://learn.microsoft.com/en-us/office/vba/api/excel.worksheet.copy' }
+          ]
+        },
+        {
+          id: 'vba-tabel-laporan',
+          heading: '12.5 Excel Table, filter, urutkan, dan ringkas',
+          body: `
+<p>Contoh berikut memakai Excel Table bernama <code>tblTransaksi</code>. Buat tabel dengan header terlebih dahulu, lalu buka <strong>Table Design → Table Name</strong> untuk mengatur namanya.</p>
+<p><strong>Contoh 17 — ubah rentang data menjadi Excel Table</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub BuatTabelTransaksi()
+    Dim ws As Worksheet
+    Dim sumber As Range
+    Dim tabel As ListObject
+    Set ws = ThisWorkbook.Worksheets("Data")
+    Set sumber = ws.Range("A1").CurrentRegion
+
+    If sumber.Rows.Count &lt; 2 Then
+        MsgBox "Tambahkan header dan setidaknya satu baris data.", vbExclamation
+        Exit Sub
+    End If
+    If ws.ListObjects.Count &gt; 0 Then
+        MsgBox "Sheet ini sudah memiliki Excel Table.", vbInformation
+        Exit Sub
+    End If
+    Set tabel = ws.ListObjects.Add(SourceType:=xlSrcRange, Source:=sumber, _
+        XlListObjectHasHeaders:=xlYes)
+    tabel.Name = "tblTransaksi"
+End Sub</code></pre>
+<p><strong>Contoh 18 — urutkan tabel berdasarkan tanggal</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub UrutkanTransaksi()
+    Dim tabel As ListObject
+    Set tabel = ThisWorkbook.Worksheets("Data").ListObjects("tblTransaksi")
+    If tabel.DataBodyRange Is Nothing Then Exit Sub
+
+    With tabel.Sort
+        .SortFields.Clear
+        .SortFields.Add Key:=tabel.ListColumns("Tanggal").DataBodyRange, _
+            SortOn:=xlSortOnValues, Order:=xlAscending, _
+            DataOption:=xlSortNormal
+        .Header = xlYes
+        .Apply
+    End With
+End Sub</code></pre>
+<p><strong>Contoh 19 — filter transaksi yang sudah lunas</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub FilterTransaksiLunas()
+    Dim tabel As ListObject
+    Set tabel = ThisWorkbook.Worksheets("Data").ListObjects("tblTransaksi")
+
+    tabel.Range.AutoFilter _
+        Field:=tabel.ListColumns("Status").Index, _
+        Criteria1:="Lunas"
+End Sub</code></pre>
+<p><strong>Contoh 20 — jumlahkan kolom Total</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub HitungTotalTransaksi()
+    Dim tabel As ListObject
+    Dim hasil As Double
+    Set tabel = ThisWorkbook.Worksheets("Data").ListObjects("tblTransaksi")
+
+    If tabel.DataBodyRange Is Nothing Then
+        hasil = 0
+    Else
+        hasil = Application.WorksheetFunction.Sum( _
+            tabel.ListColumns("Total").DataBodyRange)
+    End If
+    ThisWorkbook.Worksheets("Data").Range("G2").Value = hasil
+    ThisWorkbook.Worksheets("Data").Range("G2").NumberFormat = "#,##0.00"
+End Sub</code></pre>
+<p>Nama tabel dan header kolom harus sama persis dengan workbook. Pastikan nama <code>tblTransaksi</code> belum dipakai tabel lain di workbook. Contoh 18 mengurutkan data asli di tabel; contoh 19 mengubah filter yang terlihat pada tabel.</p>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — ListObjects.Add method (Excel)', note: 'Membuat Excel Table dari rentang', url: 'https://learn.microsoft.com/en-us/office/vba/api/excel.listobjects.add' },
+            { type: 'vendor', ref: 'Microsoft Learn — ListObject object (Excel)', note: 'Properti dan metode Excel Table', url: 'https://learn.microsoft.com/en-us/office/vba/api/excel.listobject' },
+            { type: 'vendor', ref: 'Microsoft Learn — Range.AutoFilter method (Excel)', note: 'Memfilter rentang berdasarkan kolom dan kriteria', url: 'https://learn.microsoft.com/en-us/office/vba/api/excel.range.autofilter' }
+          ]
+        },
+        {
+          id: 'vba-error-event-export',
+          heading: '12.6 Error, event, ekspor PDF, dan backup',
+          body: `
+<p><strong>Contoh 21 — tangani error dengan pesan yang jelas</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub ProsesDenganPenangananError()
+    On Error GoTo Gagal
+
+    ThisWorkbook.Worksheets("Data").Range("A1").Value = "Selesai"
+    MsgBox "Proses berhasil.", vbInformation
+    Exit Sub
+
+Gagal:
+    MsgBox "Proses gagal: " &amp; Err.Description, vbCritical, "Error VBA"
+End Sub</code></pre>
+<p><strong>Contoh 22 — isi waktu saat nilai pada kolom A berubah</strong></p>
+<p>Contoh ini bukan makro biasa. Tempel di jendela kode sheet <code>Data</code> pada editor VBA, bukan di Module. Perubahan langsung pada kolom A memberi cap waktu di kolom B.</p>
+<pre class="kb-code"><code>Option Explicit
+
+Private Sub Worksheet_Change(ByVal Target As Range)
+    Dim pantau As Range
+    Dim sel As Range
+    Set pantau = Intersect(Target, Me.Range("A2:A100"))
+    If pantau Is Nothing Then Exit Sub
+
+    On Error GoTo Gagal
+    Application.EnableEvents = False
+    For Each sel In pantau.Cells
+        If Len(CStr(sel.Value)) = 0 Then
+            sel.Offset(0, 1).ClearContents
+        Else
+            sel.Offset(0, 1).Value = Now
+            sel.Offset(0, 1).NumberFormat = "dd/mm/yyyy hh:mm"
+        End If
+    Next sel
+    Application.EnableEvents = True
+    Exit Sub
+
+Gagal:
+    Application.EnableEvents = True
+    MsgBox "Cap waktu gagal diperbarui: " &amp; Err.Description, vbCritical
+End Sub</code></pre>
+<p><strong>Contoh 23 — ekspor sheet laporan ke PDF</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub EksporLaporanPDF()
+    Dim ws As Worksheet
+    Dim tujuan As String
+    Set ws = ThisWorkbook.Worksheets("Laporan")
+
+    If Len(ThisWorkbook.Path) = 0 Then
+        MsgBox "Simpan workbook terlebih dahulu.", vbExclamation
+        Exit Sub
+    End If
+    tujuan = ThisWorkbook.Path &amp; Application.PathSeparator &amp; "Laporan.pdf"
+    ws.ExportAsFixedFormat Type:=xlTypePDF, _
+        Filename:=tujuan, _
+        Quality:=xlQualityStandard, _
+        IncludeDocProperties:=True, _
+        IgnorePrintAreas:=False, _
+        OpenAfterPublish:=True
+End Sub</code></pre>
+<p>File <code>Laporan.pdf</code> yang sudah ada di folder yang sama dapat ditimpa.</p>
+<p><strong>Contoh 24 — buat salinan backup bertanggal</strong></p>
+<pre class="kb-code"><code>Option Explicit
+
+Sub BuatBackupWorkbook()
+    Dim posisiTitik As Long
+    Dim ekstensi As String
+    Dim tujuan As String
+
+    If Len(ThisWorkbook.Path) = 0 Then
+        MsgBox "Simpan workbook terlebih dahulu.", vbExclamation
+        Exit Sub
+    End If
+    posisiTitik = InStrRev(ThisWorkbook.Name, ".")
+    If posisiTitik = 0 Then
+        MsgBox "Ekstensi file tidak dikenali.", vbExclamation
+        Exit Sub
+    End If
+
+    ekstensi = Mid$(ThisWorkbook.Name, posisiTitik)
+    tujuan = ThisWorkbook.Path &amp; Application.PathSeparator &amp; _
+        "Backup-" &amp; Format(Now, "yyyymmdd-hhnnss") &amp; ekstensi
+    ThisWorkbook.SaveCopyAs tujuan
+    MsgBox "Backup dibuat: " &amp; tujuan, vbInformation
+End Sub</code></pre>
+<div class="kb-tip"><span class="kb-callout-title">💡 Pola aman untuk dikembangkan</span>Mulai dari satu prosedur kecil. Gunakan <code>Option Explicit</code>, rujuk sheet secara eksplisit, periksa rentang kosong, tangani error, dan uji lagi di salinan file sebelum memakai makro pada data penting.</div>
+<div class="kb-warning"><span class="kb-callout-title">⚠️ Batas platform</span>VBA memerlukan aplikasi Excel desktop. Excel untuk web dapat membuka workbook berisi makro, tetapi tidak membuat, menjalankan, atau mengedit kode VBA.</div>`,
+          sources: [
+            { type: 'vendor', ref: 'Microsoft Learn — On Error statement', note: 'Mengaktifkan penanganan error pada prosedur VBA', url: 'https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/on-error-statement' },
+            { type: 'vendor', ref: 'Microsoft Learn — Worksheet.Change event (Excel)', note: 'Event perubahan pada worksheet dan penggunaan EnableEvents', url: 'https://learn.microsoft.com/en-us/office/vba/api/excel.worksheet.change' },
+            { type: 'vendor', ref: 'Microsoft Learn — Worksheet.ExportAsFixedFormat method (Excel)', note: 'Ekspor worksheet ke format tetap seperti PDF', url: 'https://learn.microsoft.com/office/vba/api/excel.worksheet.exportasfixedformat' },
+            { type: 'vendor', ref: 'Microsoft Learn — Workbook.SaveCopyAs method (Excel)', note: 'Menyimpan salinan workbook tanpa mengubah workbook terbuka', url: 'https://learn.microsoft.com/en-us/office/vba/api/excel.workbook.savecopyas' },
+            { type: 'vendor', ref: 'Microsoft Learn — Office for the web service description', note: 'Excel untuk web tidak membuat atau menjalankan makro VBA', url: 'https://learn.microsoft.com/office365/servicedescriptions/office-online-service-description/office-online-service-description#features-available-for-office-for-the-web-and-office-desktop-app' }
+          ]
         }
       ]
     }

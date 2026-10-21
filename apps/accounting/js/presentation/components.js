@@ -24,7 +24,7 @@ export function addJournalRow(tableId) {
 
   const row = document.createElement('tr');
   row.innerHTML = `
-    <td><input type="date" value="2026-01-31"></td>
+    <td><input type="date" value=""></td>
     <td><select>${options}</select></td>
     <td><input type="number" class="debit-input" value="0" min="0"></td>
     <td><input type="number" class="kredit-input" value="0" min="0"></td>

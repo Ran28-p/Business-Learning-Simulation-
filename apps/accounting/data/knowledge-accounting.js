@@ -150,7 +150,7 @@ Aset (Kas Rp20.000.000 + Peralatan Rp15.000.000 = Rp35.000.000) = Kewajiban (Uta
           heading: '2.1 Mengenal Empat Laporan Keuangan Utama',
           body: `
 <p class="kb-lead">Ada empat laporan keuangan utama yang disusun di akhir periode akuntansi. Keempatnya saling terhubung membentuk satu cerita utuh tentang kesehatan keuangan perusahaan.</p>
-<div class="kb-tip"><span class="kb-callout-title">💡 Kelengkapan menurut standar</span>PSAK 201 mensyaratkan satu set laporan keuangan lengkap: laporan posisi keuangan, laporan laba rugi dan penghasilan komprehensif lain, laporan perubahan ekuitas, laporan arus kas, <strong>dan Catatan atas Laporan Keuangan (CaLK)</strong>. SAK EMKM lebih ringkas (laporan posisi keuangan, laporan laba rugi, dan CaLK).</div>
+<div class="kb-tip"><span class="kb-callout-title">💡 Kelengkapan menurut standar</span>Menurut PSAK 201, satu set lengkap mencakup laporan posisi keuangan; laporan laba rugi dan penghasilan komprehensif lain (dapat disajikan dalam satu atau dua laporan); laporan perubahan ekuitas; laporan arus kas; serta <strong>Catatan atas Laporan Keuangan (CaLK)</strong>. Angka dalam laporan dilengkapi informasi komparatif untuk periode terdekat sebelumnya. Jika entitas menerapkan kebijakan akuntansi secara retrospektif, menyajikan kembali pos, atau mereklasifikasi pos, entitas juga menyajikan laporan posisi keuangan pada awal periode komparatif. SAK EMKM merupakan standar tersendiri bagi entitas yang memenuhi kriterianya; komponen minimumnya adalah laporan posisi keuangan, laporan laba rugi, dan CaLK.</div>
 <div class="kb-table-wrap"><table class="kb-table">
 <thead><tr><th>Laporan</th><th>Nama Inggris</th><th>Menjawab Pertanyaan</th><th>Periode</th></tr></thead>
 <tbody>
@@ -169,7 +169,7 @@ Aset (Kas Rp20.000.000 + Peralatan Rp15.000.000 = Rp35.000.000) = Kewajiban (Uta
 <div class="kb-tip"><span class="kb-callout-title">💡 Studi Kasus Berkelanjutan</span>Untuk memudahkan pemahaman, keempat laporan pada bab ini memakai <strong>satu contoh perusahaan yang sama</strong> — CV Mitra Sejahtera, usaha dagang, tahun buku 2025 — sehingga kamu bisa melihat langsung bagaimana angka-angkanya saling terhubung antar laporan.</div>`,
           sources: [
             { type: 'psak', ref: 'PSAK 201 Penyajian Laporan Keuangan (dahulu PSAK 1; penomoran baru efektif 1 Jan 2024)', url: 'https://web.iaiglobal.or.id/PSAK-Umum/7' },
-            { type: 'standar', ref: 'SAK EMKM (IAI) — komponen laporan keuangan', note: 'dirujuk lewat sumber sekunder; cek teks SAK EMKM' },
+            { type: 'standar', ref: 'SAK EMKM (IAI) — komponen laporan keuangan dan kriteria penerapan', note: 'SAK EMKM adalah standar tersendiri; pastikan entitas memenuhi kriterianya sebelum menerapkan' },
             { type: 'standar', ref: 'IAI — Perubahan Penomoran PSAK dan ISAK dalam SAK Indonesia (efektif 1 Jan 2024)', note: 'hanya penomoran, substansi tidak berubah', url: 'https://web.iaiglobal.or.id/assets/files/file_publikasi/Komparasi%20Perubahan%20Penomoran%20PSAK%20ISAK%20SAK%20Indonesia_FINAL.pdf' }
           ],
           reviewed: '2026-10'

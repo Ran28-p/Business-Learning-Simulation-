@@ -14,7 +14,7 @@
 
 import {
   getExpectedJournal,
-  getLoadedAdjustments,
+  buildAdjustmentJournal,
   generateClosingEntries,
   generateTrialBalance,
   getLedgerArray,
@@ -260,7 +260,7 @@ export function validateJournal(userEntries, options = {}) {
       }));
     } else if (!chartNames.has(e.account)) {
       items.push(feedback({
-        severity: 'warning',
+        severity: 'error',
         field: 'account',
         expected: 'Nama akun dalam Chart of Accounts',
         actual: e.account,
@@ -283,6 +283,55 @@ export function validateJournal(userEntries, options = {}) {
     const keyResult = _compareToAnswerKey(user, expectedLines, checkOrder);
     items.push(...keyResult.items);
     score += keyResult.score;
+    const expectedByDate = _toDateAccountMap(expectedLines);
+    const userByDate = _toDateAccountMap(user);
+
+    expectedByDate.forEach((expected, key) => {
+      const [date, account] = key.split('\u0000');
+      const actual = userByDate.get(key);
+      if (actual && actual.debit === expected.debit && actual.credit === expected.credit) return;
+      if (actual) {
+        items.push(feedback({
+          severity: 'error',
+          field: 'amount',
+          expected: `Debit Rp ${expected.debit.toLocaleString('id-ID')}; Kredit Rp ${expected.credit.toLocaleString('id-ID')}`,
+          actual: `Debit Rp ${actual.debit.toLocaleString('id-ID')}; Kredit Rp ${actual.credit.toLocaleString('id-ID')}`,
+          what: `Nominal akun "${account}" pada tanggal ${date} tidak sesuai.`,
+          why: 'Setiap transaksi harus dicatat pada tanggal dan nominal yang benar.',
+          concept: PSAK.AMOUNT.concept,
+          fix: `Sesuaikan nominal akun "${account}" pada tanggal ${date}.`,
+          psak: PSAK.AMOUNT
+        }));
+        return;
+      }
+      items.push(feedback({
+        severity: 'error',
+        field: 'date',
+        expected: date,
+        actual: actual ? date : '(tanggal tidak cocok atau belum diisi)',
+        what: `Tanggal pencatatan akun "${account}" tidak sesuai dengan tanggal transaksi.`,
+        why: 'Transaksi harus dicatat pada tanggal terjadinya agar masuk ke periode yang benar.',
+        concept: PSAK.DATE.concept,
+        fix: `Gunakan tanggal ${date} untuk akun "${account}" sesuai daftar transaksi.`,
+        psak: PSAK.DATE
+      }));
+    });
+
+    userByDate.forEach((actual, key) => {
+      if (expectedByDate.has(key)) return;
+      const [date, account] = key.split('\u0000');
+      items.push(feedback({
+        severity: 'error',
+        field: 'date',
+        expected: '(tidak ada)',
+        actual: date || '(tanggal kosong)',
+        what: `Tanggal ${date || 'kosong'} untuk akun "${account}" tidak ada pada kunci transaksi.`,
+        why: 'Tanggal jurnal harus sesuai dengan tanggal transaksi sumber.',
+        concept: PSAK.DATE.concept,
+        fix: 'Pilih tanggal yang tercantum pada transaksi terkait.',
+        psak: PSAK.DATE
+      }));
+    });
   } else if (expectedLines.length === 0) {
     // No key yet – pure rule validation only
     items.push(feedback({
@@ -408,7 +457,7 @@ function _compareToAnswerKey(user, expected, checkOrder) {
   userMap.forEach((usr, account) => {
     if (!expectedMap.has(account)) {
       items.push(feedback({
-        severity: 'warning',
+        severity: 'error',
         field: 'account',
         expected: '(tidak ada dalam answer key)',
         actual: account,
@@ -462,6 +511,32 @@ function _toAccountMap(lines) {
     const slot = map.get(name);
     slot.debit += (l.debit || l.d || 0);
     slot.credit += (l.credit || l.k || 0);
+  });
+  return map;
+}
+
+function _toDateAccountMap(lines) {
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const map = new Map();
+  lines.forEach(line => {
+    const account = line.account || line.a;
+    if (!account) return;
+    const rawDate = String(line.date || '').trim();
+    const isoDate = /^(\d{4})-(\d{2})-(\d{2})$/.exec(rawDate);
+    const labelDate = /^(\d{1,2})\s+([A-Za-z]+)/.exec(rawDate);
+    let date = '';
+    if (isoDate) {
+      const month = Number(isoDate[2]);
+      if (month >= 1 && month <= 12) date = `${isoDate[3]} ${monthNames[month - 1]}`;
+    } else if (labelDate) {
+      const month = monthNames.find(name => name.toLowerCase() === labelDate[2].toLowerCase());
+      if (month) date = `${labelDate[1].padStart(2, '0')} ${month}`;
+    }
+    const key = `${date}\u0000${account}`;
+    if (!map.has(key)) map.set(key, { debit: 0, credit: 0 });
+    const slot = map.get(key);
+    slot.debit += (line.debit || line.d || 0);
+    slot.credit += (line.credit || line.k || 0);
   });
   return map;
 }
@@ -538,47 +613,83 @@ export function validateAdjustmentJournal(userEntries) {
     }));
   }
 
-  // Compare to expected adjustments
-  const adjKey = getLoadedAdjustments();
-  if (adjKey.length > 0) {
-    // Use engine's adjustment journal if built
-    // For now validate structure + balance primarily
-    score += 20;
-  }
-
-  // Check typical adjustment account patterns
-  const hasExpense = user.some(e => e.account.startsWith('Beban') && e.debit > 0);
-  const hasContraOrAsset = user.some(e =>
-    e.account.includes('Akumulasi') ||
-    e.account.includes('Dibayar Dimuka') ||
-    e.account.includes('Diterima Dimuka') ||
-    e.account === 'Perlengkapan' ||
-    e.account === 'Utang Gaji' ||
-    e.account === 'Utang Upah'
-  );
-
-  if (hasExpense || hasContraOrAsset) {
-    score += 25;
+  const expectedLines = buildAdjustmentJournal();
+  if (!expectedLines.length) {
     items.push(feedback({
-      severity: 'success',
-      field: 'account',
-      what: 'Akun penyesuaian yang digunakan sesuai pola akrual/deferral.',
-      why: 'Penyesuaian tipikal melibatkan Beban + Aset/Kewajiban terkait.',
+      severity: 'error',
+      field: 'completeness',
+      what: 'Kunci jawaban penyesuaian belum tersedia.',
+      why: 'Jawaban tidak dapat dinilai dengan benar tanpa kasus penyesuaian yang dimuat.',
       concept: PSAK.ADJUSTMENT.concept,
-      fix: 'Lanjutkan.',
+      fix: 'Muat atau acak kasus latihan terlebih dahulu, lalu verifikasi kembali.',
       psak: PSAK.ADJUSTMENT
     }));
-  } else {
+    return _result(false, score, maxScore, items, 'Kunci penyesuaian tidak tersedia');
+  }
+
+  const expectedMap = _toAccountMap(expectedLines);
+  const userMap = _toAccountMap(user);
+  let matchedAccounts = 0;
+  let matchedAmounts = 0;
+
+  expectedMap.forEach((expected, account) => {
+    const actual = userMap.get(account);
+    if (!actual) {
+      items.push(feedback({
+        severity: 'error',
+        field: 'completeness',
+        expected: account,
+        actual: '(tidak ada)',
+        what: `Akun "${account}" seharusnya ada di jurnal penyesuaian, tetapi tidak ditemukan.`,
+        why: 'Setiap penyesuaian harus mencatat akun yang terdampak agar saldo dan laporan periode benar.',
+        concept: PSAK.ADJUSTMENT.concept,
+        fix: `Tambahkan akun "${account}" dengan Debit Rp ${expected.debit.toLocaleString('id-ID')} dan Kredit Rp ${expected.credit.toLocaleString('id-ID')}.`,
+        psak: PSAK.ADJUSTMENT
+      }));
+      return;
+    }
+
+    matchedAccounts++;
+    if (actual.debit === expected.debit && actual.credit === expected.credit) {
+      matchedAmounts++;
+      return;
+    }
+
+    const swapped = actual.debit === expected.credit && actual.credit === expected.debit;
     items.push(feedback({
-      severity: 'warning',
+      severity: 'error',
+      field: swapped ? 'debit_credit' : 'amount',
+      expected: `Debit Rp ${expected.debit.toLocaleString('id-ID')}; Kredit Rp ${expected.credit.toLocaleString('id-ID')}`,
+      actual: `Debit Rp ${actual.debit.toLocaleString('id-ID')}; Kredit Rp ${actual.credit.toLocaleString('id-ID')}`,
+      what: swapped
+        ? `Posisi Debit/Kredit akun "${account}" tertukar.`
+        : `Nominal akun "${account}" tidak sesuai dengan kasus penyesuaian.`,
+      why: swapped
+        ? _whySideWrong(account, expected.debit > 0 ? 'D' : 'K')
+        : 'Akun dan nominal penyesuaian harus sesuai dengan informasi akhir periode.',
+      concept: swapped ? PSAK.DEBIT_CREDIT_RULE.concept : PSAK.AMOUNT.concept,
+      fix: `Gunakan Debit Rp ${expected.debit.toLocaleString('id-ID')} dan Kredit Rp ${expected.credit.toLocaleString('id-ID')} untuk akun "${account}".`,
+      psak: swapped ? PSAK.DEBIT_CREDIT_RULE : PSAK.ADJUSTMENT
+    }));
+  });
+
+  userMap.forEach((actual, account) => {
+    if (expectedMap.has(account)) return;
+    items.push(feedback({
+      severity: 'error',
       field: 'account',
-      what: 'Tidak ditemukan pola akun penyesuaian yang umum (Beban, Akumulasi, Dibayar/Diterima Dimuka, Utang Akrual).',
-      why: 'Jurnal penyesuaian biasanya menyesuaikan aset/kewajiban dengan beban/pendapatan.',
-      concept: PSAK.ADJUSTMENT.concept,
-      fix: PSAK.ADJUSTMENT.fix,
+      expected: '(tidak ada dalam kunci penyesuaian)',
+      actual: account,
+      what: `Akun "${account}" tidak terkait dengan penyesuaian pada kasus ini.`,
+      why: 'Akun tambahan mengubah saldo dan laporan keuangan tanpa dukungan data kasus.',
+      concept: PSAK.ACCOUNT_NAME.concept,
+      fix: `Hapus akun "${account}" atau periksa kembali kunci penyesuaian.`,
       psak: PSAK.ADJUSTMENT
     }));
-  }
+  });
+
+  score += Math.round((matchedAccounts / expectedMap.size) * 25);
+  score += Math.round((matchedAmounts / expectedMap.size) * 45);
 
   score = Math.min(score, maxScore);
   const hasError = items.some(i => i.severity === 'error');
@@ -610,40 +721,70 @@ export function validateLedgerPosting() {
     return _result(false, 0, maxScore, items, 'Tidak ada jurnal');
   }
 
-  // Verify every journal line appears in ledger
-  let matched = 0;
-  journal.forEach(line => {
-    const slot = ledger.find(l => l.name === line.account);
-    if (!slot) {
+  const expectedMap = _toAccountMap(journal);
+  const postedLines = ledger.map(slot => ({
+    account: slot.name,
+    debit: slot.debits.reduce((sum, amount) => sum + amount, 0),
+    credit: slot.credits.reduce((sum, amount) => sum + amount, 0)
+  })).filter(line => line.debit !== 0 || line.credit !== 0);
+  const postedMap = _toAccountMap(postedLines);
+  let matchedAccounts = 0;
+  let matchedAmounts = 0;
+
+  expectedMap.forEach((expected, account) => {
+    const posted = postedMap.get(account);
+    if (!posted) {
       items.push(feedback({
         severity: 'error',
         field: 'ledger',
-        expected: line.account,
+        expected: account,
         actual: '(tidak ada di Buku Besar)',
-        what: `Akun "${line.account}" ada di jurnal tetapi belum ter-posting ke Buku Besar.`,
-        why: 'Setiap baris jurnal harus dipindahkan ke T-Account agar saldo akun akurat.',
+        what: `Akun "${account}" ada di jurnal tetapi belum ter-posting ke Buku Besar.`,
+        why: 'Setiap akun jurnal harus diposting dengan nominal dan sisi yang tepat.',
         concept: PSAK.LEDGER.concept,
-        fix: `Posting nominal ${line.debit > 0 ? 'Debit' : 'Kredit'} Rp ${(line.debit || line.credit).toLocaleString('id-ID')} ke T-Account "${line.account}".`,
+        fix: `Posting Debit Rp ${expected.debit.toLocaleString('id-ID')} dan Kredit Rp ${expected.credit.toLocaleString('id-ID')} ke akun "${account}".`,
         psak: PSAK.LEDGER
       }));
-    } else {
-      matched++;
+      return;
     }
-  });
 
-  if (matched === journal.length) {
-    score = 100;
+    matchedAccounts++;
+    if (posted.debit === expected.debit && posted.credit === expected.credit) {
+      matchedAmounts++;
+      return;
+    }
+
     items.push(feedback({
-      severity: 'success',
+      severity: 'error',
       field: 'ledger',
-      what: `Semua ${journal.length} baris jurnal berhasil ter-posting ke Buku Besar.`,
-      why: 'Posting lengkap memastikan Trial Balance dan laporan disusun dari data yang benar.',
+      expected: `Debit Rp ${expected.debit.toLocaleString('id-ID')}; Kredit Rp ${expected.credit.toLocaleString('id-ID')}`,
+      actual: `Debit Rp ${posted.debit.toLocaleString('id-ID')}; Kredit Rp ${posted.credit.toLocaleString('id-ID')}`,
+      what: `Saldo akun "${account}" di Buku Besar tidak sama dengan jurnal.`,
+      why: 'Posting harus mempertahankan nominal dan sisi Debit/Kredit dari setiap jurnal.',
       concept: PSAK.LEDGER.concept,
-      fix: 'Lanjutkan ke Neraca Saldo.',
+      fix: `Perbaiki posting akun "${account}" agar sesuai dengan jurnal sumber.`,
       psak: PSAK.LEDGER
     }));
-  } else {
-    score = Math.round((matched / journal.length) * 100);
+  });
+
+  postedMap.forEach((posted, account) => {
+    if (expectedMap.has(account)) return;
+    items.push(feedback({
+      severity: 'error',
+      field: 'ledger',
+      expected: '(tidak ada dalam jurnal)',
+      actual: account,
+      what: `Akun "${account}" muncul di Buku Besar tetapi tidak ada di jurnal sumber.`,
+      why: 'Posting tanpa jurnal sumber membuat saldo buku besar tidak dapat ditelusuri.',
+      concept: PSAK.LEDGER.concept,
+      fix: `Hapus posting tambahan akun "${account}" atau koreksi jurnal sumber.`,
+      psak: PSAK.LEDGER
+    }));
+  });
+
+  if (expectedMap.size > 0) {
+    score += Math.round((matchedAccounts / expectedMap.size) * 50);
+    score += Math.round((matchedAmounts / expectedMap.size) * 50);
   }
 
   // TB balance check
@@ -733,64 +874,79 @@ export function validateClosingJournal(userEntries) {
     score += 25;
   }
 
-  // Check presence of key closing accounts
-  const names = user.map(e => e.account);
-  const hasILR = names.includes('Ikhtisar Laba Rugi');
-  const hasModal = names.includes('Modal Pemilik');
-  const hasRevenue = names.some(n => n.includes('Pendapatan') || n === 'Penjualan');
-  const hasExpense = names.some(n => n.startsWith('Beban') || n === 'Harga Pokok Penjualan');
+  const expected = generateClosingEntries();
+  const expectedMap = _toAccountMap(expected.entries);
+  const userMap = _toAccountMap(user);
+  let matchedAccounts = 0;
+  let matchedAmounts = 0;
 
-  if (hasILR) {
-    score += 20;
+  if (expectedMap.size === 0) {
     items.push(feedback({
-      severity: 'success', field: 'closing',
-      what: 'Akun Ikhtisar Laba Rugi digunakan sebagai perantara penutupan.',
-      why: 'Ikhtisar L/R menampung ringkasan pendapatan dan beban sebelum ditutup ke Modal.',
-      concept: PSAK.CLOSING.concept, fix: 'Baik!', psak: PSAK.CLOSING
-    }));
-  } else {
-    items.push(feedback({
-      severity: 'error', field: 'closing',
-      what: 'Akun "Ikhtisar Laba Rugi" tidak ditemukan dalam jurnal penutup.',
-      why: 'Tanpa Ikhtisar L/R, pendapatan dan beban tidak bisa diringkas sebelum ditutup ke Modal.',
+      severity: 'error',
+      field: 'completeness',
+      what: 'Kunci jawaban jurnal penutup belum tersedia.',
+      why: 'Jawaban tidak dapat dinilai dengan benar tanpa saldo penyesuaian yang dimuat.',
       concept: PSAK.CLOSING.concept,
-      fix: 'Tambahkan Ikhtisar Laba Rugi sebagai akun perantara (step 1–3).',
+      fix: 'Muat dan selesaikan kasus akuntansi terlebih dahulu, lalu verifikasi kembali.',
       psak: PSAK.CLOSING
     }));
   }
 
-  if (hasModal) {
-    score += 15;
-  } else {
-    items.push(feedback({
-      severity: 'warning', field: 'closing',
-      what: 'Akun "Modal Pemilik" tidak ditemukan. Laba/Rugi dan Prive seharusnya ditutup ke Modal.',
-      why: 'Tujuan akhir closing adalah memindahkan hasil operasi ke ekuitas.',
-      concept: PSAK.CLOSING.concept,
-      fix: 'Tutup saldo Ikhtisar L/R dan Prive ke Modal Pemilik.',
-      psak: PSAK.CLOSING
-    }));
-  }
-
-  if (hasRevenue || hasExpense) {
-    score += 20;
-  }
-
-  // Compare to expected closing
-  try {
-    const expected = generateClosingEntries();
-    if (expected.entries.length > 0) {
-      score += 20;
+  expectedMap.forEach((expectedBalance, account) => {
+    const actual = userMap.get(account);
+    if (!actual) {
       items.push(feedback({
-        severity: 'info', field: 'closing',
-        what: `Answer key menghasilkan ${expected.entries.length} baris penutup. Net Income: Rp ${expected.netIncome.toLocaleString('id-ID')}.`,
-        why: 'Gunakan sebagai referensi urutan dan nominal.',
+        severity: 'error',
+        field: 'closing',
+        expected: account,
+        actual: '(tidak ada)',
+        what: `Akun "${account}" belum ditutup.`,
+        why: 'Setiap akun nominal dan prive harus ditutup sesuai saldo akhirnya.',
         concept: PSAK.CLOSING.concept,
-        fix: PSAK.CLOSING.fix,
+        fix: `Tambahkan penutupan akun "${account}" sesuai saldo pada neraca saldo disesuaikan.`,
         psak: PSAK.CLOSING
       }));
+      return;
     }
-  } catch (_) { /* engine may not be ready */ }
+
+    matchedAccounts++;
+    if (actual.debit === expectedBalance.debit && actual.credit === expectedBalance.credit) {
+      matchedAmounts++;
+      return;
+    }
+
+    items.push(feedback({
+      severity: 'error',
+      field: 'closing',
+      expected: `Debit Rp ${expectedBalance.debit.toLocaleString('id-ID')}; Kredit Rp ${expectedBalance.credit.toLocaleString('id-ID')}`,
+      actual: `Debit Rp ${actual.debit.toLocaleString('id-ID')}; Kredit Rp ${actual.credit.toLocaleString('id-ID')}`,
+      what: `Saldo penutupan akun "${account}" tidak sesuai.`,
+      why: 'Jurnal penutup harus menutup saldo akun nominal dan memindahkan laba/rugi serta prive ke modal.',
+      concept: PSAK.CLOSING.concept,
+      fix: `Sesuaikan Debit/Kredit akun "${account}" dengan saldo penutupan yang benar.`,
+      psak: PSAK.CLOSING
+    }));
+  });
+
+  userMap.forEach((actual, account) => {
+    if (expectedMap.has(account)) return;
+    items.push(feedback({
+      severity: 'error',
+      field: 'closing',
+      expected: '(tidak ada dalam kunci penutupan)',
+      actual: account,
+      what: `Akun "${account}" tidak seharusnya muncul pada jurnal penutup kasus ini.`,
+      why: 'Akun tambahan membuat saldo akhir periode tidak tepat.',
+      concept: PSAK.CLOSING.concept,
+      fix: `Hapus akun "${account}" atau periksa kembali kunci penutupan.`,
+      psak: PSAK.CLOSING
+    }));
+  });
+
+  if (expectedMap.size > 0) {
+    score += Math.round((matchedAccounts / expectedMap.size) * 25);
+    score += Math.round((matchedAmounts / expectedMap.size) * 50);
+  }
 
   score = Math.min(score, maxScore);
   const hasError = items.some(i => i.severity === 'error');

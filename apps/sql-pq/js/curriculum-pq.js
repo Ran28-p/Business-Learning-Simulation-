@@ -62,7 +62,7 @@
     L("m-list-fn", "List Functions", "List.Sum, List.Average, List.Max, List.Distinct, dst.", "List.Sum({10,20,30})", "Fungsi untuk bekerja dengan List (daftar nilai) — sering dipakai di dalam Table.Group untuk menghitung agregasi."),
     L("m-text-fn", "Text Functions", "Text.Upper, Text.Trim, Text.Start, Text.Contains, dst.", "Text.Contains([Product], \"Laptop\")", "Fungsi manipulasi teks di level M — dasar dari banyak langkah data cleaning."),
     L("m-date-fn", "Date Functions", "Date.Year, Date.Month, Date.AddDays, dst.", "Date.Year([Tanggal])", "Fungsi untuk mengekstrak atau memanipulasi bagian tanggal di level M."),
-    L("m-error-handling", "Error Handling", "try ekspresi otherwise nilai_pengganti", "= Table.AddColumn(Source, \"Aman\", each try [A]/[B] otherwise 0)", "'try ... otherwise' menangkap error (mis. pembagian dengan nol) dan menggantinya dengan nilai default, supaya query tidak berhenti total.")
+    L("m-error-handling", "Error Handling", "try ekspresi otherwise nilai_pengganti", "= Table.AddColumn(Source, \"Hasil\", each try [A]/[B] otherwise null)", "'try ... otherwise' menangani error, tetapi nilai pengganti seperti 0 dapat menyamarkan data bermasalah dan mengubah hasil analisis. Pilih nilai pengganti dengan alasan bisnis yang jelas, atau simpan/periksa detail error.")
   ];
 
   global.SQLPQ_CurriculumPQ = {

@@ -58,7 +58,7 @@
     {
       "key": "pph",
       "title": "PPh (Pajak Penghasilan)",
-      "summary": "Pajak atas penghasilan orang pribadi dan badan; meliputi PPh Pasal 21, 23, 25, 29, serta tarif progresif untuk wajib pajak orang pribadi. Tarif yang berlaku saat ini: PPh Orang Pribadi memakai tarif progresif 5 lapis sesuai UU HPP — 5% (sampai Rp60 juta), 15% (di atas Rp60 juta s.d. Rp250 juta), 25% (di atas Rp250 juta s.d. Rp500 juta), 30% (di atas Rp500 juta s.d. Rp5 miliar), dan 35% (di atas Rp5 miliar); PPh Badan tarif umum 22%; PPh final UMKM 0,5% dari peredaran bruto (PP 55/2022).",
+      "summary": "Pajak atas penghasilan orang pribadi dan badan; meliputi PPh Pasal 21, 23, 25, 29, serta tarif progresif untuk wajib pajak orang pribadi. Tarif PPh OP progresif 5 lapis sesuai UU HPP; tarif umum PPh Badan 22%. PPh Final UMKM 0,5% dari peredaran bruto hanya untuk subjek yang memenuhi syarat menurut PP 55/2022 sebagaimana diubah PP 20/2026; ketentuan subjek, masa penggunaan, dan batas Rp500 juta khusus OP berbeda.",
       "questions": [
         {
           "q": "Manakah pernyataan yang paling tepat tentang PPh Pasal 21?",
@@ -125,10 +125,10 @@
           "q": "Tarif PPh final UMKM menurut PP 55/2022 (sebagaimana diubah PP 20/2026) adalah ... %",
           "type": "number",
           "answer": 0.5,
-          "explanation": "Tarif PPh final UMKM adalah 0,5% dari peredaran bruto. PP 20/2026 (22 April 2026) tidak mengubah tarif, tetapi mempersempit subjeknya: Orang Pribadi, PT Perorangan, dan Koperasi (maks. 4 Tahun Pajak). PT/CV biasa kembali ke tarif umum setelah masa peralihan s.d. Tahun Pajak 2026.",
+          "explanation": "Tarif tetap 0,5%. Setelah PP 20/2026, masa penggunaan berbeda menurut subjek: WP OP dan PT Perorangan dapat memakai skema tanpa batas jangka waktu selama memenuhi syarat; koperasi paling lama 4 Tahun Pajak; badan lain hanya menurut ketentuan peralihan bagi pengguna yang memenuhi syarat sampai Tahun Pajak 2026. Untuk OP, bagian peredaran bruto sampai Rp500 juta setahun tidak dikenai PPh Final.",
           "ref": "PP 55/2022 s.t.d.d. PP 20/2026",
           "pembahasan": {
-            "konsep": "Tarif PPh final UMKM adalah 0,5% dari peredaran bruto. PP 20/2026 tidak mengubah tarif; yang berubah adalah siapa yang boleh memakainya (OP, PT Perorangan, Koperasi).",
+            "konsep": "Tarif tetap 0,5%, tetapi PP 20/2026 membedakan subjek dan jangka waktu. Batas Rp500 juta yang tidak dikenai PPh Final berlaku khusus untuk WP OP.",
             "dasar": "PP 55/2022 s.t.d.d. PP 20/2026",
             "langkah": [
               "Tarif = 0,5% dari peredaran bruto (setengah persen)"
@@ -1278,7 +1278,7 @@
     {
       "key": "pph-final",
       "title": "PPh Final Pasal 4 Ayat (2)",
-      "summary": "Pajak penghasilan yang bersifat FINAL atas jenis penghasilan tertentu — artinya dipotong/disetor sekali saat transaksi terjadi dan TIDAK diperhitungkan lagi (tidak jadi kredit pajak) dalam SPT Tahunan. Beberapa tarif utama: sewa tanah/bangunan 10% dari nilai bruto sewa (PP 34/2017); UMKM (peredaran bruto tidak lebih dari Rp4,8 miliar setahun) 0,5% dari peredaran bruto (PP 55/2022 sebagaimana diubah PP 20/2026; subjeknya Orang Pribadi, PT Perorangan, dan Koperasi, sedangkan PT/CV biasa hanya lewat ketentuan peralihan sampai akhir Tahun Pajak 2026); bunga deposito dan tabungan umumnya 20% (PP 131/2000; ada tarif lebih rendah untuk kondisi tertentu, mis. deposito dari devisa hasil ekspor); dividen kepada WP orang pribadi dalam negeri 10% final (Pasal 17 ayat (2c) UU PPh), tetapi dikecualikan dari objek PPh bila diinvestasikan di dalam negeri sesuai PMK 18/2021; hadiah undian 25% (PP 132/2000); jasa konstruksi bertarif final bervariasi (sekitar 1,75%-6%) tergantung kualifikasi usaha (PP 9/2022).",
+      "summary": "PPh Final menyelesaikan kewajiban atas penghasilan tertentu sehingga tidak digabung dan tidak dikreditkan di SPT Tahunan; waktu pemotongan atau penyetoran mengikuti aturan masing-masing jenis. PPh Final UMKM 0,5% dihitung dari omzet dan disetor per masa pajak; subjek dan masa penggunaannya mengikuti PP 55/2022 sebagaimana diubah PP 20/2026, termasuk pengecualian peredaran Rp500 juta khusus WP OP. Tarif lain antara lain sewa tanah/bangunan 10% (PP 34/2017), bunga deposito umumnya 20% (PP 131/2000), dividen tertentu 10% (Pasal 17 ayat (2c) UU PPh; perhatikan pengecualian investasi dalam negeri), hadiah undian 25% (PP 132/2000), dan jasa konstruksi sesuai kualifikasi (PP 9/2022).",
       "questions": [
         {
           "q": "Apa arti \"final\" pada PPh Final Pasal 4 ayat (2)?",
@@ -1348,7 +1348,7 @@
             "langkah": [
               "OP 7 tahun; CV/firma/koperasi 4 tahun; PT 3 tahun"
             ],
-            "jebakan": "Tertukar dengan batas CV/koperasi (4 tahun) atau PT (3 tahun). Setelah PP 20/2026, OP dan PT Perorangan menurut penjelasan DJP tanpa batas waktu.",
+            "jebakan": "Menerapkan batas lama PP 23/2018/PP 55/2022 kepada skema setelah PP 20/2026. Batas lama CV/firma/koperasi 4 tahun dan PT 3 tahun; menurut penjelasan DJP, OP dan PT Perorangan dapat tanpa batas waktu bila memenuhi syarat.",
             "ingat": "7–4–3: OP–CV/koperasi–PT."
           }
         },

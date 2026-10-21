@@ -11,7 +11,8 @@
             const kasus = Form1771Cases[Math.floor(Math.random() * Form1771Cases.length)];
             form1771State = { case: kasus, kpCounter: 0, posCounter: 0, negCounter: 0, finalCounter: 0, bukanObjekCounter: 0, sahamCounter: 0, pengurusCounter: 0, hppCounter: 0, biayaCounter: 0, cabangCounter: 0 };
 
-            document.getElementById('f1771-title').innerText = kasus.title;
+            document.getElementById('f1771-title').innerText = kasus.title
+                + (kasus.tahunPajak ? ' — Tahun Pajak ' + kasus.tahunPajak : '');
             document.getElementById('f1771-narrative').innerText = kasus.narrative;
 
             ['peredaranUsaha', 'kompensasiKerugian', 'umkmPeredaranUsaha', 'luarUsahaBruto', 'biayaLuarUsaha', 'penghasilanLN', 'penghasilanTidakTeratur'].forEach(function(id) {
@@ -240,9 +241,24 @@
             document.getElementById('f1771-jumlahCabang').innerText = String(jumlahCabang);
 
             let totalKreditPajak = 0;
-            document.querySelectorAll('#f1771-kreditpajak-rows .f1770-nilai').forEach(function(el) { totalKreditPajak += cleanNumber(el.value); });
+            let adaKreditTidakSesuaiSkema = false;
+            document.querySelectorAll('#f1771-kreditpajak-rows .form1770-dynrow').forEach(function(row) {
+                const sel = row.querySelector('select');
+                const jenis = sel ? sel.value : '';
+                const nilai = cleanNumber(row.querySelector('.f1770-nilai').value);
+                if (TaxEngine.isKreditPajak1771Dikreditkan(jenis, isUmkm ? 'umkm' : 'normal')) {
+                    totalKreditPajak += nilai;
+                } else if (jenis || nilai !== 0) {
+                    adaKreditTidakSesuaiSkema = true;
+                }
+            });
             document.getElementById('f1771-totalKreditPajak').innerText = fmtRpForm1770(totalKreditPajak);
             document.getElementById('f1771-kreditPajak').innerText = fmtRpForm1770(totalKreditPajak);
+            const kreditWarning = document.getElementById('f1771-kredit-warning');
+            kreditWarning.hidden = !adaKreditTidakSesuaiSkema;
+            kreditWarning.innerText = isUmkm
+                ? 'Skema Final UMKM hanya menerima setoran PPh Final UMKM; kredit pajak lain tidak mengurangi PPh Final.'
+                : 'Setoran PPh Final UMKM tidak dapat menjadi kredit pajak pada skema normal.';
 
             const jumlahPemegangSaham = document.querySelectorAll('#f1771-pemegangsaham-rows .form1770-dynrow').length;
             document.getElementById('f1771-jumlahPemegangSaham').innerText = String(jumlahPemegangSaham);
@@ -332,15 +348,13 @@
                 const hasilAngsuran = TaxEngine.hitungPPhBadan(peredaranUsaha, Math.floor(dasarAngsuran / 1000) * 1000);
                 document.getElementById('f1771-angsuranPPhDihitung').innerText = fmtRpForm1770(hasilAngsuran.pphTerutang);
 
-                // 14.e: hanya kredit pajak yang DIPOTONG/DIPUNGUT PIHAK LAIN dalam negeri —
-                // tidak termasuk PPh 24 (luar negeri) maupun PPh 25 (angsuran disetor sendiri,
-                // karena itu justru yang sedang dihitung di sini).
+                // 14.e: kredit pajak selain PPh 25 dan setoran PPh Final UMKM.
                 let kreditDalamNegeriUntukAngsuran = 0;
                 document.querySelectorAll('#f1771-kreditpajak-rows .form1770-dynrow').forEach(function(row) {
                     const sel = row.querySelector('select');
                     const jenis = sel ? sel.value : '';
                     const nilai = cleanNumber(row.querySelector('.f1770-nilai').value);
-                    if (jenis !== 'PPh 24' && jenis !== 'PPh 25') kreditDalamNegeriUntukAngsuran += nilai;
+                    if (TaxEngine.isKreditPajak1771PengurangAngsuran(jenis)) kreditDalamNegeriUntukAngsuran += nilai;
                 });
                 document.getElementById('f1771-angsuranKreditDN').innerText = fmtRpForm1770(kreditDalamNegeriUntukAngsuran);
 
@@ -366,7 +380,13 @@
             const jumlahCabang = document.querySelectorAll('#f1771-cabang-rows .form1770-harta-row').length;
 
             let totalKreditPajak = 0;
-            document.querySelectorAll('#f1771-kreditpajak-rows .f1770-nilai').forEach(function(el) { totalKreditPajak += cleanNumber(el.value); });
+            document.querySelectorAll('#f1771-kreditpajak-rows .form1770-dynrow').forEach(function(row) {
+                const sel = row.querySelector('select');
+                const jenis = sel ? sel.value : '';
+                if (TaxEngine.isKreditPajak1771Dikreditkan(jenis, isUmkm ? 'umkm' : 'normal')) {
+                    totalKreditPajak += cleanNumber(row.querySelector('.f1770-nilai').value);
+                }
+            });
             let totalPphFinal = 0;
             document.querySelectorAll('#f1771-final-rows .form1770-dynrow').forEach(function(row) {
                 const dpp = cleanNumber(row.querySelector('.f1770-dpp').value);
@@ -381,7 +401,9 @@
             const correctTotalHppRincian = correct.hppRincian.reduce(function(a, b) { return a + b.jumlah; }, 0);
             const correctTotalBiayaRincian = correct.biayaRincian.reduce(function(a, b) { return a + b.jumlah; }, 0);
             const correctJumlahCabang = correct.cabang.length;
-            const correctTotalKreditPajak = correct.kreditPajak.reduce(function(a, b) { return a + b.jumlah; }, 0);
+            const correctTotalKreditPajak = correct.kreditPajak
+                .filter(function(k) { return TaxEngine.isKreditPajak1771Dikreditkan(k.jenisPajak, isUmkm ? 'umkm' : 'normal'); })
+                .reduce(function(a, b) { return a + b.jumlah; }, 0);
             const correctTotalPphFinal = correct.penghasilanFinal.reduce(function(a, f) { return a + f.pphFinal; }, 0);
             const correctTotalBukanObjek = correct.penghasilanBukanObjek.reduce(function(a, b) { return a + b.jumlah; }, 0);
             const correctJumlahPemegangSaham = correct.pemegangSaham.length;
@@ -422,16 +444,16 @@
                 const correctTotalKoreksiPositif = correct.koreksiPositif.reduce(function(a, b) { return a + b.jumlah; }, 0);
                 const correctTotalKoreksiNegatif = correct.koreksiNegatif.reduce(function(a, b) { return a + b.jumlah; }, 0);
 
-                // 14.e: kredit dalam negeri saja (bukan PPh 24 luar negeri, bukan PPh 25 angsuran sendiri)
+                // 14.e: kredit pajak selain PPh 25 dan setoran PPh Final UMKM.
                 let userKreditDalamNegeri = 0;
                 document.querySelectorAll('#f1771-kreditpajak-rows .form1770-dynrow').forEach(function(row) {
                     const sel = row.querySelector('select');
                     const jenis = sel ? sel.value : '';
                     const nilai = cleanNumber(row.querySelector('.f1770-nilai').value);
-                    if (jenis !== 'PPh 24' && jenis !== 'PPh 25') userKreditDalamNegeri += nilai;
+                    if (TaxEngine.isKreditPajak1771PengurangAngsuran(jenis)) userKreditDalamNegeri += nilai;
                 });
                 const correctKreditDalamNegeri = correct.kreditPajak
-                    .filter(function(k) { return k.jenisPajak !== 'PPh 24' && k.jenisPajak !== 'PPh 25'; })
+                    .filter(function(k) { return TaxEngine.isKreditPajak1771PengurangAngsuran(k.jenisPajak); })
                     .reduce(function(a, b) { return a + b.jumlah; }, 0);
 
                 const netoLuarUsahaUser = userVals.luarUsahaBruto - userVals.biayaLuarUsaha;

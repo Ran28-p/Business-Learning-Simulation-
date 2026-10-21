@@ -21,7 +21,7 @@ window.TAX_CAREER_TRACKS = [
       },
       {
         heading: "Kalender Pajak",
-        body: "Setiap jenis pajak punya masa pajak, batas setor, dan batas lapor. Contoh umum: PPh 21/23/4(2) setor & lapor mengikuti ketentuan masa; PPN masa bulanan; SPT Tahunan mengikuti tahun pajak. Lewat jatuh tempo = risiko sanksi."
+        body: "Setiap jenis pajak punya masa pajak, batas setor, dan batas lapor. Secara umum, PPh yang dipotong/disetor sendiri dibayar paling lambat tanggal 15 bulan berikutnya; SPT Masa PPh dilaporkan paling lambat 20 hari setelah masa berakhir. PPN dan jenis pajak khusus memiliki tenggat berbeda. Rujuk PMK 81/2024 sebagaimana diubah terakhir dengan PMK 1/2026 dan cek pergeseran hari libur."
       },
       {
         heading: "Subjek, Objek, dan Jenis Pajak",

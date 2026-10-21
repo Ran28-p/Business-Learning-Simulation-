@@ -319,6 +319,17 @@
                 };
             },
 
+            isKreditPajak1771Dikreditkan: function(jenisPajak, skema) {
+                if (!jenisPajak) return false;
+                return skema === 'umkm'
+                    ? jenisPajak === 'PPh Final UMKM'
+                    : jenisPajak !== 'PPh Final UMKM';
+            },
+
+            isKreditPajak1771PengurangAngsuran: function(jenisPajak) {
+                return ['PPh 22', 'PPh 23', 'PPh 24', 'Lainnya'].includes(jenisPajak);
+            },
+
             // PPh Final UMKM sesuai PP 55/2022 s.t.d.d. PP 20/2026 — 0,5% x peredaran bruto,
             // untuk WP dengan peredaran bruto setahun tidak melebihi Rp4,8 miliar (opsional).
             // Subjek setelah PP 20/2026: WP OP, PT Perorangan, Koperasi; PT/CV biasa hanya

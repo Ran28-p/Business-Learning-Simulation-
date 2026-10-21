@@ -10,6 +10,7 @@ export const TAX_CASE_STUDIES = [
     title: 'Penjualan Kredit kepada Pelanggan PKP',
     narrative: `
       <p><strong>PT Nusantara Digital</strong> merupakan perusahaan <strong>PKP</strong>.</p>
+      <p>Asumsi simulasi: angka memakai tarif efektif 11% agar sesuai konfigurasi latihan. Ini bukan konfirmasi tarif untuk transaksi Agustus 2026. <a href="https://jdih.kemenkeu.go.id/dok/pmk-131-tahun-2024" target="_blank" rel="noopener noreferrer">Status PMK 131/2024 di JDIH Kemenkeu</a> menampilkan masa berlaku mulai 1 Januari 2025 sampai dicabut; periksa peraturan penggantinya sebelum memakai tarif untuk transaksi nyata.</p>
       <p>Pada tanggal <strong>10 Agustus 2026</strong>, perusahaan menjual <strong>10 unit Produk A</strong>
       dengan harga per unit <strong>Rp2.000.000</strong> kepada <strong>PT Maju Bersama</strong> (status pelanggan: PKP),
       secara kredit, tanpa diskon.</p>
@@ -31,6 +32,7 @@ export const TAX_CASE_STUDIES = [
       <p><strong>PT Nusantara Digital (PKP)</strong> menjual secara <strong>tunai</strong> pada
       <strong>15 Agustus 2026</strong> berupa <strong>5 unit Produk B</strong> seharga <strong>Rp1.500.000</strong> per unit
       kepada pelanggan perorangan, <strong>Budi Santoso</strong> (status: Non-PKP), tanpa diskon.</p>
+      <p>Asumsi simulasi: angka memakai tarif efektif 11% agar sesuai konfigurasi latihan. Ini bukan konfirmasi tarif untuk transaksi Agustus 2026. <a href="https://jdih.kemenkeu.go.id/dok/pmk-131-tahun-2024" target="_blank" rel="noopener noreferrer">Status PMK 131/2024 di JDIH Kemenkeu</a> menampilkan masa berlaku mulai 1 Januari 2025 sampai dicabut; periksa peraturan penggantinya sebelum memakai tarif untuk transaksi nyata.</p>
       <p>Ingat: status Non-PKP pembeli tidak membebaskan transaksi dari PPN — perlakuan PPN mengikuti status penjual.</p>
     `,
     setup: { companyTaxStatus: 'PKP' },
@@ -68,6 +70,7 @@ export const TAX_CASE_STUDIES = [
       <p><strong>PT Nusantara Digital (PKP)</strong> menjual <strong>4 unit Produk D</strong> seharga
       <strong>Rp3.000.000</strong> per unit kepada <strong>CV Sejahtera</strong> (PKP) secara kredit pada
       <strong>25 Agustus 2026</strong>, dengan diskon <strong>10%</strong> dari nilai penjualan.</p>
+      <p>Asumsi simulasi: angka memakai tarif efektif 11% agar sesuai konfigurasi latihan. Ini bukan konfirmasi tarif untuk transaksi Agustus 2026. <a href="https://jdih.kemenkeu.go.id/dok/pmk-131-tahun-2024" target="_blank" rel="noopener noreferrer">Status PMK 131/2024 di JDIH Kemenkeu</a> menampilkan masa berlaku mulai 1 Januari 2025 sampai dicabut; periksa peraturan penggantinya sebelum memakai tarif untuk transaksi nyata.</p>
     `,
     setup: { companyTaxStatus: 'PKP' },
     expected: {

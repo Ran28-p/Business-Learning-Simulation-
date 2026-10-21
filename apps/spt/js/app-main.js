@@ -298,13 +298,13 @@
                     id: 'final3',
                     title: 'Toko Online UMKM',
                     difficulty: 'Mudah',
-                    scenario: 'Seorang pelaku UMKM memiliki omzet bulanan Rp 250.000.000 dari penjualan online. Hitung PPh Final yang terutang berdasarkan tarif PP 55/2022.',
+                    scenario: 'Seorang Wajib Pajak Orang Pribadi UMKM memiliki omzet Rp 250.000.000 bulan ini. Peredaran kumulatif sebelum bulan ini sudah melampaui Rp500.000.000 pada tahun pajak berjalan. Hitung PPh Final yang terutang berdasarkan tarif PP 55/2022 sebagaimana diubah PP 20/2026.',
                     questions: [
                         { id: 'q_dpp', label: 'Omset Bulanan (Rp)', type: 'number', correct: 250000000, hint: 'Total omzet penjualan sebelum pajak.' },
                         { id: 'q_tarif', label: 'Tarif PPh Final UMKM (%)', type: 'number', correct: 0.5, hint: 'Tarif final untuk UMKM sesuai PP 55/2022.' },
                         { id: 'q_pph', label: 'PPh Final Terutang (Rp)', type: 'number', correct: 1250000, hint: 'Omset x 0.5%.' }
                     ],
-                    explanation: 'Kasus ini membantu memahami cara menghitung PPh Final untuk UMKM yang menggunakan skema tarif 0,5% dari peredaran bruto.'
+                    explanation: 'Setelah batas kumulatif peredaran Rp500.000.000 khusus WP OP terlampaui, omzet bulan berikutnya dikenai tarif 0,5% selama subjek dan syarat lain tetap memenuhi PP 55/2022 sebagaimana diubah PP 20/2026.'
                 }
             ],
             'PPh21': [

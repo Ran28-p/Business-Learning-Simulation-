@@ -63,6 +63,32 @@ P.getState().lastActiveDate = daysAgo(3); P.getState().streak = 9;
 eq(P.touchStreak(), 1, 'bolos ≥ 2 hari → streak mulai lagi dari 1');
 eq(P.getState().lastActiveDate, today, 'lastActiveDate diperbarui');
 
+section('Streak mengikuti tanggal lokal');
+const RealDate = globalThis.Date;
+const jakartaOffset = 7 * 60 * 60 * 1000;
+let fakeNow = Date.UTC(2026, 9, 20, 17, 10);
+globalThis.Date = class JakartaDate extends RealDate {
+  constructor(...args) {
+    if (args.length === 0) super(fakeNow);
+    else if (args.length >= 2) super(Date.UTC(args[0], args[1], args[2] == null ? 1 : args[2], args[3] || 0, args[4] || 0, args[5] || 0, args[6] || 0) - jakartaOffset);
+    else super(...args);
+  }
+  static now() { return fakeNow; }
+  getFullYear() { return new RealDate(this.getTime() + jakartaOffset).getUTCFullYear(); }
+  getMonth() { return new RealDate(this.getTime() + jakartaOffset).getUTCMonth(); }
+  getDate() { return new RealDate(this.getTime() + jakartaOffset).getUTCDate(); }
+};
+try {
+  P.reset();
+  P.getState().lastActiveDate = '2026-10-20';
+  P.getState().streak = 4;
+  eq(P.touchStreak(), 5, 'aktiv setelah tengah malam lokal menaikkan streak pada hari lokal baru');
+  fakeNow += 86400000;
+  eq(P.touchStreak(), 6, 'aktiv pada tengah malam lokal hari berikutnya menaikkan streak lagi');
+} finally {
+  globalThis.Date = RealDate;
+}
+
 section('Ekspor / impor');
 P.reset(); P.recordAnswer(q({ id: 'a1' }), true, 0); P.recordLessonComplete('sql:a', 'A');
 const exported = P.exportJson();
@@ -82,6 +108,19 @@ for (const bad of ['bukan json', '{"abc":1}', 'null', '[]', '{"xp":"banyak"}']) 
 eq(P.getState().completedQuestions.a1, true, 'impor gagal tidak merusak progres yang ada');
 P.importJson(JSON.stringify({ xp: 10 }), 'replace');
 check(Array.isArray(P.getState().history) && typeof P.getState().wrongAttempts === 'object', 'impor file parsial dilengkapi nilai default (tidak crash di pemakaian berikutnya)');
+const stateBeforeInvalidImport = P.exportJson();
+for (const malformed of [
+  { xp: 10, challengeAttempts: null },
+  { xp: 10, history: [null] },
+  { xp: 10, completedLessons: null },
+  { xp: -1 },
+  { xp: 10, totalAnswered: 1, totalCorrect: 2 }
+]) {
+  let msg = '';
+  try { P.importJson(JSON.stringify(malformed), 'replace'); } catch (e) { msg = e.message; }
+  check(msg.length > 0, 'impor menolak struktur progress tidak valid: ' + JSON.stringify(malformed));
+  eq(P.exportJson(), stateBeforeInvalidImport, 'impor tidak valid tidak mengubah progress');
+}
 
 section('Ketahanan penyimpanan');
 globalThis.localStorage = makeLocalStorage();

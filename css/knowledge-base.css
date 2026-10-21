@@ -175,6 +175,18 @@ body.kb-scroll-lock { overflow: hidden; }
 .kb-section-body ul, .kb-section-body ol { margin: 0 0 12px; padding-left: 22px; }
 .kb-section-body li { margin-bottom: 4px; }
 .kb-section-body strong { color: var(--kb-ink); }
+.kb-section-body .kb-code {
+  overflow-x: auto;
+  margin: 10px 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--kb-border);
+  border-radius: 8px;
+  background: var(--kb-canvas);
+  color: var(--kb-ink);
+  font: 12.5px/1.6 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre;
+}
+.kb-section-body .kb-code code { font: inherit; }
 
 /* ---- Komponen konten (dipakai lewat class di dalam body HTML) ---- */
 .kb-lead { font-size: 15px; color: var(--kb-muted); margin-bottom: 16px; }

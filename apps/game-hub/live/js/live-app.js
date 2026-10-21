@@ -4,6 +4,7 @@
   var LQ = window.LiveQuiz, LR = window.LiveRoom, LDB = window.LiveDb;
   var CAT_VIDEO_URL = new URL('../../assets/clapping-cat.mp4', document.currentScript.src).href;
   var Celebration = window.GameHubCelebration;
+  var GameAudio = window.GameHubAudio;
   var HOST_KEY = 'livequiz_host_v1', NAME_KEY = 'livequiz_name_v1', LETTERS = ['A', 'B', 'C', 'D'];
   var $ = function (id) { return document.getElementById(id); };
   function h(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
@@ -89,6 +90,7 @@
   $('in-code').addEventListener('input', function (e) { e.target.value = LQ.normCode(e.target.value); });
   $('btn-join').addEventListener('click', function () {
     var code = $('in-code').value, name = $('in-name').value, btn = $('btn-join');
+    GameAudio.unlock();
     btn.disabled = true; banner('');
     connect().then(function (d) { db = d; player = new LR.Player(db); return player.join(code, name); }).then(function () {
       try { localStorage.setItem(NAME_KEY, LQ.cleanName(name)); } catch (e) { /* abaikan */ }
@@ -107,8 +109,12 @@
     return ol;
   }
   function renderPlayer(v) {
+    if (v.status === 'reveal') {
+      var answered = v.mode === 'essay' ? v.myAnswer != null : v.myChoice != null;
+      GameAudio.answerResult((player.code || '') + ':' + v.qIndex, v.correct === true, answered);
+    }
     var root = $('v-play'), uid = db.uid;
-    var key = [v.status, v.qIndex, v.myChoice, v.myAnswer, v.question && v.question.q, v.reveal && (v.reveal.a + ':' + v.reveal.answer), v.gained, v.me && v.me.total, v.playerCount, v.board.length].join('|');
+    var key = LR.Player.viewKey(v);
     if (key === lastPKey) return; lastPKey = key; root.textContent = '';
     var stage = h('div', 'lq-stage'); root.appendChild(stage);
     if (v.status === 'lobby') {
@@ -166,8 +172,9 @@
     }
   }
   function renderPlayerTimer() {
-    var v = player.view(), t = $('lq-ptimer'), f = $('lq-pbar'); if (!t || v.status !== 'question') { if (t) t.textContent = ''; if (f) f.style.width = '0%'; return; }
+    var v = player.view(), t = $('lq-ptimer'), f = $('lq-pbar'); if (!t || v.status !== 'question') { GameAudio.resetCountdown(); if (t) t.textContent = ''; if (f) f.style.width = '0%'; return; }
     t.textContent = mmss(v.remainingMs); t.classList.toggle('is-low', v.remainingMs <= 5000); f.style.width = Math.max(0, Math.min(100, v.remainingMs / (v.timer * 1000) * 100)) + '%';
+    GameAudio.countdown((player.code || '') + ':' + v.qIndex, v.remainingMs, v.myChoice != null || v.myAnswer != null);
     if (v.myChoice == null && v.myAnswer == null && v.remainingMs <= 0) { lastPKey = ''; renderPlayer(v); }
   }
 

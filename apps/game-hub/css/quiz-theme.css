@@ -9,6 +9,16 @@
   --quiz-input: #FFF9E6;
 }
 
+:root[data-app="gamehub"][data-theme="dark"] .lq-role {
+  color: #e6edf7;
+  background: #111c30;
+  border-color: #334155;
+}
+
+:root[data-app="gamehub"][data-theme="dark"] .lq-role small {
+  color: #9db0cb;
+}
+
 body {
   background: var(--quiz-plum);
   color: var(--quiz-cerulean-light);
@@ -295,7 +305,7 @@ h1, h2, h3 {
   border-radius: 50%;
   color: var(--quiz-cerulean);
   background: var(--quiz-popcorn);
-  font: 700 28px/1 Fredoka, "Trebuchet MS", system-ui, sans-serif;
+  font: 700 26px/1 Fredoka, "Trebuchet MS", system-ui, sans-serif;
 }
 
 .lq-timer.is-low {

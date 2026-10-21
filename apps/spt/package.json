@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/test-tax-engine.mjs && node tests/test-npwp-utils.mjs && node tests/test-backup-utils.mjs && node tests/test-formulir-utils.mjs && node ../../tests/test-form-pembahasan.mjs",
+    "test": "node tests/test-tax-engine.mjs && node tests/test-simulation-answers.mjs && node tests/test-npwp-utils.mjs && node tests/test-backup-utils.mjs && node tests/test-formulir-utils.mjs && node ../../tests/test-form-pembahasan.mjs",
     "test:tax-engine": "node tests/test-tax-engine.mjs",
     "test:npwp-utils": "node tests/test-npwp-utils.mjs",
     "test:backup-utils": "node tests/test-backup-utils.mjs",

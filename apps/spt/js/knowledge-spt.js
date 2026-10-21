@@ -146,10 +146,11 @@ Peredaran Rp 4,8 M, PKP Rp 1 M → PPh ≈ <strong>Rp 110 juta</strong> (11%).
           body: `
 <div class="kb-formula">PPh Final UMKM = 0,5% × Peredaran bruto</div>
 <ul>
-  <li>Opsional bagi WP dengan batas peredaran & jangka waktu tertentu.</li>
-  <li>Bersifat final; perhatikan masa berlaku fasilitas untuk badan.</li>
+  <li>Setelah PP 20/2026: WP orang pribadi dan PT Perorangan dapat memakai skema tanpa batas jangka waktu selama syarat terpenuhi; batas peredaran OP sampai Rp500 juta setahun tidak dikenai PPh final.</li>
+  <li>Koperasi dapat memakai skema paling lama 4 Tahun Pajak. Badan lain hanya dapat memakai ketentuan peralihan bagi pengguna yang memenuhi syarat sampai Tahun Pajak 2026.</li>
+  <li>Tarif dihitung dari peredaran bruto, bukan laba. Setoran UMKM dilakukan per masa pajak, bukan sekali seumur hidup.</li>
 </ul>
-<p class="kb-legal">PP 55/2022 dan aturan terkait.</p>`
+<p class="kb-legal">PP 55/2022 sebagaimana diubah dengan PP 20/2026.</p>`
         }
       ]
     },
@@ -171,7 +172,7 @@ Peredaran Rp 4,8 M, PKP Rp 1 M → PPh ≈ <strong>Rp 110 juta</strong> (11%).
 <tr><td><strong>Pasal 8</strong></td><td>Pembetulan SPT atas kemauan sendiri (sebelum pemeriksaan).</td></tr>
 <tr><td><strong>Pasal 9–10</strong></td><td>Pembayaran/penyetoran; bunga keterlambatan.</td></tr>
 <tr><td><strong>Pasal 13–15</strong></td><td>Penerbitan SKP (ketetapan) oleh DJP.</td></tr>
-<tr><td><strong>Pasal 17</strong></td><td>Pengawasan kepatuhan, termasuk SP2DK.</td></tr>
+<tr><td><strong>Pasal 17</strong></td><td>Pengembalian kelebihan pembayaran pajak melalui SKPLB.</td></tr>
 <tr><td><strong>Pasal 35A</strong></td><td>Instansi/lembaga wajib memberi data ke DJP.</td></tr>
 </tbody></table></div>`
         },
@@ -203,7 +204,7 @@ Peredaran Rp 4,8 M, PKP Rp 1 M → PPh ≈ <strong>Rp 110 juta</strong> (11%).
 <tbody>
 <tr><td><strong>Pasal 1</strong></td><td>Definisi BKP, JKP, PKP, DPP, dll.</td></tr>
 <tr><td><strong>Pasal 4</strong></td><td>Objek PPN: penyerahan BKP/JKP, impor, ekspor, dll.</td></tr>
-<tr><td><strong>Pasal 7</strong></td><td>Tarif PPN 12% (sejak 1 Jan 2025). Barang/jasa umum efektif 11% via DPP Nilai Lain 11/12.</td></tr>
+<tr><td><strong>Pasal 7</strong></td><td>Tarif undang-undang 12%; selain BKP mewah, umumnya efektif 11% melalui DPP nilai lain 11/12 sesuai PMK 131/2024.</td></tr>
 <tr><td><strong>Pasal 8A</strong></td><td>DPP Nilai Lain untuk jenis transaksi tertentu.</td></tr>
 <tr><td><strong>Pasal 9</strong></td><td>Pajak Masukan dapat dikreditkan (syarat berlaku).</td></tr>
 <tr><td><strong>Pasal 13</strong></td><td>Kewajiban membuat Faktur Pajak.</td></tr>

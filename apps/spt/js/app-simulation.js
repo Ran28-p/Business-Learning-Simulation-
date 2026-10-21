@@ -122,6 +122,7 @@
 
             appState.currentCase.questions.forEach(q => {
                 const val = document.getElementById(q.id).value;
+                if (!val || !val.toString().trim()) return;
                 if(q.type === 'number') {
                     if(cleanNumber(val) === cleanNumber(q.correct)) correctCount++;
                 } else {

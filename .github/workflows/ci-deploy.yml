@@ -129,6 +129,9 @@ jobs:
       - name: Run test suite (Kuis Langsung — soal dihitung ulang independen, skor, alur guru+siswa, kunci tak bocor)
         run: node tests/test-livequiz.mjs
 
+      - name: Run test suite (efek audio Kuis Langsung)
+        run: node tests/test-gamehub-audio.mjs
+
       - name: Run test suite (UI Kuis Langsung di jsdom — guru & siswa dua jendela, mode lokal)
         run: npm install --no-save jsdom && node tests/test-livequiz-ui.mjs
 
