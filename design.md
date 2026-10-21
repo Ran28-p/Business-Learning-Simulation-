@@ -1,18 +1,23 @@
 # Design System — Business Learning Simulation
 
-Dokumen ini menjadi **sumber kebenaran tunggal** untuk token visual, tipografi, spacing, dan pola UI di seluruh portal + modul (`accounting`, `excel`, `sql-pq`, `spt`).
+Dokumen ini menjelaskan sistem visual portal dan seluruh aplikasi: simulator, Kuis Langsung, serta Ruang Pengajar.
+Sumber kebenaran implementasi adalah `css/design-system.css` dan `css/ds-modules.css`.
+Contoh dan palet pada bagian 1–8 mendokumentasikan fondasi awal; gunakan token `--ds-*` untuk pekerjaan baru.
 
 Prinsip utama:
-- **Light mode** = putih + biru muda (clean, professional, mudah dibaca lama).
-- **Dark mode** tetap didukung penuh lewat switcher (tombol 🌙/☀️ atau toggle switch).
-- Semua warna lewat **CSS custom properties** (`:root` + `[data-theme="dark"]`).
-- Tidak ada hard-code warna di komponen; selalu pakai token.
+- Antarmuka mengutamakan keterbacaan, konsistensi, dan aksesibilitas.
+- Light dan dark mode memakai token CSS dan atribut `data-theme`.
+- Warna baru memakai token sistem atau aksen modul yang sudah ditentukan.
+- Komponen baru menggunakan primitif `.ds-*` bila sesuai; gaya lama dipertahankan lewat bridge.
 
 ---
 
-## 1. Color Tokens
+## 1. Palet Awal (Referensi Legacy)
 
-### 1.1 Light Mode (default) — Putih & Biru Muda
+Nilai pada bagian ini mendokumentasikan palet desain awal. Jangan menyalinnya
+sebagai token baru; gunakan `--ds-*` dan aksen modul dari `css/design-system.css`.
+
+### 1.1 Light Mode — Palet awal
 
 ```css
 :root {
@@ -68,7 +73,7 @@ Prinsip utama:
 }
 ```
 
-### 1.2 Dark Mode — tetap ada, tidak dihapus
+### 1.2 Dark Mode — Palet awal
 
 ```css
 [data-theme="dark"] {
@@ -112,53 +117,31 @@ Prinsip utama:
 
 ## 2. Theme Switcher (wajib dipertahankan)
 
-### 2.1 Pola yang sudah dipakai di proyek
+### 2.1 Integrasi tema saat ini
 
 | Modul        | Elemen UI              | Atribut / Class          | Persistensi          |
 |--------------|------------------------|--------------------------|----------------------|
-| Accounting   | Tombol 🌙 / ☀️         | `#themeBtn` + `data-theme` | `localStorage`      |
-| SPT          | Toggle switch          | `.theme-switch`          | `localStorage`      |
-| SQL-PQ       | (sudah support)        | `html[data-theme="dark"]`| `localStorage`      |
-| Portal       | (disarankan ditambah)  | sama                     | sama                |
+| Portal       | Tombol tema            | `PortalTheme` + `data-theme` | `localStorage`   |
+| Accounting   | Tombol tema bawaan     | `data-theme`              | `localStorage`       |
+| SPT          | Toggle tema bawaan     | `data-theme` di `<html>` dan `<body>` | `localStorage` |
+| Excel        | Tombol tema app shell  | `data-theme`              | `localStorage`       |
+| SQL & Power Query | Tombol tema bawaan | `data-theme`              | `localStorage`       |
+| Kuis Langsung / Ruang Pengajar | App shell tema | `data-theme` | `localStorage` |
 
-### 2.2 JavaScript minimal (shared)
+`js/shared/theme.js` menyelaraskan kunci tema lama (`theme`, `portal_theme`, `sqlpq_theme`),
+memantau perubahan tema, dan menyinkronkan pilihan antar-tab. Muat skrip ini di `<head>`
+sebelum skrip modul agar tema diterapkan sebelum halaman dirender.
 
-```js
-const THEME_KEY = 'bls-theme';
+### 2.2 API tema bersama
 
-function loadTheme() {
-  return localStorage.getItem(THEME_KEY) || 'light';
-}
-
-function saveTheme(theme) {
-  localStorage.setItem(THEME_KEY, theme);
-}
-
-function applyTheme(theme) {
-  const html = document.documentElement;
-  if (theme === 'dark') {
-    html.setAttribute('data-theme', 'dark');
-  } else {
-    html.removeAttribute('data-theme');
-  }
-}
-
-function toggleTheme() {
-  const next = loadTheme() === 'dark' ? 'light' : 'dark';
-  saveTheme(next);
-  applyTheme(next);
-  // Update icon jika ada
-  const btn = document.getElementById('themeBtn');
-  if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
-}
-
-// Init on load
-document.addEventListener('DOMContentLoaded', () => {
-  applyTheme(loadTheme());
-});
-```
+Gunakan `PortalTheme.get()`, `PortalTheme.set('dark')` atau `PortalTheme.set('light')`,
+atau `PortalTheme.toggle()` untuk perubahan tema yang dipicu kode. Toggle bawaan modul
+tetap didukung dan disinkronkan melalui perubahan atribut `data-theme`.
 
 ### 2.3 Markup tombol (contoh)
+
+Markup kontrol tema berbeda antar-modul. Pertahankan tombol bawaan dan aksesibilitasnya;
+jangan menambahkan tombol kedua jika app shell sudah menyediakan kontrol tema.
 
 ```html
 <button type="button" class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
@@ -290,23 +273,25 @@ Radius card: `var(--radius-lg)` (16px)
 
 ## 6. Aturan Penggunaan
 
-1. **Jangan hard-code hex** di file CSS modul. Selalu refer ke token di atas.
-2. Jika modul butuh warna ekstra (mis. hijau Excel, indigo SQL), tambahkan sebagai **token lokal** yang diturunkan dari primary/accent, bukan warna baru yang bentrok.
-3. Dark mode **wajib** diuji setiap kali menambah komponen baru.
-4. Preferensi tema bersifat **global** (satu key `localStorage` untuk seluruh portal + modul).
-5. Sidebar gelap (seperti di Accounting & SPT) boleh tetap gelap di light mode (pola “dark sidebar + light content” masih valid).
+1. Untuk komponen baru, gunakan token `--ds-*` dan primitif `.ds-*` dari design system.
+2. Aksen khusus modul harus memakai token aksen yang sudah disediakan; jangan menambahkan warna tanpa kebutuhan.
+3. Uji tampilan light dan dark setiap kali mengubah komponen.
+4. `js/shared/theme.js` menyelaraskan preferensi dan kunci tema lama antarhalaman.
+5. CSS lama dapat memakai alias kompatibilitas; jangan menghapus bridge sebelum selector lama dimigrasikan.
 
 ---
 
 ## 7. Checklist implementasi per modul
 
-| Modul          | Token `:root` | `[data-theme="dark"]` | Switcher UI | Persistensi |
-|----------------|---------------|-----------------------|-------------|-------------|
-| Portal         | ✅ (sesuaikan) | Tambahkan             | Disarankan  | Ya          |
-| Accounting     | ✅             | ✅                    | ✅ 🌙/☀️    | Ya          |
-| SPT            | ✅             | ✅                    | ✅ toggle   | Ya          |
-| SQL-PQ         | ✅             | ✅                    | Cek/rapikan | Ya          |
-| Excel          | Sesuaikan      | Tambahkan jika belum  | Opsional    | Ya          |
+| Halaman | Design system | Tema gelap | Kontrol tema |
+|---|---|---|---|
+| Portal | `css/design-system.css` | Ya | Portal |
+| Accounting | Design system + bridge modul | Ya | Bawaan modul |
+| SPT | Design system + bridge modul | Ya | Bawaan modul |
+| Excel | Design system + bridge modul | Ya | App shell |
+| SQL & Power Query | Design system + bridge modul | Ya | Bawaan modul |
+| Kuis Langsung | Design system + tema kuis | Ya | App shell |
+| Ruang Pengajar | Design system | Ya | App shell |
 
 ---
 
@@ -355,14 +340,14 @@ Tiap halaman utama modul memakai `<html data-app="spt|accounting|excel|sqlpq">`.
 Header navy + profil → ringkasan (XP, modul dimulai, aktivitas) → sesi terakhir → 4 modul beraksen → Aktivitas terbaru & Pencapaian → Progres Saya (ekspor/impor/PDF). **Semua angka berasal dari `PortalProgress.summarize()`** (data localStorage nyata); modul yang belum dimulai tampil "Belum dimulai", tidak ada angka karangan.
 
 ### 10.5 Keputusan penting & batasan
-- **Game Hub tidak ada di repo ini** (tidak ada rute, halaman, maupun data misi). Karena aturan "jangan ganti fitur nyata dengan mockup statis / jangan mengarang data", entry point Game Hub **tidak ditambahkan**. Gamifikasi yang nyata (XP, level, badge, streak) ditampilkan di panel Pencapaian. Bila Game Hub akan dibangun, mulailah dari aksen `--ds-accent` baru + tema bergaya berbeda di berkas terpisah.
+- **Game Hub tersedia sebagai Kuis Langsung** di `apps/game-hub/`. Aplikasi mendukung peran guru dan siswa, generator soal, timer, ruang kuis, dan papan peringkat. Fitur lama berupa misi, XP gabungan, level, streak, serta lencana Game Hub tidak lagi tersedia; progres pembelajaran per modul tetap ditampilkan pada panel Pencapaian portal.
 - **Tahap 2 (workspace per modul)** — sudah dikerjakan lewat `css/ds-modules.css`, tanpa mengubah markup/logika:
   - *SPT*: umpan balik validasi (`.feedback.success/.error`) memakai token semantik + ikon ✓/⚠ (tidak hanya warna); sub-halaman `faktur_bupot`, `modul_pajak`, `tax_career` kini memakai `data-app="spt"` + design system.
   - *Accounting*: `.alert-warning/.alert-danger` memakai token (ikut dark mode) + ikon ⚠; tabel laporan tetap di dalam `.table-responsive` dengan header lengket.
   - *Excel* (≥1025px): kolom spreadsheet diberi porsi 2fr, tinggi sheet adaptif (`clamp(420px, 66dvh, 760px)`), dan panel samping (instruksi, input rumus, pengecekan, penjelasan) *sticky* dengan scroll sendiri.
   - *SQL & Power Query* (≥901px): Database Explorer (sumber data) *sticky*, editor lebih tinggi adaptif, panel hasil berlabel "Hasil", kotak soal beraksen ungu.
 - **Sengaja tidak diubah:** `formulir_spt/*.html` (replika formulir resmi 1771 + lampiran) tetap dengan gaya aslinya agar kemiripan dengan formulir asli terjaga. Perombakan lebih jauh (mis. memindah panel di dalam file HTML SPT ±100 KB) tetap butuh pemeriksaan visual di browser.
-- **Tema:** tombol tema portal menulis `portal_theme`, `theme` (dipakai bersama SPT & Accounting), dan `sqlpq_theme` — hanya saat tombol ditekan. Excel belum punya dark mode.
+- **Tema:** `js/shared/theme.js` menyelaraskan `portal_theme`, `theme`, dan `sqlpq_theme`; Excel dan seluruh halaman utama mendukung dark mode.
 
 ### 10.6 Login & profil pengguna
 - **Login hanya di Portal** (`js/auth.js`, link email). Sesi disimpan di `localStorage["unified_portal_session"]`; logout juga hanya di portal.

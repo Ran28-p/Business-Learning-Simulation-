@@ -8,6 +8,8 @@ Portal statis untuk latihan bisnis, pajak, akuntansi, Excel, SQL, dan Power Quer
 | **Accounting Simulator** | `apps/accounting/` | Siklus akuntansi, invoice, dan PPN |
 | **Excel Formula Practice** | `apps/excel/` | Latihan rumus Excel berbasis dataset penjualan |
 | **SQL & Power Query Simulator** | `apps/sql-pq/` | SQLite/WASM di browser, dataset generator, dan simulasi transformasi Power Query |
+| **Kuis Langsung** | `apps/game-hub/` | Kuis real-time untuk guru dan siswa; Firebase atau mode lokal pada satu perangkat |
+| **Ruang Pengajar** | `apps/pengajar/` | Analisis file rekap peserta secara lokal di browser, tanpa mengunggah data |
 
 ## Requirement
 
@@ -23,7 +25,7 @@ Portal statis untuk latihan bisnis, pajak, akuntansi, Excel, SQL, dan Power Quer
 ### Untuk pengujian dan validasi kode
 
 - **Node.js 20+** dan npm.
-- Dependensi test hanya berada di `apps/excel/`; aplikasi yang dipakai pengguna tetap tidak membutuhkan `npm install` atau build step.
+- Aplikasi tidak membutuhkan `npm install` atau build step. Dependensi npm hanya dipakai oleh pengujian.
 
 ## Menjalankan secara lokal
 
@@ -45,6 +47,8 @@ Buka `http://localhost:8000` pada browser. Untuk mengakses modul secara langsung
 - `http://localhost:8000/apps/excel/`
 - `http://localhost:8000/apps/accounting/`
 - `http://localhost:8000/apps/spt/`
+- `http://localhost:8000/apps/game-hub/`
+- `http://localhost:8000/apps/pengajar/`
 
 ### Alur pengguna
 
@@ -70,12 +74,38 @@ npm test --prefix apps/excel
 # Modul lain tidak butuh npm install — cukup Node bawaan
 npm test --prefix apps/accounting
 npm test --prefix apps/sql-pq
+npm test --prefix apps/spt
 
-# Progres lintas modul di portal (dashboard, ekspor/impor, rekap PDF)
+# Tes portal, kuis langsung, sinkronisasi, analitik, dan materi lintas modul
 node tests/test-portal-progress.mjs
+node tests/test-livequiz.mjs
+node tests/test-gamehub-audio.mjs
+node tests/test-cloudsync.mjs
+node tests/test-analytics.mjs
+node tests/test-payroll-ter.mjs
+node tests/test-knowledge-schema.mjs
+node tests/test-modul-pajak.mjs
+node tests/test-tax-career-pembahasan.mjs
+node tests/test-form-pembahasan.mjs
+node tests/test-pembahasan-angka.mjs
+node tests/test-regulasi.mjs
+node scripts/check-staleness.mjs
+node scripts/check-knowledge.mjs
+
+# Tes UI Kuis Langsung (memerlukan jsdom)
+npm install --no-save jsdom
+node tests/test-livequiz-ui.mjs
+
+# Tes browser E2E (Playwright)
+cd e2e
+npm install
+npx playwright install chromium
+npm test
 ```
 
-CI GitHub Actions di `.github/workflows/ci-deploy.yml` menjalankan seluruh pemeriksaan tersebut (test keempat modul, lint, dan pemeriksaan Firebase Rules) pada push dan pull request. Deploy GitHub Pages hanya dilakukan setelah semuanya lulus.
+GitHub Actions di `.github/workflows/ci-deploy.yml` menjalankan pengujian keempat simulator,
+portal, Kuis Langsung, sinkronisasi cloud, analitik, materi, lint, Firebase Rules, dan E2E.
+Deploy ke GitHub Pages hanya berjalan pada push ke `main` setelah seluruh job wajib lulus.
 
 ## Arsitektur ringkas
 
@@ -95,19 +125,24 @@ CI GitHub Actions di `.github/workflows/ci-deploy.yml` menjalankan seluruh pemer
 │   ├── accounting/            # Engine, generator, UI, dan tax workspace
 │   ├── excel/                 # Spreadsheet engine, latihan, export, dan tests
 │   ├── sql-pq/                # SQL/WASM, Power Query engine, kurikulum
-│   └── spt/                   # Shell SPT, form, modul pajak, dan Tax Career
+│   ├── spt/                   # Shell SPT, form, modul pajak, dan Tax Career
+│   ├── game-hub/              # Kuis Langsung
+│   └── pengajar/              # Analisis rekap peserta lokal
 ├── SECURITY.md                # Model ancaman dan konfigurasi Firebase
 ├── ARCHITECTURE.md            # Detail desain teknis
 └── .github/workflows/         # CI dan deploy GitHub Pages
 ```
 
-Setiap aplikasi memiliki service worker sendiri sehingga shell aplikasi dapat digunakan offline setelah kunjungan pertama. Fitur yang membutuhkan jaringan—misalnya magic-link authentication dan aset CDN yang belum divendor—tetap memerlukan koneksi.
+Portal dan empat simulator memiliki service worker untuk cache aset lokal setelah kunjungan pertama.
+Fitur yang membutuhkan Firebase atau aset eksternal yang belum tersimpan tetap memerlukan jaringan.
+Manifest PWA saat ini hanya tersedia di `apps/spt`.
 
 ## Data, backend, dan keamanan
 
-- Proyek ini adalah **static/PWA**. Tidak ada backend API atau database server untuk aplikasi inti.
+- Proyek ini adalah **situs statis/PWA** tanpa backend API yang dikelola sendiri. Firebase menyediakan layanan eksternal untuk autentikasi dan penyimpanan cloud.
 - Progres dan data latihan disimpan lokal di browser menggunakan `localStorage`. SQL Simulator memakai SQLite yang berjalan dalam WebAssembly dan bersifat in-memory per sesi.
-- Firebase hanya digunakan untuk authentication portal serta fungsi terbatas pada modul SPT. Firebase Web config di client bukan secret; keamanan data Firebase wajib ditegakkan dengan Firebase Security Rules dan authorized domains.
+- Firebase Authentication menyediakan email-link untuk portal dan login anonim untuk Kuis Langsung. Firebase Realtime Database menyimpan progres SPT, sinkronisasi progres Accounting/Excel/SQL & Power Query, serta ruang kuis. Firebase Web config di client bukan secret; keamanan data bergantung pada Firebase Security Rules dan authorized domains.
+- Ruang Pengajar memproses file rekap di browser. File dibuat peserta, dapat diubah, dan bukan bukti penilaian resmi.
 - Input Power Query tidak dieksekusi sebagai JavaScript dinamis: modul memakai parser ekspresi terbatas. Penilaian SQL membatasi query menjadi satu query baca agar dataset latihan tidak diubah.
 - Tidak ada sistem yang dapat dijamin “tidak bisa dibobol”. Untuk deployment production, ikuti checklist dan batasan yang dijelaskan dalam [`SECURITY.md`](SECURITY.md), gunakan HTTPS, aktifkan Firebase App Check bila sesuai, dan jangan pernah menaruh private key, service-account JSON, atau secret server di repository/browser.
 

@@ -1,7 +1,8 @@
-# Changelog Pengembangan Materi (Fase 0–2)
+# Changelog Pengembangan Materi (Fase 0–5)
 
-Ringkasan gabungan perubahan dari Fase 0 sampai Fase 3 terhadap ZIP asli `..._updated_125`.
-Tanggal tinjau: Oktober 2026. Fase 3 selesai untuk SPT (modul_pajak, tax_career, Isi Formulir), Accounting, Excel, dan SQL. Fase 4 (verifikasi angka) dan Fase 5 (pemeliharaan) selesai.
+Ringkasan perubahan materi dan kontrol kualitas Fase 0–5. Tanggal pembaruan: 21 Oktober 2026.
+Fase 3 selesai untuk SPT (modul_pajak, tax_career, Isi Formulir), Accounting, Excel, dan SQL.
+Fase 4 memverifikasi contoh hitung terhadap mesin; Fase 5 menambahkan pemeriksaan regulasi berkala.
 
 ## Fase 0 — Fondasi kepercayaan
 - `js/knowledge-base.js`, `css/knowledge-base.css`: blok "Sumber & rujukan", lencana "Ditinjau: bulan-tahun", `disclaimer` per modul; juga tampil di cetak/PDF dan ikut pencarian.
@@ -48,19 +49,20 @@ Tanggal tinjau: Oktober 2026. Fase 3 selesai untuk SPT (modul_pajak, tax_career,
 - Temuan: contoh PPh 21 masa Desember memakai Jan–Nov "ilustrasi" Rp5.940.000. Mesin TER menunjukkan tarif kategori A untuk bruto Rp12.000.000 adalah 4% (Rp480.000/bulan), sehingga Jan–Nov = Rp5.280.000 dan PPh Desember = Rp1.320.000 (bukan Rp660.000). Materi sudah diganti dengan angka dari mesin.
 
 ## Fase 5 — Pemeliharaan
-- `scripts/regulasi-terpantau.json` (50 entri): daftar terpusat regulasi yang dirujuk, dengan `status` (berlaku/diubah/historis/dicabut), tingkat `verifikasi` (teks-resmi / sumber-sekunder / pengetahuan-umum), `terakhirDicek`, dan catatan. Saat ini **tidak ada** regulasi yang diverifikasi dari teks resminya.
-- `scripts/check-staleness.mjs` + `scripts/lib/regulasi.mjs`: rujukan baru yang belum terdaftar menggagalkan CI; laporan umur verifikasi; `--fail-on-stale` untuk jadwal bulanan. `tests/test-regulasi.mjs` (33 pengecekan, termasuk simulasi +8 bulan).
+- `scripts/regulasi-terpantau.json` (52 entri): daftar terpusat regulasi yang dirujuk, dengan `status` (berlaku/diubah/historis/dicabut), tingkat `verifikasi` (teks-resmi / sumber-sekunder / pengetahuan-umum), `terakhirDicek`, dan catatan. Saat ini **tidak ada** regulasi yang diverifikasi dari teks resminya.
+- Entri `PMK 1/2026` ditambahkan setelah regulasi tersebut dirujuk dalam materi SPT dan pembahasan Tax Career; tautan menuju katalog resmi BPK.
+- `scripts/check-staleness.mjs` + `scripts/lib/regulasi.mjs`: rujukan baru yang belum terdaftar menggagalkan CI; laporan umur verifikasi; `--fail-on-stale` untuk jadwal bulanan. `tests/test-regulasi.mjs` (34 pengecekan, termasuk simulasi +8 bulan).
 - `.github/workflows/materi-review.yml`: pengingat terjadwal tanggal 1 tiap bulan (gagal bila ada yang > 6 bulan).
 - `docs/PEMELIHARAAN-MATERI.md`: alur tinjau 8 langkah, urutan prioritas verifikasi, aturan menulis materi baru.
 - Temuan saat pemindaian rujukan: ringkasan topik "PPh Final" di `modul_pajak` masih menulis UMKM menurut PP 23/2018 (maks. 7 tahun), dividen "PP 19/2009 10%", dan deposito tanpa catatan. Diperbarui: UMKM menurut PP 55/2022 s.t.d.d. PP 20/2026; dividen OP DN 10% final kecuali diinvestasikan di dalam negeri (PMK 18/2021); deposito umumnya 20% dengan tarif lebih rendah pada kondisi tertentu. Detail PP 131/2000 dan PP 9/2022 (jasa konstruksi) belum diverifikasi.
 
 ## Status cakupan sumber (per `check-knowledge.mjs`)
 | Modul | Subbab | Bersumber | Dikecualikan | Ditinjau |
-|---|---|---|---|---|
+|---|---:|---:|---:|---:|
 | SPT | 32 | 27 | 5 | 25 |
 | Accounting | 12 | 11 | 1 | 8 |
-| Excel | 28 | 26 | 2 | 1 |
-| SQL & PQ | 11 | 10 | 1 | 4 |
+| Excel | 42 | 40 | 2 | 8 |
+| SQL & PQ | 13 | 12 | 1 | 7 |
 
 ## Perlu dicek manual oleh pengembang materi
 - Teks resmi PP 20/2026 belum dibuka langsung; ringkasan diambil dari DJP/IKPI/DDTC (batas waktu OP & PT Perorangan, isi Pasal II peralihan).

@@ -10,9 +10,10 @@ serius: **Firebase Realtime Database**.
 
 | Aset | Di mana | Risiko utama | Pengendali |
 |---|---|---|---|
-| Progres belajar (XP, level, riwayat) | `localStorage` per modul; `apps/spt` sinkron ke Firebase `users/{uid}`; Accounting/Excel/SQL & Power Query ke `portalSync/{uid}` | Data orang lain terbaca/tertimpa; database dipenuhi data sampah sampai kuota habis | Firebase Security Rules (`database.rules.json`) |
-| Ruang Kuis Langsung (`liveRooms/<KODE>`: soal, jawaban, skor siswa) | Firebase RTDB, login anonim; kode ruang 6 karakter acak sebagai rahasia ruang | Siswa membaca kunci jawaban, menulis skor sendiri, memalsukan waktu jawab, menimpa ruang guru lain, membaca semua ruang | Rules: `key/` hanya guru, jawaban tulis-sekali dengan waktu server, skor hanya ditulis guru; diuji di `scripts/check-firebase-rules.mjs` bagian D |
-| Email & nama tampilan peserta | Firebase Auth + `users/{uid}` | Kebocoran data pribadi | Rules: hanya pemilik uid yang bisa membaca |
+| Progres belajar (XP, level, riwayat) | `localStorage` per modul; SPT memakai `users/{uid}`; Accounting/Excel/SQL & Power Query memakai `portalSync/{uid}` | Data pengguna lain terbaca/tertimpa; penyalahgunaan kuota | Firebase Security Rules (`database.rules.json`) |
+| Ruang Kuis Langsung (`liveRooms/<KODE>`) | Firebase RTDB, login anonim; kode ruang 6 karakter | Siswa membaca kunci, mengirim jawaban lebih dari sekali/terlambat, menulis skor, atau mengambil alih ruang | Rules membatasi kunci ke guru, jawaban satu kali dalam jendela waktu, dan penulisan skor ke host; diuji di `scripts/check-firebase-rules.mjs` |
+| Email akun | Firebase Auth + `users/{uid}` | Kebocoran data pribadi | Rules membatasi `users/{uid}` ke pemilik uid; nama panggilan Kuis Langsung terlihat bagi peserta terautentikasi di ruang itu |
+| Rekap peserta untuk pengajar | File JSON pilihan peserta, diproses di browser | File berbahaya atau klaim hasil yang dimanipulasi | Validasi format, batas ukuran, rendering teks aman, ekspor CSV yang dinetralkan |
 | Kode aplikasi | GitHub Pages | Library pihak ketiga disusupi; XSS dari input pengguna | Library divendor lokal; input Power Query/SQL tidak dieksekusi sebagai JS (lihat di bawah) |
 | Kuota/biaya Firebase | Proyek Firebase | Tagihan tak terduga | Tetap di paket **Spark** (tidak bisa menagih) |
 
@@ -35,8 +36,15 @@ File ini adalah sumber kebenaran rules untuk Realtime Database. Yang ditegakkan:
 3. **Skema divalidasi** — hanya field yang memang ditulis `apps/spt`
    (`xp`, `level`, `updatedAt`, `email`, `displayName`, `history`) yang diterima;
    field lain ditolak (`$other: false`). Tipe dan batas nilai ditentukan (mis.
-   `xp` 0–10.000.000, `email` ≤ 254 karakter, `history` maksimal 10.000 entri
-   ber-indeks) agar satu akun tidak bisa memenuhi kuota 1 GB paket Spark.
+   `xp` 0–10.000.000, `email` ≤ 254 karakter, dan indeks `history` dibatasi
+   sampai 10.000 entri) agar ukuran data pengguna tetap terkendali.
+4. **Sinkron lintas modul dibatasi** — `portalSync` hanya menerima unit
+   `accounting`, `excel`, dan `sqlpq`, serta key data yang diizinkan untuk tiap unit.
+   Setiap string data dibatasi 2.000.000 karakter.
+5. **Kuis Langsung dibatasi** — kunci hanya dapat dibaca host; peserta hanya dapat
+   membaca jawaban miliknya dan hanya dapat mengirim satu kali selama soal aktif.
+   Waktu mulai dan batas akhir soal memakai waktu server; skor hanya dapat ditulis
+   pemilik ruang.
 
 `firebase.json` menunjuk ke file ini supaya bisa di-deploy dengan Firebase CLI.
 
@@ -53,18 +61,17 @@ Rules baru berlaku setelah di-deploy. Pilih salah satu (keduanya gratis di Spark
 Setelah deploy, uji di **Rules Playground** (tab *Rules* → *Rules Playground*):
  simulasikan *read* ke `/users/uid-orang-lain` dengan auth uid berbeda → harus
 **ditolak**; *write* ke `/users/uid-sendiri` dengan data normal → harus **diizinkan**.
+ Uji juga batas akses `/portalSync` dan `liveRooms` sebelum mengaktifkan fitur terkait.
 
 ### Pemeriksaan otomatis di CI
 
 `node scripts/check-firebase-rules.mjs` (job `lint` di CI) memeriksa:
 
-- tidak ada `.read`/`.write` publik di mana pun, dan data pengguna terkunci ke uid;
-- **setiap field yang ditulis `apps/spt/js/app-main.js` punya aturan** — jadi kalau
-  kamu menambah field baru ke `appState.user`, CI gagal sampai
-  `database.rules.json` diperbarui (kalau tidak, sinkron cloud akan ditolak diam-diam
-  di produksi, dan progres hanya tersimpan lokal);
-- rules dijalankan terhadap payload nyata: pemilik diterima; orang lain, tanpa
-  login, field asing, nilai di luar batas, dan indeks riwayat di luar batas ditolak.
+- tidak ada `.read`/`.write` publik di mana pun; akses pengguna harus dibatasi ke uid;
+- field progres SPT dan allowlist sinkronisasi lintas modul diperiksa terhadap kode;
+- rules diuji untuk data pengguna, sinkronisasi, dan kuis langsung: identitas lain,
+  akses tanpa login, field asing, nilai di luar batas, pembacaan kunci, jawaban ganda,
+  pengiriman terlambat, dan penulisan skor oleh non-host harus ditolak.
 
 Pemeriksa ini **simulasi pendekatan** (mengevaluasi ekspresi rules sebagai
 JavaScript), bukan Firebase Emulator. Ia menangkap kesalahan logika dan regresi,
@@ -84,8 +91,8 @@ Hal-hal ini tidak terlihat dari repo — periksa dan centang sendiri:
       `".read": true` atau `".write": true` yang kedaluwarsa).
 - [ ] **Authentication → Settings → Authorized domains**: hanya domain resmi
       (domain GitHub Pages / domain sendiri dan `localhost` bila perlu).
-- [ ] **Authentication → Sign-in method**: hanya provider yang dipakai aplikasi —
-      *Email link (passwordless)* dan *Anonymous* (dipakai `apps/spt`); matikan yang lain.
+- [ ] **Authentication → Sign-in method**: aktifkan *Email link (passwordless)*
+      untuk Portal dan *Anonymous* untuk Kuis Langsung; matikan provider yang tidak dipakai.
 - [ ] **Paket Spark, jangan upgrade ke Blaze.** Spark tidak bisa menagih: kuota habis
       berarti baca/tulis diblokir, bukan ditagih. Ini yang menjaga poin 13
       FREE-FIRST POLICY.
@@ -112,6 +119,8 @@ Hal-hal ini tidak terlihat dari repo — periksa dan centang sendiri:
   Perlindungan dibatasi pada meta tag dan praktik kode di bawah.
 - Tidak ada sistem yang dapat dijamin "tidak bisa dibobol". Dokumen ini mengurangi
   risiko yang realistis untuk aplikasi pelatihan, bukan menjanjikan keamanan mutlak.
+- **Kuis Langsung bukan sistem penilaian berisiko tinggi.** Skor dihitung di browser
+  host dan dapat dimanipulasi oleh host; kode ruang bukan mekanisme autentikasi peserta.
 
 ## Praktik kode yang sudah diterapkan
 
@@ -127,6 +136,8 @@ Hal-hal ini tidak terlihat dari repo — periksa dan centang sendiri:
   tidak berubah diam-diam di sisi CDN. Sisa pengecualian dicatat di `ARCHITECTURE.md`.
 - **Service worker** hanya meng-cache request GET same-origin dan tidak menyentuh
   host Firebase maupun font.
+- **Ruang Pengajar** memproses file JSON di browser tanpa mengunggah atau menyimpan
+  rekap. Isi berkas tetap input tak tepercaya dan dapat dimanipulasi peserta.
 
 ## Impor progres di portal (berkas = input tak tepercaya)
 
